@@ -14,9 +14,14 @@ import javax.lang.model.element.Modifier;
 /**
  * Created by florentchampigny on 08/01/2016.
  */
-public class DaoGenerator {
+public class ModelDaoGenerator {
 
     static final String DAO_PACKAGE = "com.github.florent37.dao";
+
+    public static final String DAO_SUFFIX = "DAO";
+    public static final String CURSOR_HELPER_SUFFIX = "CursorHelper";
+    public static final String QUERY_BUILDER_SUFFIX = "DAOQueryBuilder";
+
     String modelName;
     TypeName modelClassName;
 
@@ -32,18 +37,22 @@ public class DaoGenerator {
     TypeSpec queryBuilder;
     TypeSpec dao;
 
-    public DaoGenerator(String modelName, ClassName modelClassName, TypeName modelCursorHelperClassName) {
+    TypeName globalDAOClassName;
+
+    public ModelDaoGenerator(String modelName, ClassName modelClassName, TypeName modelCursorHelperClassName, TypeName queryBuilderClassName, TypeName globalDAOClassName) {
         this.modelName = modelName;
         this.modelClassName = modelClassName;
         this.modelCursorHelperClassName = modelCursorHelperClassName;
 
+        this.globalDAOClassName = globalDAOClassName;
+
         this.TABLE_NAME = modelName.toUpperCase();
 
-        this.daoName = modelName + "DAO";
-        this.queryBuilderName = modelName + "DAOQueryBuilder";
+        this.daoName = modelName + DAO_SUFFIX;
+        this.queryBuilderName = modelName + QUERY_BUILDER_SUFFIX;
 
         this.thisDAOClassName = ClassName.get(DAO_PACKAGE, daoName);
-        this.queryBuilderClassName = ClassName.get(DAO_PACKAGE, queryBuilderName);
+        this.queryBuilderClassName = queryBuilderClassName;
 
     }
 
@@ -144,10 +153,10 @@ public class DaoGenerator {
                 .addMethod(MethodSpec.methodBuilder("execute")
                         .returns(listObjectsClassName)
                         .addModifiers(Modifier.PRIVATE)
-                        .addStatement("$T cursor = DAO.getInstance().open().getDatabase().rawQuery($S + constructQuery(), constructArgs())", cursorClassName, "select * from " + TABLE_NAME + " ")
+                        .addStatement("$T cursor = $T.getInstance().open().getDatabase().rawQuery($S + constructQuery(), constructArgs())", cursorClassName, globalDAOClassName, "select * from " + TABLE_NAME + " ")
                         .addStatement("$T objects = $T.get(cursor)", listObjectsClassName, modelCursorHelperClassName)
                         .addStatement("cursor.close()")
-                        .addStatement("DAO.getInstance().close()")
+                        .addStatement("$T.getInstance().close()",globalDAOClassName)
                         .addStatement("return objects")
                         .build())
 
@@ -181,8 +190,8 @@ public class DaoGenerator {
                         .returns(TypeName.LONG)
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("$T values = $T.getValues(object)", contentValuesClassName, modelCursorHelperClassName)
-                        .addStatement("long insertId = DAO.getInstance().open().getDatabase().insert($S, null, values)", "USER")
-                        .addStatement("DAO.getInstance().close()")
+                        .addStatement("long insertId = $T.getInstance().open().getDatabase().insert($S, null, values)", globalDAOClassName, TABLE_NAME)
+                        .addStatement("$T.getInstance().close()",globalDAOClassName)
                         .addStatement("return insertId")
                         .build())
 
@@ -190,8 +199,8 @@ public class DaoGenerator {
                         .addParameter(modelClassName, "object")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(thisDAOClassName)
-                        .addStatement("DAO.getInstance().open().getDatabase().delete($S, $S, null)", "USER", "_id = id")
-                        .addStatement("DAO.getInstance().close()")
+                        .addStatement("$T.getInstance().open().getDatabase().delete($S, $S, null)", globalDAOClassName, TABLE_NAME, "_id = id")
+                        .addStatement("$T.getInstance().close()", globalDAOClassName)
                         .addStatement("return this")
                         .build())
 

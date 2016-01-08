@@ -1,5 +1,6 @@
 package com.github.florent37.dao;
 
+import com.github.florent37.dao.annotations.Model;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -22,6 +23,7 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
@@ -31,10 +33,16 @@ import javax.lang.model.element.TypeElement;
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes("com.github.florent37.dao.annotations.Model")
 @AutoService(Processor.class)
-public class DAOProcessor extends AbstractProcessor {
+public class FreezerProcessor extends AbstractProcessor {
 
     static final String DAO_PACKAGE = "com.github.florent37.dao";
     Filer filer;
+
+    ClassName daoClassName = ClassName.get(DAO_PACKAGE, "DAO");
+    ClassName dbHelperClassName = ClassName.get(DAO_PACKAGE, "DatabaseHelper");
+
+    List<Element> models = new ArrayList<>();
+    List<ClassName> daosList = new ArrayList<>();
 
     @Override public synchronized void init(ProcessingEnvironment env) {
         super.init(env);
@@ -43,34 +51,53 @@ public class DAOProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        for (Element element : roundEnv.getElementsAnnotatedWith(Model.class)) {
+            models.add(element);
+            generateCursorHelperFiles(element);
+            generateModelDaoFiles(element);
+        }
         writeJavaFiles();
         return true;
     }
 
-    protected void writeJavaFiles() {
-        String MODEL_PACKAGE = "com.github.florent37.dao.model";
-        String OBJECT_NAME = "User";
+    private String getObjectName(Element element){
+        return ((TypeElement)element).getSimpleName().toString();
+    }
 
-        ClassName modelType = ClassName.get(MODEL_PACKAGE, OBJECT_NAME);
-        ClassName daoClassType = ClassName.get(DAO_PACKAGE, OBJECT_NAME+"DAO");
-        ClassName cursorHelperClassType = ClassName.get(MODEL_PACKAGE,OBJECT_NAME+"CursorHelper");
+    private String getObjectPackage(Element element){
+        return ((TypeElement)element).getEnclosingElement().toString();
+    }
 
+    protected void generateCursorHelperFiles(Element element) {
+        String OBJECT_NAME = getObjectName(element);
+        String MODEL_PACKAGE = getObjectPackage(element);
 
-        TypeSpec dbHelper = generateDatabaseHelper("user.db", 1, Arrays.asList(
-                daoClassType
-        ));
-        writeFile(JavaFile.builder(DAO_PACKAGE, dbHelper).build());
-
-        TypeSpec cursorHelper = generateCursorHelper(MODEL_PACKAGE, OBJECT_NAME, modelType);
+        TypeSpec cursorHelper = generateCursorHelper(MODEL_PACKAGE, OBJECT_NAME, TypeName.get(element.asType()));
         writeFile(JavaFile.builder(MODEL_PACKAGE, cursorHelper).build());
+    }
+
+    protected void generateModelDaoFiles(Element element) {
+        String OBJECT_NAME = getObjectName(element);
+        String MODEL_PACKAGE = getObjectPackage(element);
+
+        ClassName cursorHelperClassType = ClassName.get(MODEL_PACKAGE, OBJECT_NAME + ModelDaoGenerator.CURSOR_HELPER_SUFFIX);
+        ClassName queryBuilderClassType = ClassName.get(MODEL_PACKAGE, OBJECT_NAME + ModelDaoGenerator.QUERY_BUILDER_SUFFIX);
+        ClassName modelType = ClassName.get(MODEL_PACKAGE, OBJECT_NAME);
+
+        ModelDaoGenerator modelDaoGenerator = new ModelDaoGenerator(OBJECT_NAME, modelType, cursorHelperClassType, queryBuilderClassType, daoClassName);
+        modelDaoGenerator.generate();
+        writeFile(JavaFile.builder(DAO_PACKAGE, modelDaoGenerator.getDao()).build());
+        writeFile(JavaFile.builder(MODEL_PACKAGE, modelDaoGenerator.getQueryBuilder()).build());
+
+        daosList.add(ClassName.get(DAO_PACKAGE, OBJECT_NAME + ModelDaoGenerator.DAO_SUFFIX));
+    }
+
+    protected void writeJavaFiles() {
+        TypeSpec dbHelper = generateDatabaseHelper("database.db", 1, daosList);
+        writeFile(JavaFile.builder(DAO_PACKAGE, dbHelper).build());
 
         TypeSpec dao = generateDAO();
         writeFile(JavaFile.builder(DAO_PACKAGE, dao).build());
-
-        DaoGenerator daoGenerator = new DaoGenerator(OBJECT_NAME, modelType, cursorHelperClassType);
-        daoGenerator.generate();
-        writeFile(JavaFile.builder(DAO_PACKAGE, daoGenerator.getDao()).build());
-        writeFile(JavaFile.builder(DAO_PACKAGE, daoGenerator.getQueryBuilder()).build());
     }
 
     protected TypeSpec generateDatabaseHelper(String fileName, int version, List<ClassName> daos) {
@@ -113,10 +140,8 @@ public class DAOProcessor extends AbstractProcessor {
 
     protected TypeSpec generateDAO() {
 
-        ClassName daoClassName = ClassName.get(DAO_PACKAGE, "DAO");
         ClassName applicationClassName = ClassName.get("android.app", "Application");
         ClassName databaseClassName = ClassName.get("android.database.sqlite", "SQLiteDatabase");
-        ClassName dbHelperClassName = ClassName.get(DAO_PACKAGE, "DatabaseHelper");
 
         return TypeSpec.classBuilder("DAO")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
