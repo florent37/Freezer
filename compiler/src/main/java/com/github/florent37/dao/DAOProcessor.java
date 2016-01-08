@@ -48,19 +48,32 @@ public class DAOProcessor extends AbstractProcessor {
     }
 
     protected void writeJavaFiles() {
-        String PACKAGE = "com.github.florent37.dao.model";
+        String MODEL_PACKAGE = "com.github.florent37.dao.model";
         String OBJECT_NAME = "User";
-        TypeName modelType = ClassName.get(PACKAGE, OBJECT_NAME);
 
-        writeDatabaseHelper("user.db", 1, Arrays.asList(
-                ClassName.get("com.github.florent37.dao.dao", "UserDAO")
+        ClassName modelType = ClassName.get(MODEL_PACKAGE, OBJECT_NAME);
+        ClassName daoClassType = ClassName.get(DAO_PACKAGE, OBJECT_NAME+"DAO");
+        ClassName cursorHelperClassType = ClassName.get(MODEL_PACKAGE,OBJECT_NAME+"CursorHelper");
+
+
+        TypeSpec dbHelper = generateDatabaseHelper("user.db", 1, Arrays.asList(
+                daoClassType
         ));
-        writeCursorHelper(PACKAGE, OBJECT_NAME, modelType);
+        writeFile(JavaFile.builder(DAO_PACKAGE, dbHelper).build());
 
-        writeDAO();
+        TypeSpec cursorHelper = generateCursorHelper(MODEL_PACKAGE, OBJECT_NAME, modelType);
+        writeFile(JavaFile.builder(MODEL_PACKAGE, cursorHelper).build());
+
+        TypeSpec dao = generateDAO();
+        writeFile(JavaFile.builder(DAO_PACKAGE, dao).build());
+
+        DaoGenerator daoGenerator = new DaoGenerator(OBJECT_NAME, modelType, cursorHelperClassType);
+        daoGenerator.generate();
+        writeFile(JavaFile.builder(DAO_PACKAGE, daoGenerator.getDao()).build());
+        writeFile(JavaFile.builder(DAO_PACKAGE, daoGenerator.getQueryBuilder()).build());
     }
 
-    protected void writeDatabaseHelper(String fileName, int version, List<ClassName> daos) {
+    protected TypeSpec generateDatabaseHelper(String fileName, int version, List<ClassName> daos) {
 
         ClassName sqliteOpenHelperClassName = ClassName.get("android.database.sqlite", "SQLiteOpenHelper");
         ClassName contextClassName = ClassName.get("android.content", "Context");
@@ -83,7 +96,7 @@ public class DAOProcessor extends AbstractProcessor {
 
         onUpgrade.addStatement("onCreate(database)");
 
-        TypeSpec databaseHelper = TypeSpec.classBuilder("DatabaseHelper")
+        return TypeSpec.classBuilder("DatabaseHelper")
                 .superclass(sqliteOpenHelperClassName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
 
@@ -96,21 +109,16 @@ public class DAOProcessor extends AbstractProcessor {
                 .addMethod(onCreate.build())
                 .addMethod(onUpgrade.build())
                 .build();
-
-        JavaFile javaFile = JavaFile.builder(DAO_PACKAGE, databaseHelper)
-                .build();
-
-        writeFile(javaFile);
     }
 
-    protected void writeDAO() {
+    protected TypeSpec generateDAO() {
 
         ClassName daoClassName = ClassName.get(DAO_PACKAGE, "DAO");
         ClassName applicationClassName = ClassName.get("android.app", "Application");
         ClassName databaseClassName = ClassName.get("android.database.sqlite", "SQLiteDatabase");
         ClassName dbHelperClassName = ClassName.get(DAO_PACKAGE, "DatabaseHelper");
 
-        TypeSpec dao = TypeSpec.classBuilder("DAO")
+        return TypeSpec.classBuilder("DAO")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addField(daoClassName, "INSTANCE", Modifier.PRIVATE, Modifier.STATIC)
                 .addField(databaseClassName, "database", Modifier.PRIVATE)
@@ -157,14 +165,9 @@ public class DAOProcessor extends AbstractProcessor {
                         .build())
 
                 .build();
-
-        JavaFile javaFile = JavaFile.builder(DAO_PACKAGE, dao)
-                .build();
-
-        writeFile(javaFile);
     }
 
-    protected void writeCursorHelper(String PACKAGE, String OBJECT_NAME, TypeName modelType) {
+    protected TypeSpec generateCursorHelper(String PACKAGE, String OBJECT_NAME, TypeName modelType) {
         ClassName cursorClassName = ClassName.get("android.database", "Cursor");
         ClassName contentValuesClassName = ClassName.get("android.content", "ContentValues");
         ParameterizedTypeName modelListClassName = ParameterizedTypeName.get(ClassName.get(List.class), modelType);
@@ -211,16 +214,13 @@ public class DAOProcessor extends AbstractProcessor {
                 .addStatement("return objects")
                 .build();
 
-        TypeSpec cursorHelper = TypeSpec.classBuilder(OBJECT_NAME + "CursorHelper")
+        return TypeSpec.classBuilder(OBJECT_NAME + "CursorHelper")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addMethod(fromCursor)
                 .addMethod(getValues)
                 .addMethod(get)
                 .build();
 
-        JavaFile javaFile = JavaFile.builder(PACKAGE, cursorHelper)
-                .build();
-        writeFile(javaFile);
     }
 
     protected void writeFile(JavaFile javaFile) {
