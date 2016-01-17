@@ -33,3 +33,12 @@ List<User> users = userDAO.selectWhere()
                 .nameEquals("kévin")
                 .asList();
 ```
+
+#Accepted types
+
+int
+float
+boolean
+String
+
+
