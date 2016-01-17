@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.VariableElement;
 
 /**
  * Created by florentchampigny on 08/01/2016.
@@ -39,7 +40,9 @@ public class ModelDaoGenerator {
 
     TypeName globalDAOClassName;
 
-    public ModelDaoGenerator(String modelName, ClassName modelClassName, TypeName modelCursorHelperClassName, TypeName queryBuilderClassName, TypeName globalDAOClassName) {
+    List<VariableElement> fields;
+
+    public ModelDaoGenerator(String modelName, ClassName modelClassName, TypeName modelCursorHelperClassName, TypeName queryBuilderClassName, TypeName globalDAOClassName, List<VariableElement> fields) {
         this.modelName = modelName;
         this.modelClassName = modelClassName;
         this.modelCursorHelperClassName = modelCursorHelperClassName;
@@ -54,6 +57,7 @@ public class ModelDaoGenerator {
         this.thisDAOClassName = ClassName.get(DAO_PACKAGE, daoName);
         this.queryBuilderClassName = queryBuilderClassName;
 
+        this.fields = fields;
     }
 
     public TypeSpec getDao() {
@@ -87,27 +91,7 @@ public class ModelDaoGenerator {
                         .addStatement("this.args = new $T()", arrayListStringClassName)
                         .build())
 
-                        //region for fields
-                .addMethod(MethodSpec.methodBuilder("ageEquals")
-                        .returns(queryBuilderClassName)
-                        .addModifiers(Modifier.PUBLIC)
-
-                        .addParameter(TypeName.INT, "age")
-                        .addStatement("queryBuilder.append(\"$L = ?\")", "age")
-                        .addStatement("args.add(String.valueOf($L))\n", "age")
-                        .addStatement("return this")
-                        .build())
-
-                .addMethod(MethodSpec.methodBuilder("nameEquals")
-                        .returns(queryBuilderClassName)
-                        .addModifiers(Modifier.PUBLIC)
-
-                        .addParameter(ClassName.get(String.class), "name")
-                        .addStatement("queryBuilder.append(\"$L = ?\")", "name")
-                        .addStatement("args.add($L)", "name")
-                        .addStatement("return this")
-                        .build())
-                        //endregion
+                .addMethods(generateQueryMethods())
 
                 .addMethod(MethodSpec.methodBuilder("or")
                         .returns(queryBuilderClassName)
@@ -170,7 +154,7 @@ public class ModelDaoGenerator {
                 .addMethod(MethodSpec.methodBuilder("create")
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .returns(ClassName.get(String.class))
-                        .addStatement("return $S", "create table " + TABLE_NAME + " ( _id integer primary key autoincrement, age integer, name text not null );")
+                        .addStatement("return $S", "create table " + TABLE_NAME + " ( _id integer primary key autoincrement, "+generateTableCreate()+" );")
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("update")
@@ -191,7 +175,7 @@ public class ModelDaoGenerator {
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("$T values = $T.getValues(object)", contentValuesClassName, modelCursorHelperClassName)
                         .addStatement("long insertId = $T.getInstance().open().getDatabase().insert($S, null, values)", globalDAOClassName, TABLE_NAME)
-                        .addStatement("$T.getInstance().close()",globalDAOClassName)
+                        .addStatement("$T.getInstance().close()", globalDAOClassName)
                         .addStatement("return insertId")
                         .build())
 
@@ -205,5 +189,37 @@ public class ModelDaoGenerator {
                         .build())
 
                 .build();
+    }
+
+    protected List<MethodSpec> generateQueryMethods(){
+        List<MethodSpec> methodSpecs = new ArrayList<>();
+
+        for(VariableElement variableElement : fields){
+            methodSpecs.add(MethodSpec.methodBuilder(variableElement.getSimpleName()+"Equals")
+                    .returns(queryBuilderClassName)
+                    .addModifiers(Modifier.PUBLIC)
+
+                    .addParameter(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString())
+                    .addStatement("queryBuilder.append(\"$L = ?\")", variableElement.getSimpleName())
+                    .addStatement("args.add(String.valueOf($L))\n", variableElement.getSimpleName())
+                    .addStatement("return this")
+                    .build());
+        }
+
+        return methodSpecs;
+    }
+
+    protected String generateTableCreate() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i=0;i<fields.size();++i){
+            VariableElement variableElement = fields.get(i);
+            stringBuilder
+                    .append(variableElement.getSimpleName())
+                    .append(" ")
+                    .append(FreezerUtils.getFieldTableType(variableElement));
+            if(i<fields.size()-1)
+                stringBuilder.append(",");
+        }
+        return stringBuilder.toString();
     }
 }

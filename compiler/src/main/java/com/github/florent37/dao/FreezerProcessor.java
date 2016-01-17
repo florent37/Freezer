@@ -26,6 +26,9 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.ElementFilter;
 
 /**
  * Created by florentchampigny on 07/01/2016.
@@ -44,7 +47,8 @@ public class FreezerProcessor extends AbstractProcessor {
     List<Element> models = new ArrayList<>();
     List<ClassName> daosList = new ArrayList<>();
 
-    @Override public synchronized void init(ProcessingEnvironment env) {
+    @Override
+    public synchronized void init(ProcessingEnvironment env) {
         super.init(env);
         filer = env.getFiler();
     }
@@ -60,19 +64,19 @@ public class FreezerProcessor extends AbstractProcessor {
         return true;
     }
 
-    private String getObjectName(Element element){
-        return ((TypeElement)element).getSimpleName().toString();
+    private String getObjectName(Element element) {
+        return ((TypeElement) element).getSimpleName().toString();
     }
 
-    private String getObjectPackage(Element element){
-        return ((TypeElement)element).getEnclosingElement().toString();
+    private String getObjectPackage(Element element) {
+        return ((TypeElement) element).getEnclosingElement().toString();
     }
 
     protected void generateCursorHelperFiles(Element element) {
         String OBJECT_NAME = getObjectName(element);
         String MODEL_PACKAGE = getObjectPackage(element);
 
-        TypeSpec cursorHelper = generateCursorHelper(MODEL_PACKAGE, OBJECT_NAME, TypeName.get(element.asType()));
+        TypeSpec cursorHelper = generateCursorHelper(MODEL_PACKAGE, OBJECT_NAME, TypeName.get(element.asType()), FreezerUtils.getFields(element));
         writeFile(JavaFile.builder(MODEL_PACKAGE, cursorHelper).build());
     }
 
@@ -84,7 +88,7 @@ public class FreezerProcessor extends AbstractProcessor {
         ClassName queryBuilderClassType = ClassName.get(MODEL_PACKAGE, OBJECT_NAME + ModelDaoGenerator.QUERY_BUILDER_SUFFIX);
         ClassName modelType = ClassName.get(MODEL_PACKAGE, OBJECT_NAME);
 
-        ModelDaoGenerator modelDaoGenerator = new ModelDaoGenerator(OBJECT_NAME, modelType, cursorHelperClassType, queryBuilderClassType, daoClassName);
+        ModelDaoGenerator modelDaoGenerator = new ModelDaoGenerator(OBJECT_NAME, modelType, cursorHelperClassType, queryBuilderClassType, daoClassName, FreezerUtils.getFields(element));
         modelDaoGenerator.generate();
         writeFile(JavaFile.builder(DAO_PACKAGE, modelDaoGenerator.getDao()).build());
         writeFile(JavaFile.builder(MODEL_PACKAGE, modelDaoGenerator.getQueryBuilder()).build());
@@ -192,38 +196,39 @@ public class FreezerProcessor extends AbstractProcessor {
                 .build();
     }
 
-    protected TypeSpec generateCursorHelper(String PACKAGE, String OBJECT_NAME, TypeName modelType) {
+    protected TypeSpec generateCursorHelper(String PACKAGE, String OBJECT_NAME, TypeName modelType, List<VariableElement> fields) {
         ClassName cursorClassName = ClassName.get("android.database", "Cursor");
         ClassName contentValuesClassName = ClassName.get("android.content", "ContentValues");
         ParameterizedTypeName modelListClassName = ParameterizedTypeName.get(ClassName.get(List.class), modelType);
         ParameterizedTypeName modelArrayListClassName = ParameterizedTypeName.get(ClassName.get(ArrayList.class), modelType);
 
-        MethodSpec fromCursor = MethodSpec.methodBuilder("fromCursor")
+        MethodSpec.Builder fromCursorB = MethodSpec.methodBuilder("fromCursor")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(modelType)
                 .addParameter(cursorClassName, "cursor")
                 .addStatement("$T object = new $T()", modelType, modelType)
-                .addStatement("//_id")
+                .addStatement("//_id");
 
-                        //for
-                .addStatement("object.$L = cursor.get$L($L)", "age", "Int", 1)
-                .addStatement("object.$L = cursor.get$L($L)", "name", "String", 2)
+        //for
+        for (int i = 0; i < fields.size(); ++i) {
+            VariableElement variableElement = fields.get(i);
+            fromCursorB.addStatement("object.$L = cursor.get$L($L)", variableElement.getSimpleName(), FreezerUtils.getFieldType(variableElement), i + 1);
+        }
 
-                .addStatement("return object")
-                .build();
+        fromCursorB.addStatement("return object");
 
-        MethodSpec getValues = MethodSpec.methodBuilder("getValues")
+        MethodSpec.Builder getValuesB = MethodSpec.methodBuilder("getValues")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(contentValuesClassName)
                 .addParameter(modelType, "object")
-                .addStatement("$T values = new $T()", contentValuesClassName, contentValuesClassName)
+                .addStatement("$T values = new $T()", contentValuesClassName, contentValuesClassName);
 
-                        //for
-                .addStatement("values.put($S,object.$L)", "age", "age")
-                .addStatement("values.put($S,object.$L)", "name", "name")
+        for (int i = 0; i < fields.size(); ++i) {
+            VariableElement variableElement = fields.get(i);
+            getValuesB.addStatement("values.put($S,object.$L)", variableElement.getSimpleName(), variableElement.getSimpleName());
+        }
 
-                .addStatement("return values")
-                .build();
+        getValuesB.addStatement("return values");
 
         MethodSpec get = MethodSpec.methodBuilder("get")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -241,19 +246,19 @@ public class FreezerProcessor extends AbstractProcessor {
 
         return TypeSpec.classBuilder(OBJECT_NAME + "CursorHelper")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addMethod(fromCursor)
-                .addMethod(getValues)
+                .addMethod(fromCursorB.build())
+                .addMethod(getValuesB.build())
                 .addMethod(get)
                 .build();
 
     }
 
     protected void writeFile(JavaFile javaFile) {
-        //try {
-        //    javaFile.writeTo(System.out);
-        //} catch (IOException e) {
-        //    e.printStackTrace();
-        //}
+        try {
+            javaFile.writeTo(System.out);
+        } catch (IOException e) {
+            //e.printStackTrace();
+        }
 
         try {
             javaFile.writeTo(filer);
