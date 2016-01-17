@@ -10,6 +10,7 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,25 +65,19 @@ public class FreezerProcessor extends AbstractProcessor {
         return true;
     }
 
-    private String getObjectName(Element element) {
-        return ((TypeElement) element).getSimpleName().toString();
-    }
 
-    private String getObjectPackage(Element element) {
-        return ((TypeElement) element).getEnclosingElement().toString();
-    }
 
     protected void generateCursorHelperFiles(Element element) {
-        String OBJECT_NAME = getObjectName(element);
-        String MODEL_PACKAGE = getObjectPackage(element);
+        String OBJECT_NAME = FreezerUtils.getObjectName(element);
+        String MODEL_PACKAGE = FreezerUtils.getObjectPackage(element);
 
         TypeSpec cursorHelper = generateCursorHelper(MODEL_PACKAGE, OBJECT_NAME, TypeName.get(element.asType()), FreezerUtils.getFields(element));
         writeFile(JavaFile.builder(MODEL_PACKAGE, cursorHelper).build());
     }
 
     protected void generateModelDaoFiles(Element element) {
-        String OBJECT_NAME = getObjectName(element);
-        String MODEL_PACKAGE = getObjectPackage(element);
+        String OBJECT_NAME = FreezerUtils.getObjectName(element);
+        String MODEL_PACKAGE = FreezerUtils.getObjectPackage(element);
 
         ClassName cursorHelperClassType = ClassName.get(MODEL_PACKAGE, OBJECT_NAME + ModelDaoGenerator.CURSOR_HELPER_SUFFIX);
         ClassName queryBuilderClassType = ClassName.get(MODEL_PACKAGE, OBJECT_NAME + ModelDaoGenerator.QUERY_BUILDER_SUFFIX);
@@ -212,7 +207,10 @@ public class FreezerProcessor extends AbstractProcessor {
         //for
         for (int i = 0; i < fields.size(); ++i) {
             VariableElement variableElement = fields.get(i);
-            fromCursorB.addStatement("object.$L = cursor.get$L($L)", variableElement.getSimpleName(), FreezerUtils.getFieldType(variableElement), i + 1);
+            String cursor = "cursor.get$L($L)";
+            cursor = String.format(FreezerUtils.getFieldCast(variableElement),cursor);
+
+            fromCursorB.addStatement("object.$L = " +cursor, variableElement.getSimpleName(), FreezerUtils.getFieldType(variableElement), i + 1);
         }
 
         fromCursorB.addStatement("return object");
@@ -223,6 +221,7 @@ public class FreezerProcessor extends AbstractProcessor {
                 .addParameter(modelType, "object")
                 .addStatement("$T values = new $T()", contentValuesClassName, contentValuesClassName);
 
+        //for
         for (int i = 0; i < fields.size(); ++i) {
             VariableElement variableElement = fields.get(i);
             getValuesB.addStatement("values.put($S,object.$L)", variableElement.getSimpleName(), variableElement.getSimpleName());

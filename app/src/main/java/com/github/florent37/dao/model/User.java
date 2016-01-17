@@ -16,6 +16,8 @@ public class User {
 
     int age;
     String name;
+    boolean ok;
+    float note;
 
     public User() {
     }
