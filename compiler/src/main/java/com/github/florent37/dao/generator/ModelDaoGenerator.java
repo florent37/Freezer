@@ -1,5 +1,7 @@
-package com.github.florent37.dao;
+package com.github.florent37.dao.generator;
 
+import com.github.florent37.dao.Constants;
+import com.github.florent37.dao.FreezerUtils;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -9,6 +11,7 @@ import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 
@@ -17,20 +20,12 @@ import javax.lang.model.element.VariableElement;
  */
 public class ModelDaoGenerator {
 
-    static final String DAO_PACKAGE = "com.github.florent37.dao";
-
-    public static final String DAO_SUFFIX = "DAO";
-    public static final String CURSOR_HELPER_SUFFIX = "CursorHelper";
-    public static final String QUERY_BUILDER_SUFFIX = "DAOQueryBuilder";
-
     String modelName;
+    String modelPackage;
     TypeName modelClassName;
 
     TypeName modelCursorHelperClassName;
 
-    String daoName;
-    String queryBuilderName;
-    TypeName thisDAOClassName;
     TypeName queryBuilderClassName;
 
     String TABLE_NAME;
@@ -38,26 +33,20 @@ public class ModelDaoGenerator {
     TypeSpec queryBuilder;
     TypeSpec dao;
 
-    TypeName globalDAOClassName;
-
     List<VariableElement> fields;
 
-    public ModelDaoGenerator(String modelName, ClassName modelClassName, TypeName modelCursorHelperClassName, TypeName queryBuilderClassName, TypeName globalDAOClassName, List<VariableElement> fields) {
-        this.modelName = modelName;
-        this.modelClassName = modelClassName;
-        this.modelCursorHelperClassName = modelCursorHelperClassName;
+    public ModelDaoGenerator(Element element) {
+        this.modelName = FreezerUtils.getObjectName(element);
+        this.modelPackage = FreezerUtils.getObjectPackage(element);
 
-        this.globalDAOClassName = globalDAOClassName;
+        this.modelClassName = TypeName.get(element.asType());
+        this.modelCursorHelperClassName = FreezerUtils.getCursorHelper(element);
 
         this.TABLE_NAME = modelName.toUpperCase();
 
-        this.daoName = modelName + DAO_SUFFIX;
-        this.queryBuilderName = modelName + QUERY_BUILDER_SUFFIX;
+        this.queryBuilderClassName = FreezerUtils.getQueryBuilder(element);
 
-        this.thisDAOClassName = ClassName.get(DAO_PACKAGE, daoName);
-        this.queryBuilderClassName = queryBuilderClassName;
-
-        this.fields = fields;
+        this.fields =  FreezerUtils.getFields(element);
     }
 
     public TypeSpec getDao() {
@@ -68,27 +57,20 @@ public class ModelDaoGenerator {
         return queryBuilder;
     }
 
-    public void generate() {
+    public ModelDaoGenerator generate() {
 
-        TypeName contentValuesClassName = ClassName.get("android.content", "ContentValues");
+        TypeName listObjectsClassName = FreezerUtils.listOf(modelClassName);
 
-        TypeName stringBuilderClassName = ClassName.get(StringBuilder.class);
-        TypeName listStringClassName = ParameterizedTypeName.get(List.class, String.class);
-        TypeName arrayListStringClassName = ParameterizedTypeName.get(ClassName.get(ArrayList.class), ClassName.get(String.class));
-        TypeName listObjectsClassName = ParameterizedTypeName.get(ClassName.get(List.class), modelClassName);
-
-        TypeName cursorClassName = ClassName.get("android.database", "Cursor");
-
-        this.queryBuilder = TypeSpec.classBuilder(queryBuilderName) //UserDAOQueryBuilder
+        this.queryBuilder = TypeSpec.classBuilder(FreezerUtils.getQueryBuilderName(modelName)) //UserDAOQueryBuilder
                 .addModifiers(Modifier.PUBLIC)
 
-                .addField(stringBuilderClassName, "queryBuilder")
-                .addField(listStringClassName, "args")
+                .addField(ClassName.get(StringBuilder.class), "queryBuilder")
+                .addField(FreezerUtils.listOf(String.class), "args")
 
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
-                        .addStatement("this.queryBuilder = new $T()", stringBuilderClassName)
-                        .addStatement("this.args = new $T()", arrayListStringClassName)
+                        .addStatement("this.queryBuilder = new $T()", ClassName.get(StringBuilder.class))
+                        .addStatement("this.args = new $T()", FreezerUtils.arraylistOf(String.class))
                         .build())
 
                 .addMethods(generateQueryMethods())
@@ -137,16 +119,16 @@ public class ModelDaoGenerator {
                 .addMethod(MethodSpec.methodBuilder("execute")
                         .returns(listObjectsClassName)
                         .addModifiers(Modifier.PRIVATE)
-                        .addStatement("$T cursor = $T.getInstance().open().getDatabase().rawQuery($S + constructQuery(), constructArgs())", cursorClassName, globalDAOClassName, "select * from " + TABLE_NAME + " ")
+                        .addStatement("$T cursor = $T.getInstance().open().getDatabase().rawQuery($S + constructQuery(), constructArgs())", Constants.cursorClassName, Constants.daoClassName, "select * from " + TABLE_NAME + " ")
                         .addStatement("$T objects = $T.get(cursor)", listObjectsClassName, modelCursorHelperClassName)
                         .addStatement("cursor.close()")
-                        .addStatement("$T.getInstance().close()",globalDAOClassName)
+                        .addStatement("$T.getInstance().close()",Constants.daoClassName)
                         .addStatement("return objects")
                         .build())
 
                 .build();
 
-        this.dao = TypeSpec.classBuilder(daoName) //UserDAO
+        this.dao = TypeSpec.classBuilder(FreezerUtils.getModelDaoName(modelName)) //UserDAO
                 .addModifiers(Modifier.PUBLIC)
 
                 .addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).build())
@@ -173,22 +155,23 @@ public class ModelDaoGenerator {
                         .addParameter(modelClassName, "object")
                         .returns(TypeName.LONG)
                         .addModifiers(Modifier.PUBLIC)
-                        .addStatement("$T values = $T.getValues(object)", contentValuesClassName, modelCursorHelperClassName)
-                        .addStatement("long insertId = $T.getInstance().open().getDatabase().insert($S, null, values)", globalDAOClassName, TABLE_NAME)
-                        .addStatement("$T.getInstance().close()", globalDAOClassName)
+                        .addStatement("$T values = $T.getValues(object)", Constants.contentValuesClassName, modelCursorHelperClassName)
+                        .addStatement("long insertId = $T.getInstance().open().getDatabase().insert($S, null, values)", Constants.daoClassName, TABLE_NAME)
+                        .addStatement("$T.getInstance().close()", Constants.daoClassName)
                         .addStatement("return insertId")
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("delete")
                         .addParameter(modelClassName, "object")
                         .addModifiers(Modifier.PUBLIC)
-                        .returns(thisDAOClassName)
-                        .addStatement("$T.getInstance().open().getDatabase().delete($S, $S, null)", globalDAOClassName, TABLE_NAME, "_id = id")
-                        .addStatement("$T.getInstance().close()", globalDAOClassName)
-                        .addStatement("return this")
+                        .returns(TypeName.VOID)
+                        .addStatement("$T.getInstance().open().getDatabase().delete($S, $S, null)", Constants.daoClassName, TABLE_NAME, "_id = id")
+                        .addStatement("$T.getInstance().close()", Constants.daoClassName)
                         .build())
 
                 .build();
+
+        return this;
     }
 
     protected List<MethodSpec> generateQueryMethods(){
@@ -201,7 +184,7 @@ public class ModelDaoGenerator {
 
                     .addParameter(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString())
                     .addStatement("queryBuilder.append(\"$L = ?\")", variableElement.getSimpleName())
-                    .addStatement("args.add(String.valueOf($L))\n", variableElement.getSimpleName())
+                    .addStatement("args.add("+FreezerUtils.getQueryCast(variableElement)+")\n",variableElement.getSimpleName())
                     .addStatement("return this")
                     .build());
         }
