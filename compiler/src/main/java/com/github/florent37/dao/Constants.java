@@ -26,4 +26,5 @@ public class Constants {
     public static final TypeName cursorClassName = ClassName.get("android.database", "Cursor");
     public static final TypeName contentValuesClassName = ClassName.get("android.content", "ContentValues");
 
+    public static final String FIELD_ID = "_id";
 }

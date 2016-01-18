@@ -157,6 +157,7 @@ public class ModelDaoGenerator {
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("$T values = $T.getValues(object)", Constants.contentValuesClassName, modelCursorHelperClassName)
                         .addStatement("long insertId = $T.getInstance().open().getDatabase().insert($S, null, values)", Constants.daoClassName, TABLE_NAME)
+                        .addStatement("object.$L = insertId", Constants.FIELD_ID)
                         .addStatement("$T.getInstance().close()", Constants.daoClassName)
                         .addStatement("return insertId")
                         .build())
@@ -184,7 +185,7 @@ public class ModelDaoGenerator {
 
                     .addParameter(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString())
                     .addStatement("queryBuilder.append(\"$L = ?\")", variableElement.getSimpleName())
-                    .addStatement("args.add("+FreezerUtils.getQueryCast(variableElement)+")\n",variableElement.getSimpleName())
+                    .addStatement("args.add(" + FreezerUtils.getQueryCast(variableElement) + ")", variableElement.getSimpleName())
                     .addStatement("return this")
                     .build());
         }
@@ -196,12 +197,14 @@ public class ModelDaoGenerator {
         StringBuilder stringBuilder = new StringBuilder();
         for(int i=0;i<fields.size();++i){
             VariableElement variableElement = fields.get(i);
-            stringBuilder
-                    .append(variableElement.getSimpleName())
-                    .append(" ")
-                    .append(FreezerUtils.getFieldTableType(variableElement));
-            if(i<fields.size()-1)
-                stringBuilder.append(",");
+            if(!Constants.FIELD_ID.equals(variableElement.getSimpleName().toString())) {
+                stringBuilder
+                        .append(variableElement.getSimpleName())
+                        .append(" ")
+                        .append(FreezerUtils.getFieldTableType(variableElement));
+                if (i < fields.size() - 1)
+                    stringBuilder.append(",");
+            }
         }
         return stringBuilder.toString();
     }

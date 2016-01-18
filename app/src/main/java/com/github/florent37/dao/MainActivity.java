@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.github.florent37.dao.model.User;
+import com.github.florent37.dao.model.UserDAO;
 
 public class MainActivity extends AppCompatActivity {
 

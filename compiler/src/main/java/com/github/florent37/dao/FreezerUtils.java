@@ -34,7 +34,7 @@ public class FreezerUtils {
 
     public static String getFieldCast(VariableElement variableElement) {
         TypeName typeName = TypeName.get(variableElement.asType());
-        if (typeName == TypeName.BOOLEAN || typeName == TypeName.LONG || typeName == TypeName.BYTE)
+        if (typeName == TypeName.BOOLEAN)
             return "(1 == %s)";
         return "%s";
     }
@@ -83,7 +83,7 @@ public class FreezerUtils {
     }
 
     public static ClassName getModelDao(Element element) {
-        return ClassName.get(Constants.DAO_PACKAGE, getModelDaoName(element));
+        return ClassName.get(getObjectPackage(element), getModelDaoName(element));
     }
 
     public static ParameterizedTypeName listOf(TypeName type) {
@@ -100,6 +100,18 @@ public class FreezerUtils {
 
     public static ParameterizedTypeName arraylistOf(Class classe) {
         return ParameterizedTypeName.get(ClassName.get(ArrayList.class), ClassName.get(classe));
+    }
+
+    public static boolean isPrimitive(Element element){
+        return  isPrimitive(TypeName.get(element.asType()));
+    }
+
+    public static boolean isModelId(VariableElement variableElement){
+        return Constants.FIELD_ID.equals(variableElement.getSimpleName().toString());
+    }
+
+    public static boolean isPrimitive(TypeName typeName){
+        return  typeName.isPrimitive()|| (ClassName.get(String.class).equals(typeName));
     }
 
     public static String getQueryCast(VariableElement variableElement) {

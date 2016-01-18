@@ -14,10 +14,14 @@ import java.util.List;
 @Model
 public class User {
 
+    long _id;
+
     int age;
     String name;
     boolean ok;
     float note;
+
+    Car car;
 
     public User() {
     }

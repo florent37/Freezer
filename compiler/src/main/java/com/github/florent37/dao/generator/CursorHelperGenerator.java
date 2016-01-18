@@ -2,13 +2,10 @@ package com.github.florent37.dao.generator;
 
 import com.github.florent37.dao.Constants;
 import com.github.florent37.dao.FreezerUtils;
-import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.Element;
@@ -35,16 +32,19 @@ public class CursorHelperGenerator {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(modelType)
                 .addParameter(Constants.cursorClassName, "cursor")
-                .addStatement("$T object = new $T()", modelType, modelType)
-                .addStatement("//_id");
+                .addStatement("$T object = new $T()", modelType, modelType);
 
         //for
         for (int i = 0; i < fields.size(); ++i) {
             VariableElement variableElement = fields.get(i);
-            String cursor = "cursor.get$L($L)";
-            cursor = String.format(FreezerUtils.getFieldCast(variableElement),cursor);
+            if (FreezerUtils.isPrimitive(variableElement)) {
+                String cursor = "cursor.get$L($L)";
+                cursor = String.format(FreezerUtils.getFieldCast(variableElement), cursor);
 
-            fromCursorB.addStatement("object.$L = " +cursor, variableElement.getSimpleName(), FreezerUtils.getFieldType(variableElement), i + 1);
+                fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), FreezerUtils.getFieldType(variableElement), i);
+            } else {
+                fromCursorB.addStatement("//$L", variableElement.getSimpleName());
+            }
         }
 
         fromCursorB.addStatement("return object");
@@ -58,7 +58,13 @@ public class CursorHelperGenerator {
         //for
         for (int i = 0; i < fields.size(); ++i) {
             VariableElement variableElement = fields.get(i);
-            getValuesB.addStatement("values.put($S,object.$L)", variableElement.getSimpleName(), variableElement.getSimpleName());
+            if (FreezerUtils.isPrimitive(variableElement)) {
+                String statement = "values.put($S,object.$L)";
+                if (FreezerUtils.isModelId(variableElement))
+                    statement = "if(object."+Constants.FIELD_ID+" != 0) "+statement;
+                getValuesB.addStatement(statement, variableElement.getSimpleName(), variableElement.getSimpleName());
+            } else
+                getValuesB.addStatement("//$L", variableElement.getSimpleName());
         }
 
         getValuesB.addStatement("return values");

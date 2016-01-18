@@ -65,7 +65,7 @@ public class FreezerProcessor extends AbstractProcessor {
     private void generateModelDaoFiles(Element element) {
         ModelDaoGenerator modelDaoGenerator = new ModelDaoGenerator(element).generate();
 
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, modelDaoGenerator.getDao()).build());
+        writeFile(JavaFile.builder(FreezerUtils.getObjectPackage(element), modelDaoGenerator.getDao()).build());
         writeFile(JavaFile.builder(FreezerUtils.getObjectPackage(element), modelDaoGenerator.getQueryBuilder()).build());
 
         daosList.add(FreezerUtils.getModelDao(element));
