@@ -4,6 +4,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -161,8 +162,15 @@ public class FreezerUtils {
         return getTableName(getObjectName(element));
     }
 
+    public static List<TypeName> getParameters(Element element){
+        return ((ParameterizedTypeName)ParameterizedTypeName.get(element.asType())).typeArguments;
+    }
+
     public static TypeName getFieldCursorHelperClass(VariableElement element) {
-        return ClassName.bestGuess(element.asType().toString() + Constants.CURSOR_HELPER_SUFFIX);
+        if(getParameters(element).isEmpty())
+            return ClassName.bestGuess(element.asType().toString() + Constants.CURSOR_HELPER_SUFFIX);
+        else
+            return
     }
 
     public static TypeName getFieldClass(VariableElement element) {
