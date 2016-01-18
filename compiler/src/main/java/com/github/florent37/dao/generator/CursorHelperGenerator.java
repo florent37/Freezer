@@ -36,12 +36,14 @@ public class CursorHelperGenerator {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(modelType)
                 .addParameter(Constants.cursorClassName, "cursor")
-                .addStatement("return fromCursor(cursor,0)");
+                .addParameter(Constants.databaseClassName, "db")
+                .addStatement("return fromCursor(cursor,db,0)");
 
         MethodSpec.Builder fromCursorB = MethodSpec.methodBuilder("fromCursor")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(modelType)
                 .addParameter(Constants.cursorClassName, "cursor")
+                .addParameter(Constants.databaseClassName, "db")
                 .addParameter(TypeName.INT, "start")
                 .addStatement("$T object = new $T()", modelType, modelType);
 
@@ -55,7 +57,17 @@ public class CursorHelperGenerator {
 
                 fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), FreezerUtils.getFieldType(variableElement), i);
             } else {
-                fromCursorB.addStatement("object.$L = $T.fromCursor(cursor,2+3); //+3 for _id & object_id & secondObject_id", variableElement.getSimpleName(), FreezerUtils.getFieldCursorHelperClass(variableElement));
+                String JOIN_NAME = FreezerUtils.getTableName(objectName) + "_" + FreezerUtils.getTableName(variableElement);
+
+                fromCursorB.addStatement("$T cursor$L = db.rawQuery($S,new String[]{String.valueOf(object._id)})",Constants.cursorClassName,i,"select * from "+FreezerUtils.getTableName(variableElement)+", "+JOIN_NAME+" WHERE "+JOIN_NAME+"."+FreezerUtils.getKeyName(objectName)+" = ? AND "+FreezerUtils.getTableName(variableElement)+"."+Constants.FIELD_ID+" = "+JOIN_NAME+"."+FreezerUtils.getKeyName(variableElement));
+                fromCursorB.addStatement("$T objects$L = $T.get(cursor$L,db)", FreezerUtils.listOf(variableElement), i, FreezerUtils.getFieldCursorHelperClass(variableElement), i);
+
+                //if its a list
+
+                //else
+                fromCursorB.addStatement("if(!objects$L.isEmpty()) object.$L = objects$L.get(0)", i, FreezerUtils.getObjectName(variableElement), i);
+
+                fromCursorB.addStatement("cursor$L.close()",i);
             }
         }
 
@@ -99,10 +111,11 @@ public class CursorHelperGenerator {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(FreezerUtils.listOf(modelType))
                 .addParameter(Constants.cursorClassName, "cursor")
+                .addParameter(Constants.databaseClassName, "db")
                 .addStatement("$T objects = new $T()", FreezerUtils.listOf(modelType), FreezerUtils.arraylistOf(modelType))
                 .addStatement("cursor.moveToFirst()")
                 .addCode("while (!cursor.isAfterLast()) {\n")
-                .addStatement("    $T object = fromCursor(cursor)", modelType)
+                .addStatement("    $T object = fromCursor(cursor,db)", modelType)
                 .addStatement("    objects.add(object)")
                 .addStatement("    cursor.moveToNext()")
                 .addCode("}\n")
@@ -119,5 +132,17 @@ public class CursorHelperGenerator {
                 .build();
 
     }
+
+    //private String constructJoiners() {
+    //    StringBuilder stringBuilder = new StringBuilder();
+    //    for (VariableElement variableElement : otherClassFields) {
+    //        String JOIN_NAME = TABLE_NAME + "_" + FreezerUtils.getTableName(variableElement);
+    //        stringBuilder.append(" JOIN ").append(JOIN_NAME).append(" ON (")
+    //                .append(JOIN_NAME).append(".").append(FreezerUtils.getKeyName(modelName)).append("=").append(TABLE_NAME).append(".").append(Constants.FIELD_ID)
+    //                .append(") JOIN ").append(FreezerUtils.getTableName(variableElement)).append(" ON (")
+    //                .append(JOIN_NAME).append(".").append(FreezerUtils.getKeyName(variableElement)).append("=").append(FreezerUtils.getTableName(variableElement)).append(".").append(Constants.FIELD_ID).append(") ");
+    //    }
+    //    return stringBuilder.toString();
+    //}
 
 }

@@ -121,8 +121,9 @@ public class ModelDaoGenerator {
                 .addMethod(MethodSpec.methodBuilder("execute")
                         .returns(listObjectsClassName)
                         .addModifiers(Modifier.PRIVATE)
-                        .addStatement("$T cursor = $T.getInstance().open().getDatabase().rawQuery($S + constructQuery(), constructArgs())", Constants.cursorClassName, Constants.daoClassName, "select * from " + TABLE_NAME + " " + constructJoiners())
-                        .addStatement("$T objects = $T.get(cursor)", listObjectsClassName, modelCursorHelperClassName)
+                        .addStatement("$T db = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
+                        .addStatement("$T cursor = db.rawQuery($S + constructQuery(), constructArgs())", Constants.cursorClassName, "select * from " + TABLE_NAME + " ")
+                        .addStatement("$T objects = $T.get(cursor,db)", listObjectsClassName, modelCursorHelperClassName)
                         .addStatement("cursor.close()")
                         .addStatement("$T.getInstance().close()", Constants.daoClassName)
                         .addStatement("return objects")
@@ -186,18 +187,6 @@ public class ModelDaoGenerator {
         return this;
     }
 
-    private String constructJoiners() {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (VariableElement variableElement : otherClassFields) {
-            String JOIN_NAME = TABLE_NAME + "_" + FreezerUtils.getTableName(variableElement);
-            stringBuilder.append(" JOIN ").append(JOIN_NAME).append(" ON (")
-                    .append(JOIN_NAME).append(".").append(FreezerUtils.getKeyName(modelName)).append("=").append(TABLE_NAME).append(".").append(Constants.FIELD_ID)
-            .append(") JOIN ").append(FreezerUtils.getTableName(variableElement)).append(" ON (")
-                    .append(JOIN_NAME).append(".").append(FreezerUtils.getKeyName(variableElement)).append("=").append(FreezerUtils.getTableName(variableElement)).append(".").append(Constants.FIELD_ID).append(") ");
-        }
-        return stringBuilder.toString();
-    }
-
     protected List<MethodSpec> generateQueryMethods() {
         List<MethodSpec> methodSpecs = new ArrayList<>();
 
@@ -226,8 +215,8 @@ public class ModelDaoGenerator {
                     .append('"')
                     .append("create table ").append(TABLE_NAME).append("_").append(FreezerUtils.getTableName(variableElement))
                     .append(" ( _id integer primary key autoincrement, ")
-                    .append(FreezerUtils.getKeyName(modelName)).append(" integer), ")
-                    .append(FreezerUtils.getKeyName(variableElement)).append(" integer ;")
+                    .append(FreezerUtils.getKeyName(modelName)).append(" integer, ")
+                    .append(FreezerUtils.getKeyName(variableElement)).append(" integer );")
                     .append('"');
         }
 

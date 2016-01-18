@@ -107,6 +107,10 @@ public class FreezerUtils {
         return ParameterizedTypeName.get(ClassName.get(List.class), type);
     }
 
+    public static ParameterizedTypeName listOf(Element element) {
+        return ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(element.asType()));
+    }
+
     public static ParameterizedTypeName listOf(Class classe) {
         return ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(classe));
     }

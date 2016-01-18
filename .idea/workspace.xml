@@ -25,16 +25,34 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
+      <file leaf-file-name="FreezerProcessor.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/FreezerProcessor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="90" column="29" selection-start-line="90" selection-start-column="29" selection-end-line="90" selection-end-column="29" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="ModelDaoGenerator.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/generator/ModelDaoGenerator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-8.37037">
-              <caret line="192" column="59" selection-start-line="192" selection-start-column="59" selection-end-line="192" selection-end-column="59" />
+            <state vertical-scroll-proportion="-2.2592592">
+              <caret line="176" column="54" selection-start-line="176" selection-start-column="54" selection-end-line="176" selection-end-column="54" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CarCursorHelper.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/CarCursorHelper.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-5.5555553">
+              <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
               <folding>
-                <element signature="e#1561#1562#0" expanded="true" />
-                <element signature="e#1587#1588#0" expanded="true" />
-                <element signature="e#1628#1629#0" expanded="true" />
-                <element signature="e#1663#1664#0" expanded="true" />
+                <element signature="e#312#313#0" expanded="true" />
+                <element signature="e#352#353#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -43,28 +61,58 @@
       <file leaf-file-name="CursorHelperGenerator.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/generator/CursorHelperGenerator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-20.037037">
-              <caret line="70" column="13" selection-start-line="70" selection-start-column="13" selection-end-line="70" selection-end-column="13" />
+            <state vertical-scroll-proportion="-7.814815">
+              <caret line="62" column="120" selection-start-line="62" selection-start-column="120" selection-end-line="62" selection-end-column="120" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="UserDAO.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/UserDAO.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.2222223">
-              <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="UserDAOQueryBuilder.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="UserDAOQueryBuilder.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/UserDAOQueryBuilder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.83370286">
-              <caret line="68" column="0" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
+            <state vertical-scroll-proportion="17.74074">
+              <caret line="10" column="13" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DogDAOQueryBuilder.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/DogDAOQueryBuilder.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-5.5925927">
+              <caret line="56" column="35" selection-start-line="56" selection-start-column="35" selection-end-line="56" selection-end-column="35" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DogCursorHelper.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/DogCursorHelper.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-2.2222223">
+              <caret line="8" column="19" selection-start-line="8" selection-start-column="19" selection-end-line="8" selection-end-column="19" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UserCursorHelper.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/UserCursorHelper.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.59866965">
+              <caret line="23" column="57" selection-start-line="23" selection-start-column="57" selection-end-line="23" selection-end-column="57" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DAOGenerator.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/generator/DAOGenerator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="19" column="61" selection-start-line="19" selection-start-column="61" selection-end-line="19" selection-end-column="61" />
               <folding />
             </state>
           </provider>
@@ -2134,25 +2182,26 @@
         <option value="$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/ModelDaoGenerator.java" />
         <option value="$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/generator/DAOGenerator.java" />
         <option value="$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/Constants.java" />
-        <option value="$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/UserCursorHelper.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/CarDAOQueryBuilder.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/MainActivity.java" />
         <option value="$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/DatabaseHelper.java" />
         <option value="$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/generator/DatabaseHelperGenerator.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/CarDAO.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/User.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/Car.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/CarCursorHelper.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/UserCursorHelper.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/UserDAO.java" />
-        <option value="$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/FreezerProcessor.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/UserDAOQueryBuilder.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/UserDAO2.java" />
         <option value="$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/UserDAO.java" />
-        <option value="$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/FreezerUtils.java" />
-        <option value="$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/generator/CursorHelperGenerator.java" />
         <option value="$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/UserDAOQueryBuilder.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/Dog.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/User.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/MainActivity.java" />
         <option value="$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/generator/ModelDaoGenerator.java" />
+        <option value="$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/UserCursorHelper.java" />
+        <option value="$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/FreezerUtils.java" />
+        <option value="$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/FreezerProcessor.java" />
+        <option value="$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/generator/CursorHelperGenerator.java" />
       </list>
     </option>
   </component>
@@ -2188,6 +2237,8 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="PackagesPane" />
       <pane id="AndroidView">
         <subPane>
@@ -2263,7 +2314,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -2700,7 +2750,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -2708,7 +2757,7 @@
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="recentsLimit" value="5" />
     <property name="restartRequiresConfirmation" value="true" />
-    <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_SERIALS" value="emulator-5554" />
+    <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_SERIALS" value="CVH7N15B04005266" />
     <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_AVD" value="Nexus_5_API_19" />
     <property name="DEBUGGABLE_DEVICE" value="huawei-nexus_6p-CVH7N15B04005266" />
     <property name="DEBUGGABLE_PROCESS" value="com.github.florent37.dao" />
@@ -2930,19 +2979,19 @@
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32980132" sideWeight="0.51161104" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32980132" sideWeight="0.51741654" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Android Monitor" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32980132" sideWeight="0.48838896" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android Monitor" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32980132" sideWeight="0.48258346" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32980132" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32980132" sideWeight="0.48838896" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32980132" sideWeight="0.48258346" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24963716" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32980132" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32980132" sideWeight="0.49709725" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Android Model" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
@@ -2964,13 +3013,13 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/FreezerUtils.java</url>
-          <line>164</line>
+          <line>168</line>
           <properties />
           <option name="timeStamp" value="21" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/FreezerUtils.java</url>
-          <line>160</line>
+          <line>164</line>
           <properties />
           <option name="timeStamp" value="22" />
         </line-breakpoint>
@@ -2980,6 +3029,22 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/generator/ModelDaoGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="192" column="59" selection-start-line="192" selection-start-column="59" selection-end-line="192" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/generator/CursorHelperGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="70" column="13" selection-start-line="70" selection-start-column="13" selection-end-line="70" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/FreezerProcessor.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -3006,9 +3071,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="19" column="43" selection-start-line="19" selection-start-column="43" selection-end-line="19" selection-end-column="43" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -3024,7 +3087,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="12" column="10" selection-start-line="12" selection-start-column="10" selection-end-line="12" selection-end-column="10" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3061,7 +3123,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="12" column="10" selection-start-line="12" selection-start-column="10" selection-end-line="12" selection-end-column="10" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3090,7 +3151,7 @@
         <state vertical-scroll-proportion="0.8786611">
           <caret line="28" column="39" selection-start-line="28" selection-start-column="31" selection-end-line="28" selection-end-column="39" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -3099,31 +3160,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="10" column="1" selection-start-line="10" selection-start-column="1" selection-end-line="10" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/MainActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="26" column="25" selection-start-line="26" selection-start-column="25" selection-end-line="26" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/User.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="28" column="28" selection-start-line="28" selection-start-column="28" selection-end-line="28" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/Car.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="8" column="18" selection-start-line="8" selection-start-column="18" selection-end-line="8" selection-end-column="18" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3131,15 +3167,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/generator/DAOGenerator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="19" column="61" selection-start-line="19" selection-start-column="61" selection-end-line="19" selection-end-column="61" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3167,60 +3194,136 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/Dog.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="19" column="28" selection-start-line="19" selection-start-column="28" selection-end-line="19" selection-end-column="28" />
+          <folding>
+            <element signature="e#266#267#0" expanded="true" />
+            <element signature="e#298#299#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/User.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="24" column="41" selection-start-line="24" selection-start-column="38" selection-end-line="24" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/MainActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="24" column="63" selection-start-line="24" selection-start-column="63" selection-end-line="24" selection-end-column="63" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/github/florent37/dao/model/Car.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="10" column="16" selection-start-line="10" selection-start-column="16" selection-end-line="10" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/CarDAO.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.1330377">
+          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/generator/DAOGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="19" column="61" selection-start-line="19" selection-start-column="61" selection-end-line="19" selection-end-column="61" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Android/sdk/sources/android-23/android/database/Cursor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.9288703">
+          <caret line="151" column="12" selection-start-line="151" selection-start-column="12" selection-end-line="151" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/FreezerUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33263597">
-          <caret line="143" column="25" selection-start-line="143" selection-start-column="25" selection-end-line="143" selection-end-column="25" />
+        <state vertical-scroll-proportion="0.458159">
+          <caret line="109" column="40" selection-start-line="109" selection-start-column="40" selection-end-line="109" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/CarCursorHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-5.5555553">
+          <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
           <folding>
-            <element signature="e#5323#5324#0" expanded="true" />
-            <element signature="e#5377#5378#0" expanded="true" />
-            <element signature="e#5438#5439#0" expanded="true" />
-            <element signature="e#5486#5487#0" expanded="true" />
+            <element signature="e#312#313#0" expanded="true" />
+            <element signature="e#352#353#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/generator/ModelDaoGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-2.2592592">
+          <caret line="176" column="54" selection-start-line="176" selection-start-column="54" selection-end-line="176" selection-end-column="54" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/FreezerProcessor.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="76" column="0" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
+          <caret line="90" column="29" selection-start-line="90" selection-start-column="29" selection-end-line="90" selection-end-column="29" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/generator/ModelDaoGenerator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-8.37037">
-          <caret line="192" column="59" selection-start-line="192" selection-start-column="59" selection-end-line="192" selection-end-column="59" />
-          <folding>
-            <element signature="e#1561#1562#0" expanded="true" />
-            <element signature="e#1587#1588#0" expanded="true" />
-            <element signature="e#1628#1629#0" expanded="true" />
-            <element signature="e#1663#1664#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/compiler/src/main/java/com/github/florent37/dao/generator/CursorHelperGenerator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-20.037037">
-          <caret line="70" column="13" selection-start-line="70" selection-start-column="13" selection-end-line="70" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/UserDAO.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.2222223">
-          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
+        <state vertical-scroll-proportion="-7.814815">
+          <caret line="62" column="120" selection-start-line="62" selection-start-column="120" selection-end-line="62" selection-end-column="120" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/UserDAOQueryBuilder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.83370286">
-          <caret line="68" column="0" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
+        <state vertical-scroll-proportion="17.74074">
+          <caret line="10" column="13" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/DogDAOQueryBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-5.5925927">
+          <caret line="56" column="35" selection-start-line="56" selection-start-column="35" selection-end-line="56" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/DogCursorHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-2.2222223">
+          <caret line="8" column="19" selection-start-line="8" selection-start-column="19" selection-end-line="8" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/build/generated/source/apt/debug/com/github/florent37/dao/model/UserCursorHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.59866965">
+          <caret line="23" column="57" selection-start-line="23" selection-start-column="57" selection-end-line="23" selection-end-column="57" />
           <folding />
         </state>
       </provider>

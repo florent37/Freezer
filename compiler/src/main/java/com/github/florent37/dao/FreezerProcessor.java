@@ -80,11 +80,11 @@ public class FreezerProcessor extends AbstractProcessor {
     }
 
     protected void writeFile(JavaFile javaFile) {
-        try {
-            javaFile.writeTo(System.out);
-        } catch (IOException e) {
-            //e.printStackTrace();
-        }
+        //try {
+        //    javaFile.writeTo(System.out);
+        //} catch (IOException e) {
+        //    //e.printStackTrace();
+        //}
 
         try {
             javaFile.writeTo(this.processingEnv.getFiler());

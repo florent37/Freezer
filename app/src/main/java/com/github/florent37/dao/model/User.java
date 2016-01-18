@@ -18,12 +18,14 @@ public class User {
 
     int age;
     Car car;
+    Dog dog;
 
     public User(){}
 
-    public User(int age, Car car) {
+    public User(int age, Car car, Dog dog) {
         this.age = age;
         this.car = car;
+        this.dog = dog;
     }
 
     @Override public String toString() {
@@ -31,6 +33,7 @@ public class User {
                 "_id=" + _id +
                 ", age=" + age +
                 ", car=" + car +
+                ", dog=" + dog +
                 '}';
     }
 }
