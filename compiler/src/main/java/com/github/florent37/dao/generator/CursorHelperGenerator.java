@@ -6,6 +6,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.Element;
@@ -20,30 +21,41 @@ public class CursorHelperGenerator {
     String objectName;
     TypeName modelType;
     List<VariableElement> fields;
+    List<VariableElement> otherClassFields;
 
     public CursorHelperGenerator(Element element) {
         this.objectName = FreezerUtils.getObjectName(element);
         this.modelType = TypeName.get(element.asType());
         this.fields = FreezerUtils.getFields(element);
+        this.otherClassFields = FreezerUtils.getNonPrimitiveClassFields(element);
     }
 
     public TypeSpec generate() {
+
+        MethodSpec.Builder fromCursorSimple = MethodSpec.methodBuilder("fromCursor")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(modelType)
+                .addParameter(Constants.cursorClassName, "cursor")
+                .addStatement("return fromCursor(cursor,0)");
+
         MethodSpec.Builder fromCursorB = MethodSpec.methodBuilder("fromCursor")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(modelType)
                 .addParameter(Constants.cursorClassName, "cursor")
+                .addParameter(TypeName.INT, "start")
                 .addStatement("$T object = new $T()", modelType, modelType);
+
 
         //for
         for (int i = 0; i < fields.size(); ++i) {
             VariableElement variableElement = fields.get(i);
             if (FreezerUtils.isPrimitive(variableElement)) {
-                String cursor = "cursor.get$L($L)";
+                String cursor = "cursor.get$L(start + $L)";
                 cursor = String.format(FreezerUtils.getFieldCast(variableElement), cursor);
 
                 fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), FreezerUtils.getFieldType(variableElement), i);
             } else {
-                fromCursorB.addStatement("//$L", variableElement.getSimpleName());
+                fromCursorB.addStatement("object.$L = $T.fromCursor(cursor,2+3); //+3 for _id & object_id & secondObject_id", variableElement.getSimpleName(), FreezerUtils.getFieldCursorHelperClass(variableElement));
             }
         }
 
@@ -55,6 +67,7 @@ public class CursorHelperGenerator {
                 .addParameter(modelType, "object")
                 .addStatement("$T values = new $T()", Constants.contentValuesClassName, Constants.contentValuesClassName);
 
+
         //for
         for (int i = 0; i < fields.size(); ++i) {
             VariableElement variableElement = fields.get(i);
@@ -63,8 +76,21 @@ public class CursorHelperGenerator {
                 if (FreezerUtils.isModelId(variableElement))
                     statement = "if(object."+Constants.FIELD_ID+" != 0) "+statement;
                 getValuesB.addStatement(statement, variableElement.getSimpleName(), variableElement.getSimpleName());
-            } else
-                getValuesB.addStatement("//$L", variableElement.getSimpleName());
+            }
+        }
+
+        List<MethodSpec> joinMethods = new ArrayList<>();
+        for(VariableElement variableElement : otherClassFields){
+            String JOIN_NAME = FreezerUtils.getTableName(objectName)+"_"+FreezerUtils.getTableName(variableElement);
+            joinMethods.add(MethodSpec.methodBuilder("get"+JOIN_NAME+"Values")
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .returns(Constants.contentValuesClassName)
+                    .addParameter(TypeName.LONG, "objectId")
+                    .addParameter(TypeName.LONG, "secondObjectId")
+                    .addStatement("$T values = new $T()", Constants.contentValuesClassName, Constants.contentValuesClassName)
+                    .addStatement("values.put($S,objectId)",FreezerUtils.getKeyName(this.objectName))
+                    .addStatement("values.put($S,secondObjectId)",FreezerUtils.getKeyName(variableElement))
+                    .addStatement("return values").build());
         }
 
         getValuesB.addStatement("return values");
@@ -85,9 +111,11 @@ public class CursorHelperGenerator {
 
         return TypeSpec.classBuilder(FreezerUtils.getCursorHelperName(objectName))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addMethod(fromCursorSimple.build())
                 .addMethod(fromCursorB.build())
                 .addMethod(getValuesB.build())
                 .addMethod(get)
+                .addMethods(joinMethods)
                 .build();
 
     }

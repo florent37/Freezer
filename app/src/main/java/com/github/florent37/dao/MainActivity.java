@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.github.florent37.dao.model.Car;
 import com.github.florent37.dao.model.User;
 import com.github.florent37.dao.model.UserDAO;
 
@@ -18,23 +19,11 @@ public class MainActivity extends AppCompatActivity {
 
         userDAO = new UserDAO();
 
-        userDAO.add(new User(3, "florent",true));
-        userDAO.add(new User(20, "kévin",false));
-        userDAO.add(new User(10, "alex",true));
+        userDAO.add(new User(3, new Car("florent")));
+        userDAO.add(new User(20, new Car("kévin")));
+        userDAO.add(new User(10, new Car("alex")));
 
         Log.d("DAO all", userDAO.selectWhere()
-                .asList()
-                .toString());
-
-        Log.d("DAO ok", userDAO.selectWhere()
-                .okEquals(true)
-                .asList()
-                .toString());
-
-        Log.d("DAO kevin 3", userDAO.selectWhere()
-                .ageEquals(3)
-                .or()
-                .nameEquals("kévin")
                 .asList()
                 .toString());
     }

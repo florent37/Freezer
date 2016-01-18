@@ -14,30 +14,23 @@ import java.util.List;
 @Model
 public class User {
 
-    long _id;
+    public long _id;
 
     int age;
-    String name;
-    boolean ok;
-    float note;
-
     Car car;
 
-    public User() {
-    }
+    public User(){}
 
-    public User(int age, String name, boolean ok) {
+    public User(int age, Car car) {
         this.age = age;
-        this.name = name;
-        this.ok = ok;
+        this.car = car;
     }
 
     @Override public String toString() {
         return "User{" +
-                "age=" + age +
-                ", name='" + name + '\'' +
-                ", ok=" + ok +
-                ", note=" + note +
+                "_id=" + _id +
+                ", age=" + age +
+                ", car=" + car +
                 '}';
     }
 }

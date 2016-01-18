@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 
@@ -19,6 +18,24 @@ public class FreezerUtils {
 
     public static List<VariableElement> getFields(Element element) {
         return ElementFilter.fieldsIn(element.getEnclosedElements());
+    }
+
+    public static List<VariableElement> getPrimitiveFields(Element element) {
+        List<VariableElement> primitives = new ArrayList<>();
+        for (VariableElement e : getFields(element)) {
+            if (isPrimitive(e))
+                primitives.add(e);
+        }
+        return primitives;
+    }
+
+    public static List<VariableElement> getNonPrimitiveClassFields(Element element) {
+        List<VariableElement> nonPrimitive = new ArrayList<>();
+        for (VariableElement e : getFields(element)) {
+            if (!isPrimitive(e))
+                nonPrimitive.add(e);
+        }
+        return nonPrimitive;
     }
 
     public static String getFieldType(VariableElement variableElement) {
@@ -51,11 +68,11 @@ public class FreezerUtils {
     }
 
     public static String getObjectName(Element element) {
-        return ((TypeElement) element).getSimpleName().toString();
+        return element.getSimpleName().toString();
     }
 
     public static String getObjectPackage(Element element) {
-        return ((TypeElement) element).getEnclosingElement().toString();
+        return element.getEnclosingElement().toString();
     }
 
     public static TypeName getCursorHelper(Element element) {
@@ -102,16 +119,16 @@ public class FreezerUtils {
         return ParameterizedTypeName.get(ClassName.get(ArrayList.class), ClassName.get(classe));
     }
 
-    public static boolean isPrimitive(Element element){
-        return  isPrimitive(TypeName.get(element.asType()));
+    public static boolean isPrimitive(Element element) {
+        return isPrimitive(TypeName.get(element.asType()));
     }
 
-    public static boolean isModelId(VariableElement variableElement){
+    public static boolean isModelId(VariableElement variableElement) {
         return Constants.FIELD_ID.equals(variableElement.getSimpleName().toString());
     }
 
-    public static boolean isPrimitive(TypeName typeName){
-        return  typeName.isPrimitive()|| (ClassName.get(String.class).equals(typeName));
+    public static boolean isPrimitive(TypeName typeName) {
+        return typeName.isPrimitive() || (ClassName.get(String.class).equals(typeName));
     }
 
     public static String getQueryCast(VariableElement variableElement) {
@@ -122,5 +139,29 @@ public class FreezerUtils {
             return "String.valueOf($L ? 1 : 0)";
         else
             return "String.valueOf($L)";
+    }
+
+    public static String getKeyName(VariableElement variableElement) {
+        return getKeyName(getObjectName(variableElement));
+    }
+
+    public static String getKeyName(String modelName) {
+        return modelName.toLowerCase() + "_id";
+    }
+
+    public static String getTableName(String elementName) {
+        return elementName.toUpperCase();
+    }
+
+    public static String getTableName(Element element) {
+        return getTableName(getObjectName(element));
+    }
+
+    public static TypeName getFieldCursorHelperClass(VariableElement element) {
+        return ClassName.bestGuess(element.asType().toString() + Constants.CURSOR_HELPER_SUFFIX);
+    }
+
+    public static TypeName getFieldClass(VariableElement element) {
+        return ClassName.get(element.asType());
     }
 }
