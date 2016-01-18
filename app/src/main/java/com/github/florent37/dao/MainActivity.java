@@ -9,6 +9,8 @@ import com.github.florent37.dao.model.Dog;
 import com.github.florent37.dao.model.User;
 import com.github.florent37.dao.model.UserDAO;
 
+import java.util.Arrays;
+
 public class MainActivity extends AppCompatActivity {
 
     UserDAO userDAO;
@@ -20,9 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
         userDAO = new UserDAO();
 
-        userDAO.add(new User(3, new Car("florent"), new Dog("lolo")));
-        userDAO.add(new User(20, new Car("kévin"), new Dog("mimo")));
-        userDAO.add(new User(10, new Car("alex"), new Dog("nana")));
+        userDAO.add(new User(3, Arrays.asList(new Car("florent"), new Car("kevin"))));
 
         Log.d("DAO all", userDAO.selectWhere()
                 .asList()

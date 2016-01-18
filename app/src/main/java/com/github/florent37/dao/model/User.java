@@ -17,22 +17,21 @@ public class User {
     public long _id;
 
     int age;
-    Car car;
+    List<Car> cars;
     Dog dog;
 
     public User(){}
 
-    public User(int age, Car car, Dog dog) {
+    public User(int age, List<Car> cars) {
         this.age = age;
-        this.car = car;
-        this.dog = dog;
+        this.cars = cars;
     }
 
     @Override public String toString() {
         return "User{" +
                 "_id=" + _id +
                 ", age=" + age +
-                ", car=" + car +
+                ", cars=" + cars +
                 ", dog=" + dog +
                 '}';
     }

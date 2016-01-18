@@ -57,6 +57,8 @@ public class CursorHelperGenerator {
 
                 fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), FreezerUtils.getFieldType(variableElement), i);
             } else {
+
+                fromCursorB.addCode("\n");
                 String JOIN_NAME = FreezerUtils.getTableName(objectName) + "_" + FreezerUtils.getTableName(variableElement);
 
                 fromCursorB.addStatement("$T cursor$L = db.rawQuery($S,new String[]{String.valueOf(object._id)})",Constants.cursorClassName,i,"select * from "+FreezerUtils.getTableName(variableElement)+", "+JOIN_NAME+" WHERE "+JOIN_NAME+"."+FreezerUtils.getKeyName(objectName)+" = ? AND "+FreezerUtils.getTableName(variableElement)+"."+Constants.FIELD_ID+" = "+JOIN_NAME+"."+FreezerUtils.getKeyName(variableElement));
@@ -67,11 +69,11 @@ public class CursorHelperGenerator {
                 //else
                 fromCursorB.addStatement("if(!objects$L.isEmpty()) object.$L = objects$L.get(0)", i, FreezerUtils.getObjectName(variableElement), i);
 
-                fromCursorB.addStatement("cursor$L.close()",i);
+                fromCursorB.addStatement("cursor$L.close()", i);
             }
         }
 
-        fromCursorB.addStatement("return object");
+        fromCursorB.addCode("\n").addStatement("return object");
 
         MethodSpec.Builder getValuesB = MethodSpec.methodBuilder("getValues")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
