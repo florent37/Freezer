@@ -8,21 +8,17 @@ import java.util.List;
  * Created by florentchampigny on 19/01/2016.
  */
 @Model
-public class Tree {
-
+public class User {
     public long _id;
 
-    int age;
     String name;
-    List<Leaf> leafs;
-    Root root;
+    List<Car> cars;
 
-    public Tree() {
+    public User() {
     }
 
-    public Tree(int age, String name) {
-        this.age = age;
+    public User(String name, List<Car> cars) {
         this.name = name;
+        this.cars = cars;
     }
-
 }

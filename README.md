@@ -1,4 +1,4 @@
-# Freezer
+# Fridge
 
 Simply add @Model on your objects
 
@@ -25,7 +25,7 @@ Will generate Fridges
 ```java
 UserFridge userFridge = new UserFridge();
 
-userFridge.add(new User("florent", new Car(Color.RED));
+userFridge.add(new User("florent", Arrays.asList(new Car(Color.RED), new Car(Color.BLUE))));
 
 List<User> allUsers = userDAO.selectWhere()
                 .asList());
