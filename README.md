@@ -5,19 +5,15 @@ Simply add @Model on your objects
 ```java
 @Model
 public class User {
-
     String name;
     List<Car> cars;
-    
 }
 ```
 
 ```java
 @Model
 public class Car {
-
     int color;
-    
 }
 ```
 
