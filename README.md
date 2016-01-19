@@ -1,44 +1,70 @@
 # Freezer
 
-Simply add @Model on your object
+Simply add @Model on your objects
 
 ```java
 @Model
 public class User {
 
-    int age;
     String name;
-
-    public User() {
-    }
+    List<Car> cars;
     
-    ...
 }
 ```
 
-Will generate Daos
 ```java
-UserDAO userDAO = new UserDAO();
+@Model
+public class Car {
 
-userDAO.add(new User(3, "florent"));
-userDAO.add(new User(20, "kévin"));
-userDAO.add(new User(10, "alex"));
+    int color;
+    
+}
+```
+
+Will generate Fridges
+```java
+UserFridge userFridge = new UserFridge();
+
+userFridge.add(new User("florent", new Car(Color.RED));
 
 List<User> allUsers = userDAO.selectWhere()
                 .asList());
 
-List<User> users = userDAO.selectWhere()
-                .ageEquals(3)
-                .or()
-                .nameEquals("kévin")
-                .asList();
+User userFlorent = userDAO.selectWhere()
+                .nameEquals("florent")
+                .first();
 ```
 
 #Accepted types
 
-int
-float
-boolean
-String
+##Primitives
+- int
+- float
+- boolean
+- String
+
+##One To One
+
+```java
+@Model
+public class User {
+
+    Car car;
+
+}
+
+```
+
+##One To Many
+
+```java
+@Model
+public class User {
+
+    List<Car> cars;
+
+}
+
+```
 
 
