@@ -9,7 +9,9 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
@@ -136,17 +138,17 @@ public class ModelDaoGenerator {
                 .returns(TypeName.LONG)
                 .addModifiers(Modifier.PUBLIC)
                 .addStatement("$T database = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
-                .addStatement("object.$L = database.insert($S, null, $T.getValues(object))", Constants.FIELD_ID, TABLE_NAME, modelCursorHelperClassName);
+                .addStatement("object.$L = database.insert($S, null, $T.getValues(object,null))", Constants.FIELD_ID, TABLE_NAME, modelCursorHelperClassName);
 
         for (VariableElement variableElement : otherClassFields) {
             String JOINTABLE = TABLE_NAME + "_" + FreezerUtils.getTableName(variableElement);
             if (!FreezerUtils.isCollection(variableElement)) {
-                addB.addStatement("if(object.$L != null) object.$L._id = database.insert($S, null, $T.getValues(object.$L))", FreezerUtils.getObjectName(variableElement), FreezerUtils.getObjectName(variableElement), FreezerUtils.getTableName(variableElement), FreezerUtils.getFieldCursorHelperClass(variableElement), FreezerUtils.getObjectName(variableElement));
+                addB.addStatement("if(object.$L != null) object.$L._id = database.insert($S, null, $T.getValues(object.$L,$S))", FreezerUtils.getObjectName(variableElement), FreezerUtils.getObjectName(variableElement), FreezerUtils.getTableName(variableElement), FreezerUtils.getFieldCursorHelperClass(variableElement), FreezerUtils.getObjectName(variableElement),FreezerUtils.getObjectName(variableElement));
             } else {
                 addB.beginControlFlow("if(object.$L != null)", FreezerUtils.getObjectName(variableElement))
                         .beginControlFlow("for($T child : object.$L)", FreezerUtils.getFieldClass(variableElement), FreezerUtils.getObjectName(variableElement))
-                        .addStatement("child._id = database.insert($S, null, CarCursorHelper.getValues(child))", FreezerUtils.getTableName(variableElement))
-                        .addStatement("database.insert($S, null, $T.get$LValues(object._id,child._id))", JOINTABLE, modelCursorHelperClassName, JOINTABLE)
+                        .addStatement("child._id = database.insert($S, null, CarCursorHelper.getValues(child,null))", FreezerUtils.getTableName(variableElement))
+                        .addStatement("database.insert($S, null, $T.get$LValues(object._id,child._id, $S))", JOINTABLE, modelCursorHelperClassName, JOINTABLE, FreezerUtils.getObjectName(variableElement))
                         .endControlFlow()
                         .endControlFlow();
             }
@@ -217,15 +219,22 @@ public class ModelDaoGenerator {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append('"').append("create table ").append(TABLE_NAME).append(" (_id integer primary key autoincrement, ").append(generateTableCreate()).append(");").append('"');
 
+        Set<String> addedTables = new HashSet<>();
+
         for (VariableElement variableElement : otherClassFields) {
-            stringBuilder
-                    .append(",\n")
-                    .append('"')
-                    .append("create table ").append(TABLE_NAME).append("_").append(FreezerUtils.getTableName(variableElement))
-                    .append(" ( _id integer primary key autoincrement, ")
-                    .append(FreezerUtils.getKeyName(modelName)).append(" integer, ")
-                    .append(FreezerUtils.getKeyName(variableElement)).append(" integer );")
-                    .append('"');
+            String table = TABLE_NAME+"_"+FreezerUtils.getTableName(variableElement);
+            if(!addedTables.contains(table)) {
+                stringBuilder
+                        .append(",\n")
+                        .append('"')
+                        .append("create table ").append(table)
+                        .append(" ( _id integer primary key autoincrement, ")
+                        .append(FreezerUtils.getKeyName(modelName)).append(" integer, ")
+                        .append(FreezerUtils.getKeyName(variableElement)).append(" integer, ")
+                        .append(Constants.FIELD_NAME).append(" text )")
+                        .append('"');
+                addedTables.add(table);
+            }
         }
 
         return stringBuilder.toString();

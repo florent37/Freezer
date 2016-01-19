@@ -2,12 +2,15 @@ package com.github.florent37.dao.generator;
 
 import com.github.florent37.dao.Constants;
 import com.github.florent37.dao.FreezerUtils;
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
@@ -60,7 +63,7 @@ public class CursorHelperGenerator {
                 fromCursorB.addCode("\n");
                 String JOIN_NAME = FreezerUtils.getTableName(objectName) + "_" + FreezerUtils.getTableName(variableElement);
 
-                fromCursorB.addStatement("$T cursor$L = db.rawQuery($S,new String[]{String.valueOf(object._id)})", Constants.cursorClassName, i, "select * from " + FreezerUtils.getTableName(variableElement) + ", " + JOIN_NAME + " WHERE " + JOIN_NAME + "." + FreezerUtils.getKeyName(objectName) + " = ? AND " + FreezerUtils.getTableName(variableElement) + "." + Constants.FIELD_ID + " = " + JOIN_NAME + "." + FreezerUtils.getKeyName(variableElement));
+                fromCursorB.addStatement("$T cursor$L = db.rawQuery($S,new String[]{String.valueOf(object._id), $S})", Constants.cursorClassName, i, "SELECT * FROM " + FreezerUtils.getTableName(variableElement) + ", " + JOIN_NAME + " WHERE " + JOIN_NAME + "." + FreezerUtils.getKeyName(objectName) + " = ? AND " + FreezerUtils.getTableName(variableElement) + "." + Constants.FIELD_ID + " = " + JOIN_NAME + "." + FreezerUtils.getKeyName(variableElement)+" AND "+JOIN_NAME+"."+Constants.FIELD_NAME+"= ?", FreezerUtils.getObjectName(variableElement));
 
 
                 if (FreezerUtils.isCollection(variableElement)){
@@ -81,7 +84,9 @@ public class CursorHelperGenerator {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(Constants.contentValuesClassName)
                 .addParameter(modelType, "object")
-                .addStatement("$T values = new $T()", Constants.contentValuesClassName, Constants.contentValuesClassName);
+                .addParameter(ClassName.get(String.class), "name")
+                .addStatement("$T values = new $T()", Constants.contentValuesClassName, Constants.contentValuesClassName)
+                .addStatement("if(name != null) values.put($S,name)",Constants.FIELD_NAME);
 
         //for
         for (int i = 0; i < fields.size(); ++i) {
@@ -95,17 +100,23 @@ public class CursorHelperGenerator {
         }
 
         List<MethodSpec> joinMethods = new ArrayList<>();
+        Set<String> addedMethodsNames = new HashSet<>();
         for (VariableElement variableElement : otherClassFields) {
             String JOIN_NAME = FreezerUtils.getTableName(objectName) + "_" + FreezerUtils.getTableName(variableElement);
-            joinMethods.add(MethodSpec.methodBuilder("get" + JOIN_NAME + "Values")
-                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .returns(Constants.contentValuesClassName)
-                    .addParameter(TypeName.LONG, "objectId")
-                    .addParameter(TypeName.LONG, "secondObjectId")
-                    .addStatement("$T values = new $T()", Constants.contentValuesClassName, Constants.contentValuesClassName)
-                    .addStatement("values.put($S,objectId)", FreezerUtils.getKeyName(this.objectName))
-                    .addStatement("values.put($S,secondObjectId)", FreezerUtils.getKeyName(variableElement))
-                    .addStatement("return values").build());
+            if(!addedMethodsNames.contains(JOIN_NAME)) {
+                joinMethods.add(MethodSpec.methodBuilder("get" + JOIN_NAME + "Values")
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .returns(Constants.contentValuesClassName)
+                        .addParameter(TypeName.LONG, "objectId")
+                        .addParameter(TypeName.LONG, "secondObjectId")
+                        .addParameter(ClassName.get(String.class), "name")
+                        .addStatement("$T values = new $T()", Constants.contentValuesClassName, Constants.contentValuesClassName)
+                        .addStatement("values.put($S,objectId)", FreezerUtils.getKeyName(this.objectName))
+                        .addStatement("values.put($S,secondObjectId)", FreezerUtils.getKeyName(variableElement))
+                        .addStatement("values.put($S,name)", Constants.FIELD_NAME)
+                        .addStatement("return values").build());
+                addedMethodsNames.add(JOIN_NAME);
+            }
         }
 
         getValuesB.addStatement("return values");
@@ -135,17 +146,5 @@ public class CursorHelperGenerator {
                 .build();
 
     }
-
-    //private String constructJoiners() {
-    //    StringBuilder stringBuilder = new StringBuilder();
-    //    for (VariableElement variableElement : otherClassFields) {
-    //        String JOIN_NAME = TABLE_NAME + "_" + FreezerUtils.getTableName(variableElement);
-    //        stringBuilder.append(" JOIN ").append(JOIN_NAME).append(" ON (")
-    //                .append(JOIN_NAME).append(".").append(FreezerUtils.getKeyName(modelName)).append("=").append(TABLE_NAME).append(".").append(Constants.FIELD_ID)
-    //                .append(") JOIN ").append(FreezerUtils.getTableName(variableElement)).append(" ON (")
-    //                .append(JOIN_NAME).append(".").append(FreezerUtils.getKeyName(variableElement)).append("=").append(FreezerUtils.getTableName(variableElement)).append(".").append(Constants.FIELD_ID).append(") ");
-    //    }
-    //    return stringBuilder.toString();
-    //}
 
 }

@@ -27,4 +27,5 @@ public class Constants {
     public static final TypeName contentValuesClassName = ClassName.get("android.content", "ContentValues");
 
     public static final String FIELD_ID = "_id";
+    public static final String FIELD_NAME = "_field_name";
 }

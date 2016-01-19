@@ -18,6 +18,7 @@ public class User {
 
     int age;
     List<Car> cars;
+    List<Car> bags;
     Dog dog;
 
     public User(){}
