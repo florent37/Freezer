@@ -4,7 +4,6 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -147,7 +146,7 @@ public class FreezerUtils {
     }
 
     public static String getKeyName(VariableElement variableElement) {
-        return getKeyName(getObjectName(variableElement));
+        return getKeyName(getFieldClassName(variableElement));
     }
 
     public static String getKeyName(String modelName) {
@@ -159,21 +158,47 @@ public class FreezerUtils {
     }
 
     public static String getTableName(Element element) {
-        return getTableName(getObjectName(element));
+        return getTableName(getFieldClassName(element));
     }
 
-    public static List<TypeName> getParameters(Element element){
-        return ((ParameterizedTypeName)ParameterizedTypeName.get(element.asType())).typeArguments;
+    public static List<TypeName> getParameters(Element element) {
+        try {
+            return ((ParameterizedTypeName) ParameterizedTypeName.get(element.asType())).typeArguments;
+        }catch (Exception e){
+            return null;
+        }
+    }
+
+    public static TypeName getEnclosedTypeName(Element element) {
+        List<TypeName> parameters = getParameters(element);
+        if (parameters == null || parameters.isEmpty()) return null;
+        else return parameters.get(0);
     }
 
     public static TypeName getFieldCursorHelperClass(VariableElement element) {
-        if(getParameters(element).isEmpty())
-            return ClassName.bestGuess(element.asType().toString() + Constants.CURSOR_HELPER_SUFFIX);
-        else
-            return
+        return ClassName.bestGuess(getFieldClass(element).toString() + Constants.CURSOR_HELPER_SUFFIX);
     }
 
-    public static TypeName getFieldClass(VariableElement element) {
-        return ClassName.get(element.asType());
+    public static TypeName getFieldClass(Element element) {
+        TypeName enclosed = getEnclosedTypeName(element);
+        if(enclosed != null)
+            return enclosed;
+        else return ClassName.get(element.asType());
+    }
+
+    public static String getFieldClassName(Element element){
+        String name;
+
+        TypeName t = getFieldClass(element);
+        if(t instanceof ClassName){
+            ClassName className = (ClassName)t;
+            name = className.simpleName();
+        }else name = t.toString();
+
+        return name;
+    }
+
+    public static boolean isCollection(Element element) {
+        return getEnclosedTypeName(element) != null;
     }
 }

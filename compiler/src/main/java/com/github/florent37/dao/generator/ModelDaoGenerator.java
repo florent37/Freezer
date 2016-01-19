@@ -140,8 +140,16 @@ public class ModelDaoGenerator {
 
         for (VariableElement variableElement : otherClassFields) {
             String JOINTABLE = TABLE_NAME + "_" + FreezerUtils.getTableName(variableElement);
-            addB.addStatement("object.$L._id = database.insert($S, null, $T.getValues(object.$L))", FreezerUtils.getObjectName(variableElement), FreezerUtils.getTableName(variableElement), FreezerUtils.getFieldCursorHelperClass(variableElement), FreezerUtils.getObjectName(variableElement));
-            addB.addStatement("database.insert($S, null, $T.get$LValues(object._id,object.$L._id))", JOINTABLE, modelCursorHelperClassName, JOINTABLE, FreezerUtils.getObjectName(variableElement));
+            if (!FreezerUtils.isCollection(variableElement)) {
+                addB.addStatement("if(object.$L != null) object.$L._id = database.insert($S, null, $T.getValues(object.$L))", FreezerUtils.getObjectName(variableElement), FreezerUtils.getObjectName(variableElement), FreezerUtils.getTableName(variableElement), FreezerUtils.getFieldCursorHelperClass(variableElement), FreezerUtils.getObjectName(variableElement));
+            } else {
+                addB.beginControlFlow("if(object.$L != null)", FreezerUtils.getObjectName(variableElement))
+                        .beginControlFlow("for($T child : object.$L)", FreezerUtils.getFieldClass(variableElement), FreezerUtils.getObjectName(variableElement))
+                        .addStatement("child._id = database.insert($S, null, CarCursorHelper.getValues(child))", FreezerUtils.getTableName(variableElement))
+                        .addStatement("database.insert($S, null, $T.get$LValues(object._id,child._id))", JOINTABLE, modelCursorHelperClassName, JOINTABLE)
+                        .endControlFlow()
+                        .endControlFlow();
+            }
         }
 
         addB.addStatement("$T.getInstance().close()", Constants.daoClassName)

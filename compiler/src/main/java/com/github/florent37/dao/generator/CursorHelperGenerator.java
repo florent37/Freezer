@@ -47,7 +47,6 @@ public class CursorHelperGenerator {
                 .addParameter(TypeName.INT, "start")
                 .addStatement("$T object = new $T()", modelType, modelType);
 
-
         //for
         for (int i = 0; i < fields.size(); ++i) {
             VariableElement variableElement = fields.get(i);
@@ -61,13 +60,16 @@ public class CursorHelperGenerator {
                 fromCursorB.addCode("\n");
                 String JOIN_NAME = FreezerUtils.getTableName(objectName) + "_" + FreezerUtils.getTableName(variableElement);
 
-                fromCursorB.addStatement("$T cursor$L = db.rawQuery($S,new String[]{String.valueOf(object._id)})",Constants.cursorClassName,i,"select * from "+FreezerUtils.getTableName(variableElement)+", "+JOIN_NAME+" WHERE "+JOIN_NAME+"."+FreezerUtils.getKeyName(objectName)+" = ? AND "+FreezerUtils.getTableName(variableElement)+"."+Constants.FIELD_ID+" = "+JOIN_NAME+"."+FreezerUtils.getKeyName(variableElement));
-                fromCursorB.addStatement("$T objects$L = $T.get(cursor$L,db)", FreezerUtils.listOf(variableElement), i, FreezerUtils.getFieldCursorHelperClass(variableElement), i);
+                fromCursorB.addStatement("$T cursor$L = db.rawQuery($S,new String[]{String.valueOf(object._id)})", Constants.cursorClassName, i, "select * from " + FreezerUtils.getTableName(variableElement) + ", " + JOIN_NAME + " WHERE " + JOIN_NAME + "." + FreezerUtils.getKeyName(objectName) + " = ? AND " + FreezerUtils.getTableName(variableElement) + "." + Constants.FIELD_ID + " = " + JOIN_NAME + "." + FreezerUtils.getKeyName(variableElement));
 
-                //if its a list
 
-                //else
-                fromCursorB.addStatement("if(!objects$L.isEmpty()) object.$L = objects$L.get(0)", i, FreezerUtils.getObjectName(variableElement), i);
+                if (FreezerUtils.isCollection(variableElement)){
+                    fromCursorB.addStatement("object.$L = $T.get(cursor$L,db)",FreezerUtils.getObjectName(variableElement), FreezerUtils.getFieldCursorHelperClass(variableElement), i);
+                }
+                else{
+                    fromCursorB.addStatement("$T objects$L = $T.get(cursor$L,db)", FreezerUtils.listOf(variableElement), i, FreezerUtils.getFieldCursorHelperClass(variableElement), i);
+                    fromCursorB.addStatement("if(!objects$L.isEmpty()) object.$L = objects$L.get(0)", i, FreezerUtils.getObjectName(variableElement), i);
+                }
 
                 fromCursorB.addStatement("cursor$L.close()", i);
             }
@@ -81,29 +83,28 @@ public class CursorHelperGenerator {
                 .addParameter(modelType, "object")
                 .addStatement("$T values = new $T()", Constants.contentValuesClassName, Constants.contentValuesClassName);
 
-
         //for
         for (int i = 0; i < fields.size(); ++i) {
             VariableElement variableElement = fields.get(i);
             if (FreezerUtils.isPrimitive(variableElement)) {
                 String statement = "values.put($S,object.$L)";
                 if (FreezerUtils.isModelId(variableElement))
-                    statement = "if(object."+Constants.FIELD_ID+" != 0) "+statement;
+                    statement = "if(object." + Constants.FIELD_ID + " != 0) " + statement;
                 getValuesB.addStatement(statement, variableElement.getSimpleName(), variableElement.getSimpleName());
             }
         }
 
         List<MethodSpec> joinMethods = new ArrayList<>();
-        for(VariableElement variableElement : otherClassFields){
-            String JOIN_NAME = FreezerUtils.getTableName(objectName)+"_"+FreezerUtils.getTableName(variableElement);
-            joinMethods.add(MethodSpec.methodBuilder("get"+JOIN_NAME+"Values")
+        for (VariableElement variableElement : otherClassFields) {
+            String JOIN_NAME = FreezerUtils.getTableName(objectName) + "_" + FreezerUtils.getTableName(variableElement);
+            joinMethods.add(MethodSpec.methodBuilder("get" + JOIN_NAME + "Values")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                     .returns(Constants.contentValuesClassName)
                     .addParameter(TypeName.LONG, "objectId")
                     .addParameter(TypeName.LONG, "secondObjectId")
                     .addStatement("$T values = new $T()", Constants.contentValuesClassName, Constants.contentValuesClassName)
-                    .addStatement("values.put($S,objectId)",FreezerUtils.getKeyName(this.objectName))
-                    .addStatement("values.put($S,secondObjectId)",FreezerUtils.getKeyName(variableElement))
+                    .addStatement("values.put($S,objectId)", FreezerUtils.getKeyName(this.objectName))
+                    .addStatement("values.put($S,secondObjectId)", FreezerUtils.getKeyName(variableElement))
                     .addStatement("return values").build());
         }
 
