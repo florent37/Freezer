@@ -14,7 +14,7 @@ import javax.lang.model.util.ElementFilter;
 /**
  * Created by florentchampigny on 17/01/16.
  */
-public class FreezerUtils {
+public class FridgeUtils {
 
     public static List<VariableElement> getFields(Element element) {
         return ElementFilter.fieldsIn(element.getEnclosedElements());

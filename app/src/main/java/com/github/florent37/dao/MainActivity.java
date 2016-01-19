@@ -4,27 +4,24 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.github.florent37.dao.model.Car;
-import com.github.florent37.dao.model.Dog;
-import com.github.florent37.dao.model.User;
-import com.github.florent37.dao.model.UserDAO;
-
-import java.util.Arrays;
+import com.github.florent37.dao.model.Tree;
+import com.github.florent37.dao.model.TreeFridge;
 
 public class MainActivity extends AppCompatActivity {
 
-    UserDAO userDAO;
+    TreeFridge treeFridge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        userDAO = new UserDAO();
+        treeFridge = new TreeFridge();
 
-        userDAO.add(new User(3, Arrays.asList(new Car("florent"), new Car("kevin"))));
+        treeFridge.add(new Tree(3, "chaine"));
 
-        Log.d("DAO all", userDAO.selectWhere()
+        Log.d("DAO all", treeFridge.selectWhere()
+                .ageEquals(3)
                 .asList()
                 .toString());
     }

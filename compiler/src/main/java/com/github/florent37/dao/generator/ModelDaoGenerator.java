@@ -1,7 +1,7 @@
 package com.github.florent37.dao.generator;
 
 import com.github.florent37.dao.Constants;
-import com.github.florent37.dao.FreezerUtils;
+import com.github.florent37.dao.FridgeUtils;
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
@@ -39,18 +39,18 @@ public class ModelDaoGenerator {
     List<VariableElement> otherClassFields;
 
     public ModelDaoGenerator(Element element) {
-        this.modelName = FreezerUtils.getObjectName(element);
-        this.modelPackage = FreezerUtils.getObjectPackage(element);
+        this.modelName = FridgeUtils.getObjectName(element);
+        this.modelPackage = FridgeUtils.getObjectPackage(element);
 
         this.modelClassName = TypeName.get(element.asType());
-        this.modelCursorHelperClassName = FreezerUtils.getCursorHelper(element);
+        this.modelCursorHelperClassName = FridgeUtils.getCursorHelper(element);
 
-        this.TABLE_NAME = FreezerUtils.getTableName(element);
+        this.TABLE_NAME = FridgeUtils.getTableName(element);
 
-        this.queryBuilderClassName = FreezerUtils.getQueryBuilder(element);
+        this.queryBuilderClassName = FridgeUtils.getQueryBuilder(element);
 
-        this.fields = FreezerUtils.getPrimitiveFields(element);
-        this.otherClassFields = FreezerUtils.getNonPrimitiveClassFields(element);
+        this.fields = FridgeUtils.getPrimitiveFields(element);
+        this.otherClassFields = FridgeUtils.getNonPrimitiveClassFields(element);
     }
 
     public TypeSpec getDao() {
@@ -63,18 +63,18 @@ public class ModelDaoGenerator {
 
     public ModelDaoGenerator generate() {
 
-        TypeName listObjectsClassName = FreezerUtils.listOf(modelClassName);
+        TypeName listObjectsClassName = FridgeUtils.listOf(modelClassName);
 
-        this.queryBuilder = TypeSpec.classBuilder(FreezerUtils.getQueryBuilderName(modelName)) //UserDAOQueryBuilder
+        this.queryBuilder = TypeSpec.classBuilder(FridgeUtils.getQueryBuilderName(modelName)) //UserDAOQueryBuilder
                 .addModifiers(Modifier.PUBLIC)
 
                 .addField(ClassName.get(StringBuilder.class), "queryBuilder")
-                .addField(FreezerUtils.listOf(String.class), "args")
+                .addField(FridgeUtils.listOf(String.class), "args")
 
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("this.queryBuilder = new $T()", ClassName.get(StringBuilder.class))
-                        .addStatement("this.args = new $T()", FreezerUtils.arraylistOf(String.class))
+                        .addStatement("this.args = new $T()", FridgeUtils.arraylistOf(String.class))
                         .build())
 
                 .addMethods(generateQueryMethods())
@@ -141,14 +141,14 @@ public class ModelDaoGenerator {
                 .addStatement("object.$L = database.insert($S, null, $T.getValues(object,null))", Constants.FIELD_ID, TABLE_NAME, modelCursorHelperClassName);
 
         for (VariableElement variableElement : otherClassFields) {
-            String JOINTABLE = TABLE_NAME + "_" + FreezerUtils.getTableName(variableElement);
-            if (!FreezerUtils.isCollection(variableElement)) {
-                addB.addStatement("if(object.$L != null) object.$L._id = database.insert($S, null, $T.getValues(object.$L,$S))", FreezerUtils.getObjectName(variableElement), FreezerUtils.getObjectName(variableElement), FreezerUtils.getTableName(variableElement), FreezerUtils.getFieldCursorHelperClass(variableElement), FreezerUtils.getObjectName(variableElement),FreezerUtils.getObjectName(variableElement));
+            String JOINTABLE = TABLE_NAME + "_" + FridgeUtils.getTableName(variableElement);
+            if (!FridgeUtils.isCollection(variableElement)) {
+                addB.addStatement("if(object.$L != null) object.$L._id = database.insert($S, null, $T.getValues(object.$L,$S))", FridgeUtils.getObjectName(variableElement), FridgeUtils.getObjectName(variableElement), FridgeUtils.getTableName(variableElement), FridgeUtils.getFieldCursorHelperClass(variableElement), FridgeUtils.getObjectName(variableElement), FridgeUtils.getObjectName(variableElement));
             } else {
-                addB.beginControlFlow("if(object.$L != null)", FreezerUtils.getObjectName(variableElement))
-                        .beginControlFlow("for($T child : object.$L)", FreezerUtils.getFieldClass(variableElement), FreezerUtils.getObjectName(variableElement))
-                        .addStatement("child._id = database.insert($S, null, CarCursorHelper.getValues(child,null))", FreezerUtils.getTableName(variableElement))
-                        .addStatement("database.insert($S, null, $T.get$LValues(object._id,child._id, $S))", JOINTABLE, modelCursorHelperClassName, JOINTABLE, FreezerUtils.getObjectName(variableElement))
+                addB.beginControlFlow("if(object.$L != null)", FridgeUtils.getObjectName(variableElement))
+                        .beginControlFlow("for($T child : object.$L)", FridgeUtils.getFieldClass(variableElement), FridgeUtils.getObjectName(variableElement))
+                        .addStatement("child._id = database.insert($S, null, $T.getValues(child,null))", FridgeUtils.getTableName(variableElement), FridgeUtils.getFieldCursorHelperClass(variableElement))
+                        .addStatement("database.insert($S, null, $T.get$LValues(object._id,child._id, $S))", JOINTABLE, modelCursorHelperClassName, JOINTABLE, FridgeUtils.getObjectName(variableElement))
                         .endControlFlow()
                         .endControlFlow();
             }
@@ -157,7 +157,7 @@ public class ModelDaoGenerator {
         addB.addStatement("$T.getInstance().close()", Constants.daoClassName)
                 .addStatement("return object.$L", Constants.FIELD_ID);
 
-        this.dao = TypeSpec.classBuilder(FreezerUtils.getModelDaoName(modelName)) //UserDAO
+        this.dao = TypeSpec.classBuilder(FridgeUtils.getModelDaoName(modelName)) //UserDAO
                 .addModifiers(Modifier.PUBLIC)
 
                 .addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).build())
@@ -188,7 +188,7 @@ public class ModelDaoGenerator {
                         .addParameter(modelClassName, "object")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(TypeName.VOID)
-                        .addStatement("$T.getInstance().open().getDatabase().delete($S, $S, null)", Constants.daoClassName, TABLE_NAME, "_id = id")
+                        .addStatement("$T.getInstance().open().getDatabase().delete($S, $S, new String[]{String.valueOf(object.$L)})", Constants.daoClassName, TABLE_NAME, "_id = ?", Constants.FIELD_ID)
                         .addStatement("$T.getInstance().close()", Constants.daoClassName)
                         .build())
 
@@ -207,7 +207,7 @@ public class ModelDaoGenerator {
 
                     .addParameter(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString())
                     .addStatement("queryBuilder.append(\"$L = ?\")", variableElement.getSimpleName())
-                    .addStatement("args.add(" + FreezerUtils.getQueryCast(variableElement) + ")", variableElement.getSimpleName())
+                    .addStatement("args.add(" + FridgeUtils.getQueryCast(variableElement) + ")", variableElement.getSimpleName())
                     .addStatement("return this")
                     .build());
         }
@@ -222,15 +222,15 @@ public class ModelDaoGenerator {
         Set<String> addedTables = new HashSet<>();
 
         for (VariableElement variableElement : otherClassFields) {
-            String table = TABLE_NAME+"_"+FreezerUtils.getTableName(variableElement);
+            String table = TABLE_NAME+"_"+ FridgeUtils.getTableName(variableElement);
             if(!addedTables.contains(table)) {
                 stringBuilder
                         .append(",\n")
                         .append('"')
                         .append("create table ").append(table)
                         .append(" ( _id integer primary key autoincrement, ")
-                        .append(FreezerUtils.getKeyName(modelName)).append(" integer, ")
-                        .append(FreezerUtils.getKeyName(variableElement)).append(" integer, ")
+                        .append(FridgeUtils.getKeyName(modelName)).append(" integer, ")
+                        .append(FridgeUtils.getKeyName(variableElement)).append(" integer, ")
                         .append(Constants.FIELD_NAME).append(" text )")
                         .append('"');
                 addedTables.add(table);
@@ -248,7 +248,7 @@ public class ModelDaoGenerator {
                 stringBuilder
                         .append(variableElement.getSimpleName())
                         .append(" ")
-                        .append(FreezerUtils.getFieldTableType(variableElement));
+                        .append(FridgeUtils.getFieldTableType(variableElement));
                 if (i < fields.size() - 1)
                     stringBuilder.append(",");
             }

@@ -7,17 +7,17 @@ import com.squareup.javapoet.TypeName;
  * Created by florentchampigny on 18/01/2016.
  */
 public class Constants {
-    public static final String DAO_PACKAGE = "com.github.florent37.dao";
+    public static final String DAO_PACKAGE = "com.github.florent37.fridge";
 
-    public static final String DAO_CLASS_NAME = "DAO";
+    public static final String DAO_CLASS_NAME = "Fridge";
     public static final String DATABASE_HELPER_CLASS_NAME = "DatabaseHelper";
 
-    public static final String DAO_SUFFIX = "DAO";
+    public static final String DAO_SUFFIX = "Fridge";
     public static final String CURSOR_HELPER_SUFFIX = "CursorHelper";
-    public static final String QUERY_BUILDER_SUFFIX = "DAOQueryBuilder";
+    public static final String QUERY_BUILDER_SUFFIX = "FridgeQueryBuilder";
 
-    public static final TypeName daoClassName = ClassName.get(Constants.DAO_PACKAGE, "DAO");
-    public static final TypeName dbHelperClassName = ClassName.get(Constants.DAO_PACKAGE, "DatabaseHelper");
+    public static final TypeName daoClassName = ClassName.get(Constants.DAO_PACKAGE, DAO_SUFFIX);
+    public static final TypeName dbHelperClassName = ClassName.get(Constants.DAO_PACKAGE, DATABASE_HELPER_CLASS_NAME);
 
     public static final TypeName applicationClassName = ClassName.get("android.app", "Application");
     public static final TypeName databaseClassName = ClassName.get("android.database.sqlite", "SQLiteDatabase");
