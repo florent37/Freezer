@@ -138,23 +138,12 @@ public class ModelDaoGenerator {
                 .returns(TypeName.LONG)
                 .addModifiers(Modifier.PUBLIC)
                 .addStatement("$T database = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
-                .addStatement("object.$L = database.insert($S, null, $T.getValues(object,null))", Constants.FIELD_ID, TABLE_NAME, modelCursorHelperClassName);
-
-        for (VariableElement variableElement : otherClassFields) {
-            String JOINTABLE = TABLE_NAME + "_" + FridgeUtils.getTableName(variableElement);
-            if (!FridgeUtils.isCollection(variableElement)) {
-                addB.addStatement("if(object.$L != null) object.$L._id = database.insert($S, null, $T.getValues(object.$L,$S))", FridgeUtils.getObjectName(variableElement), FridgeUtils.getObjectName(variableElement), FridgeUtils.getTableName(variableElement), FridgeUtils.getFieldCursorHelperClass(variableElement), FridgeUtils.getObjectName(variableElement), FridgeUtils.getObjectName(variableElement));
-            } else {
-                addB.beginControlFlow("if(object.$L != null)", FridgeUtils.getObjectName(variableElement))
-                        .beginControlFlow("for($T child : object.$L)", FridgeUtils.getFieldClass(variableElement), FridgeUtils.getObjectName(variableElement))
-                        .addStatement("child._id = database.insert($S, null, $T.getValues(child,null))", FridgeUtils.getTableName(variableElement), FridgeUtils.getFieldCursorHelperClass(variableElement))
-                        .addStatement("database.insert($S, null, $T.get$LValues(object._id,child._id, $S))", JOINTABLE, modelCursorHelperClassName, JOINTABLE, FridgeUtils.getObjectName(variableElement))
-                        .endControlFlow()
-                        .endControlFlow();
-            }
-        }
-
-        addB.addStatement("$T.getInstance().close()", Constants.daoClassName)
+                .addStatement("$T.insert(database,object)",modelCursorHelperClassName)
+                //.addStatement("database.beginTransaction()")
+                //.addStatement("object.$L = database.insert($S, null, $T.getValues(object,null))", Constants.FIELD_ID, TABLE_NAME, modelCursorHelperClassName)
+                //.addStatement("database.setTransactionSuccessful()")
+                //.addStatement("database.endTransaction()")
+                .addStatement("$T.getInstance().close()", Constants.daoClassName)
                 .addStatement("return object.$L", Constants.FIELD_ID);
 
         this.dao = TypeSpec.classBuilder(FridgeUtils.getModelDaoName(modelName)) //UserDAO
@@ -192,6 +181,25 @@ public class ModelDaoGenerator {
                         .addStatement("$T.getInstance().close()", Constants.daoClassName)
                         .build())
 
+                .addMethod(MethodSpec.methodBuilder("deleteAll")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(TypeName.VOID)
+                        .addStatement("$T.getInstance().open().getDatabase().execSQL($S)", Constants.daoClassName, "delete from " + TABLE_NAME)
+                        .addStatement("$T.getInstance().close()", Constants.daoClassName)
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("count")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(TypeName.INT)
+                        .addStatement("$T db = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
+                        .addStatement("$T cursor = db.rawQuery($S,null)", Constants.cursorClassName, "select count(*) from " + TABLE_NAME)
+                        .addStatement("cursor.moveToFirst()")
+                        .addStatement("int recCount = cursor.getInt(0)")
+                        .addStatement("cursor.close()")
+                        .addStatement("$T.getInstance().close()", Constants.daoClassName)
+                        .addStatement("return recCount")
+                        .build())
+
                 .build();
 
         return this;
@@ -222,8 +230,8 @@ public class ModelDaoGenerator {
         Set<String> addedTables = new HashSet<>();
 
         for (VariableElement variableElement : otherClassFields) {
-            String table = TABLE_NAME+"_"+ FridgeUtils.getTableName(variableElement);
-            if(!addedTables.contains(table)) {
+            String table = TABLE_NAME + "_" + FridgeUtils.getTableName(variableElement);
+            if (!addedTables.contains(table)) {
                 stringBuilder
                         .append(",\n")
                         .append('"')

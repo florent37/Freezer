@@ -1,8 +1,10 @@
 package com.github.florent37.dao;
 
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -200,5 +202,16 @@ public class FridgeUtils {
 
     public static boolean isCollection(Element element) {
         return getEnclosedTypeName(element) != null;
+    }
+
+    public static String getMethodId(MethodSpec methodSpec){
+        return methodSpec.name+methodSpec.parameters.toString();
+    }
+
+    protected static List<String> getMethodsNames(TypeSpec typeSpec) {
+        List<String> names = new ArrayList<>();
+        for (MethodSpec methodSpec : typeSpec.methodSpecs)
+            names.add(methodSpec.name + methodSpec.parameters.toString());
+        return names;
     }
 }

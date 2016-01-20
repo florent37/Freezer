@@ -13,6 +13,7 @@ public class User {
 
     String name;
     List<Car> cars;
+    Car car;
 
     public User() {
     }
