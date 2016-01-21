@@ -22,6 +22,7 @@ public class Dog {
 @Model
 public class Cat {
     String shortName;
+}
 ```
 
 #Add Data
