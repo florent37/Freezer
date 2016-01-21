@@ -7,12 +7,12 @@ import com.squareup.javapoet.TypeName;
  * Created by florentchampigny on 18/01/2016.
  */
 public class Constants {
-    public static final String DAO_PACKAGE = "com.github.florent37.fridge";
+    public static final String DAO_PACKAGE = "com.github.florent37.orm";
 
-    public static final String DAO_CLASS_NAME = "Fridge";
+    public static final String DAO_CLASS_NAME = "ORM";
     public static final String DATABASE_HELPER_CLASS_NAME = "DatabaseHelper";
 
-    public static final String DAO_SUFFIX = "Fridge";
+    public static final String DAO_SUFFIX = "ORM";
     public static final String CURSOR_HELPER_SUFFIX = "CursorHelper";
     public static final String QUERY_BUILDER_SUFFIX = "FridgeQueryBuilder";
 

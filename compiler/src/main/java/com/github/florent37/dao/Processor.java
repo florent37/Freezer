@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -26,15 +25,15 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
-import static com.github.florent37.dao.FridgeUtils.getMethodId;
+import static com.github.florent37.dao.ProcessUtils.getMethodId;
 
 /**
  * Created by florentchampigny on 07/01/2016.
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes("com.github.florent37.dao.annotations.Model")
-@AutoService(Processor.class)
-public class FridgeProcessor extends AbstractProcessor {
+@AutoService(javax.annotation.processing.Processor.class)
+public class Processor extends AbstractProcessor {
 
     List<Element> models = new ArrayList<>();
     List<ClassName> daosList = new ArrayList<>();
@@ -57,8 +56,8 @@ public class FridgeProcessor extends AbstractProcessor {
         for (CursorHelper from : cursorHelpers) {
             for (Dependency dependency : from.dependencies) {
                 for (CursorHelper to : cursorHelpers) {
-                    if (dependency.getTypeName().equals(FridgeUtils.getFieldClass(to.element))) {
-                        HashSet<String> methodsNames = new HashSet<>(FridgeUtils.getMethodsNames(to.getTypeSpec()));
+                    if (dependency.getTypeName().equals(ProcessUtils.getFieldClass(to.element))) {
+                        HashSet<String> methodsNames = new HashSet<>(ProcessUtils.getMethodsNames(to.getTypeSpec()));
 
                         TypeSpec.Builder builder = to.getTypeSpec().toBuilder();
 
@@ -83,10 +82,10 @@ public class FridgeProcessor extends AbstractProcessor {
     private void generateModelDaoFiles(Element element) {
         ModelDaoGenerator modelDaoGenerator = new ModelDaoGenerator(element).generate();
 
-        writeFile(JavaFile.builder(FridgeUtils.getObjectPackage(element), modelDaoGenerator.getDao()).build());
-        writeFile(JavaFile.builder(FridgeUtils.getObjectPackage(element), modelDaoGenerator.getQueryBuilder()).build());
+        writeFile(JavaFile.builder(ProcessUtils.getObjectPackage(element), modelDaoGenerator.getDao()).build());
+        writeFile(JavaFile.builder(ProcessUtils.getObjectPackage(element), modelDaoGenerator.getQueryBuilder()).build());
 
-        daosList.add(FridgeUtils.getModelDao(element));
+        daosList.add(ProcessUtils.getModelDao(element));
     }
 
     protected void writeJavaFiles() {

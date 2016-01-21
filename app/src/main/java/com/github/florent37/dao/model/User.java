@@ -12,16 +12,15 @@ public class User {
     public long _id;
 
     String name;
-    List<Car> cars;
-    Car car;
+    Cat cat;
+    List<Dog> dogs;
 
-    public User() {
-    }
+    public User(){}
 
-    public User(String name, List<Car> cars, Car car) {
+    public User(String name, Cat cat, List<Dog> dogs) {
         this.name = name;
-        this.cars = cars;
-        this.car = car;
+        this.cat = cat;
+        this.dogs = dogs;
     }
 
     @Override public String toString() {

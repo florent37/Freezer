@@ -22,7 +22,7 @@ public class CursorHelper {
     }
 
     public String getPackage(){
-        return FridgeUtils.getObjectPackage(element);
+        return ProcessUtils.getObjectPackage(element);
     }
 
     public Element getElement() {

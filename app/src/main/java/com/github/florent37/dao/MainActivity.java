@@ -5,37 +5,39 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.github.florent37.dao.model.Car;
-import com.github.florent37.dao.model.CarFridge;
+import com.github.florent37.dao.model.Cat;
+import com.github.florent37.dao.model.CatORM;
+import com.github.florent37.dao.model.Dog;
+import com.github.florent37.dao.model.DogORM;
 import com.github.florent37.dao.model.User;
-import com.github.florent37.dao.model.UserFridge;
+import com.github.florent37.dao.model.UserORM;
 
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
-    UserFridge userFridge;
+    UserORM userORM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        userFridge = new UserFridge();
+        userORM = new UserORM();
 
-        userFridge.deleteAll();
+        userORM.deleteAll();
 
-        userFridge.add(Arrays.asList(
-                        new User("florent", Arrays.asList(new Car(Color.RED), new Car(Color.BLUE)), new Car(Color.WHITE)),
-                        new User("kevin", Arrays.asList(new Car(Color.RED)), new Car(Color.RED)),
-                        new User("alex", Arrays.asList(new Car(Color.YELLOW)), new Car(Color.BLACK))
+        userORM.add(Arrays.asList(
+                        new User("florent", new Cat("Java"), Arrays.asList(new Dog("Loulou"))),
+                        new User("kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty"))),
+                        new User("alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")))
                 )
         );
 
-        Log.d("DAO", userFridge.selectWhere()
-                .cars(CarFridge.where().colorEquals(Color.RED))
+        Log.d("DAO", userORM.selectWhere()
+                .cat(CatORM.where().shortNameEquals("Java"))
                 .or()
-                .car(CarFridge.where().colorEquals(Color.BLACK))
+                .dogs(DogORM.where().nameEquals("Sasha"))
                 .asList()
                 .toString());
     }

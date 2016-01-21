@@ -1,7 +1,7 @@
 package com.github.florent37.dao.generator;
 
 import com.github.florent37.dao.Constants;
-import com.github.florent37.dao.FridgeUtils;
+import com.github.florent37.dao.ProcessUtils;
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
@@ -39,18 +39,18 @@ public class ModelDaoGenerator {
     List<VariableElement> otherClassFields;
 
     public ModelDaoGenerator(Element element) {
-        this.modelName = FridgeUtils.getObjectName(element);
-        this.modelPackage = FridgeUtils.getObjectPackage(element);
+        this.modelName = ProcessUtils.getObjectName(element);
+        this.modelPackage = ProcessUtils.getObjectPackage(element);
 
         this.modelClassName = TypeName.get(element.asType());
-        this.modelCursorHelperClassName = FridgeUtils.getCursorHelper(element);
+        this.modelCursorHelperClassName = ProcessUtils.getCursorHelper(element);
 
-        this.TABLE_NAME = FridgeUtils.getTableName(element);
+        this.TABLE_NAME = ProcessUtils.getTableName(element);
 
-        this.queryBuilderClassName = FridgeUtils.getQueryBuilder(element);
+        this.queryBuilderClassName = ProcessUtils.getQueryBuilder(element);
 
-        this.fields = FridgeUtils.getPrimitiveFields(element);
-        this.otherClassFields = FridgeUtils.getNonPrimitiveClassFields(element);
+        this.fields = ProcessUtils.getPrimitiveFields(element);
+        this.otherClassFields = ProcessUtils.getNonPrimitiveClassFields(element);
     }
 
     public TypeSpec getDao() {
@@ -63,25 +63,25 @@ public class ModelDaoGenerator {
 
     public ModelDaoGenerator generate() {
 
-        TypeName listObjectsClassName = FridgeUtils.listOf(modelClassName);
+        TypeName listObjectsClassName = ProcessUtils.listOf(modelClassName);
 
-        this.queryBuilder = TypeSpec.classBuilder(FridgeUtils.getQueryBuilderName(modelName)) //UserDAOQueryBuilder
+        this.queryBuilder = TypeSpec.classBuilder(ProcessUtils.getQueryBuilderName(modelName)) //UserDAOQueryBuilder
                 .addModifiers(Modifier.PUBLIC)
 
                 .addField(ClassName.get(StringBuilder.class), "queryBuilder")
-                .addField(FridgeUtils.listOf(String.class), "args")
-                .addField(FridgeUtils.listOf(String.class), "fromTables")
-                .addField(FridgeUtils.listOf(String.class), "fromTablesNames")
-                .addField(FridgeUtils.listOf(String.class), "fromTablesId")
+                .addField(ProcessUtils.listOf(String.class), "args")
+                .addField(ProcessUtils.listOf(String.class), "fromTables")
+                .addField(ProcessUtils.listOf(String.class), "fromTablesNames")
+                .addField(ProcessUtils.listOf(String.class), "fromTablesId")
                 .addField(TypeName.BOOLEAN, "named")
 
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("this.queryBuilder = new $T()", ClassName.get(StringBuilder.class))
-                        .addStatement("this.args = new $T()", FridgeUtils.arraylistOf(String.class))
-                        .addStatement("this.fromTables = new $T()", FridgeUtils.arraylistOf(String.class))
-                        .addStatement("this.fromTablesNames = new $T()", FridgeUtils.arraylistOf(String.class))
-                        .addStatement("this.fromTablesId = new $T()", FridgeUtils.arraylistOf(String.class))
+                        .addStatement("this.args = new $T()", ProcessUtils.arraylistOf(String.class))
+                        .addStatement("this.fromTables = new $T()", ProcessUtils.arraylistOf(String.class))
+                        .addStatement("this.fromTablesNames = new $T()", ProcessUtils.arraylistOf(String.class))
+                        .addStatement("this.fromTablesId = new $T()", ProcessUtils.arraylistOf(String.class))
                         .build())
 
                 .addMethod(MethodSpec.constructorBuilder()
@@ -144,7 +144,7 @@ public class ModelDaoGenerator {
                         .addStatement("$T tableId", ClassName.get(String.class))
                         .addStatement("int tablePos = fromTablesNames.indexOf(tableName)")
                         .addStatement("if(tablePos != -1) tableId = fromTablesId.get(tablePos)")
-                        .addStatement("else{ tableId = $S + fromTables.size(); fromTablesId.add(tableId); fromTables.add(tableName + \" \" + tableId); fromTablesNames.add(tableName); }", "t")
+                        .addStatement("else{ tableId = $S + fromTables.size(); fromTablesId.add(tableId); fromTables.add(tableName + \" \" + tableId); fromTablesNames.add(tableName); }", Constants.QUERY_TABLE_VARIABLE)
                         .addStatement("return tableId")
 
                         .build())
@@ -158,7 +158,7 @@ public class ModelDaoGenerator {
                         .addParameter(TypeName.get(String.class), "joinIdTo")
                         .addParameter(TypeName.get(String.class), "table")
                         .addParameter(TypeName.get(String.class), "variable")
-                        .addParameter(FridgeUtils.listOf(String.class), "args")
+                        .addParameter(ProcessUtils.listOf(String.class), "args")
                         .addStatement("args.addAll(this.args)")
                         .addStatement("queryBuilder.append(\" AND \").append(joinTable).append(\".\").append(joinIdFrom).append(\"  = \").append(fromTable).append(\".$L\")", Constants.FIELD_ID)
                         .addStatement("queryBuilder.append(\" AND \").append(joinTable).append(\".\").append(joinIdTo).append(\"  = \").append(table).append(\".$L\")", Constants.FIELD_ID)
@@ -179,7 +179,7 @@ public class ModelDaoGenerator {
 
                 .build();
 
-        this.dao = TypeSpec.classBuilder(FridgeUtils.getModelDaoName(modelName)) //UserDAO
+        this.dao = TypeSpec.classBuilder(ProcessUtils.getModelDaoName(modelName)) //UserDAO
                 .addModifiers(Modifier.PUBLIC)
 
                 .addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).build())
@@ -222,7 +222,7 @@ public class ModelDaoGenerator {
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("add")
-                        .addParameter(FridgeUtils.listOf(modelClassName), "objects")
+                        .addParameter(ProcessUtils.listOf(modelClassName), "objects")
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("for($T object : objects) add(object)", modelClassName)
                         .build())
@@ -270,20 +270,20 @@ public class ModelDaoGenerator {
                     .addParameter(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString())
                     .addStatement("if(named) queryBuilder.append($S)", Constants.QUERY_NAMED + ".")
                     .addStatement("queryBuilder.append(\"$L = ?\")", variableElement.getSimpleName())
-                    .addStatement("args.add(" + FridgeUtils.getQueryCast(variableElement) + ")", variableElement.getSimpleName())
+                    .addStatement("args.add(" + ProcessUtils.getQueryCast(variableElement) + ")", variableElement.getSimpleName())
                     .addStatement("return this")
                     .build());
         }
 
         for (VariableElement variableElement : otherClassFields) {
 
-            String JOINTABLE = FridgeUtils.getTableName(modelName) + "_" + FridgeUtils.getTableName(variableElement);
+            String JOINTABLE = ProcessUtils.getTableName(modelName) + "_" + ProcessUtils.getTableName(variableElement);
 
             methodSpecs.add(MethodSpec.methodBuilder(variableElement.getSimpleName().toString())
                     .returns(queryBuilderClassName)
                     .addModifiers(Modifier.PUBLIC)
-                    .addParameter(FridgeUtils.getFieldQueryBuilderClass(variableElement), "query")
-                    .addStatement("queryBuilder.append('(').append(query.query($S,getTableId($S),$S,$S,getTableId($S),$S,args)).append(')')", TABLE_NAME, JOINTABLE, FridgeUtils.getKeyName(modelName), FridgeUtils.getKeyName(variableElement), FridgeUtils.getTableName(variableElement), FridgeUtils.getObjectName(variableElement))
+                    .addParameter(ProcessUtils.getFieldQueryBuilderClass(variableElement), "query")
+                    .addStatement("queryBuilder.append('(').append(query.query($S,getTableId($S),$S,$S,getTableId($S),$S,args)).append(')')", TABLE_NAME, JOINTABLE, ProcessUtils.getKeyName(modelName), ProcessUtils.getKeyName(variableElement), ProcessUtils.getTableName(variableElement), ProcessUtils.getObjectName(variableElement))
                     .addStatement("return this")
                     .build());
         }
@@ -298,15 +298,15 @@ public class ModelDaoGenerator {
         Set<String> addedTables = new HashSet<>();
 
         for (VariableElement variableElement : otherClassFields) {
-            String table = TABLE_NAME + "_" + FridgeUtils.getTableName(variableElement);
+            String table = TABLE_NAME + "_" + ProcessUtils.getTableName(variableElement);
             if (!addedTables.contains(table)) {
                 stringBuilder
                         .append(",\n")
                         .append('"')
                         .append("create table ").append(table)
                         .append(" ( _id integer primary key autoincrement, ")
-                        .append(FridgeUtils.getKeyName(modelName)).append(" integer, ")
-                        .append(FridgeUtils.getKeyName(variableElement)).append(" integer, ")
+                        .append(ProcessUtils.getKeyName(modelName)).append(" integer, ")
+                        .append(ProcessUtils.getKeyName(variableElement)).append(" integer, ")
                         .append(Constants.FIELD_NAME).append(" text )")
                         .append('"');
                 addedTables.add(table);
@@ -324,7 +324,7 @@ public class ModelDaoGenerator {
                 stringBuilder
                         .append(variableElement.getSimpleName())
                         .append(" ")
-                        .append(FridgeUtils.getFieldTableType(variableElement));
+                        .append(ProcessUtils.getFieldTableType(variableElement));
                 if (i < fields.size() - 1)
                     stringBuilder.append(",");
             }
