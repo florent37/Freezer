@@ -95,7 +95,7 @@ public class User {
 This project was first developed by Xebia and has been open-sourced since. We will continue working and investing on it.
 We encourage the community to contribute to the project by opening tickets and/or pull requests.
 
-[![logo xebia](https://raw.githubusercontent.com/florent37/Android-ORM/master/logo-xebia.jpg)](http://www.xebia.fr/)
+[![logo xebia](https://raw.githubusercontent.com/florent37/Android-ORM/master/logo_xebia.jpg)](http://www.xebia.fr/)
 
 License
 --------
