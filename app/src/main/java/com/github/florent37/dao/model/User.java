@@ -22,4 +22,13 @@ public class User {
         this.name = name;
         this.cars = cars;
     }
+
+    @Override public String toString() {
+        return "User{" +
+                "_id=" + _id +
+                ", name='" + name + '\'' +
+                ", cars=" + cars +
+                ", car=" + car +
+                '}';
+    }
 }

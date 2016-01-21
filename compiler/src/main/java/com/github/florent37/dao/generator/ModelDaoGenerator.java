@@ -70,11 +70,21 @@ public class ModelDaoGenerator {
 
                 .addField(ClassName.get(StringBuilder.class), "queryBuilder")
                 .addField(FridgeUtils.listOf(String.class), "args")
+                .addField(FridgeUtils.listOf(String.class), "fromTables")
+                .addField(TypeName.BOOLEAN, "named")
 
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("this.queryBuilder = new $T()", ClassName.get(StringBuilder.class))
                         .addStatement("this.args = new $T()", FridgeUtils.arraylistOf(String.class))
+                        .addStatement("this.fromTables = new $T()", FridgeUtils.arraylistOf(String.class))
+                        .build())
+
+                .addMethod(MethodSpec.constructorBuilder()
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(TypeName.BOOLEAN, "named")
+                        .addStatement("this()")
+                        .addStatement("this.named = named")
                         .build())
 
                 .addMethods(generateQueryMethods())
@@ -115,16 +125,36 @@ public class ModelDaoGenerator {
 
                 .addMethod(MethodSpec.methodBuilder("constructQuery")
                         .returns(TypeName.get(String.class))
-                        .addModifiers(Modifier.PRIVATE)
-                        .addStatement("if (queryBuilder.length() == 0) return $S", "")
-                        .addStatement("return $S + queryBuilder.toString()", "where ")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("$T query = new $T()", ClassName.get(StringBuilder.class), ClassName.get(StringBuilder.class))
+                        .addStatement("for($T s : fromTables) query.append($S).append(s)", ClassName.get(String.class), ", ")
+                        .addStatement("if (queryBuilder.length() != 0) query.append($S)", " where ")
+                        .addStatement("query.append(queryBuilder.toString())")
+                        .addStatement("return query.toString()")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("query")
+                        .returns(TypeName.get(String.class))
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(TypeName.get(String.class), "fromTable")
+                        .addParameter(TypeName.get(String.class), "joinTable")
+                        .addParameter(TypeName.get(String.class), "joinIdFrom")
+                        .addParameter(TypeName.get(String.class), "joinIdTo")
+                        .addParameter(TypeName.get(String.class), "table")
+                        .addParameter(TypeName.get(String.class), "variable")
+                        .addParameter(FridgeUtils.listOf(String.class), "args")
+                        .addStatement("args.addAll(this.args)")
+                        .addStatement("queryBuilder.append(\" AND \").append(joinTable).append(\".\").append(joinIdFrom).append(\"  = \").append(fromTable).append(\".$L\")", Constants.FIELD_ID)
+                        .addStatement("queryBuilder.append(\" AND \").append(joinTable).append(\".\").append(joinIdTo).append(\"  = \").append(table).append(\".$L\")", Constants.FIELD_ID)
+                        .addStatement("queryBuilder.append(\" AND \").append(joinTable).append(\".$L  = '\").append(variable).append(\"'\")", Constants.FIELD_NAME)
+                        .addStatement("return queryBuilder.toString().replace($S,table)", Constants.QUERY_NAMED)
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("execute")
                         .returns(listObjectsClassName)
                         .addModifiers(Modifier.PRIVATE)
                         .addStatement("$T db = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
-                        .addStatement("$T cursor = db.rawQuery($S + constructQuery(), constructArgs())", Constants.cursorClassName, "select * from " + TABLE_NAME + " ")
+                        .addStatement("$T cursor = db.rawQuery($S + constructQuery(), constructArgs())", Constants.cursorClassName, String.format("select %s.* from %s ", TABLE_NAME, TABLE_NAME))
                         .addStatement("$T objects = $T.get(cursor,db)", listObjectsClassName, modelCursorHelperClassName)
                         .addStatement("cursor.close()")
                         .addStatement("$T.getInstance().close()", Constants.daoClassName)
@@ -132,19 +162,6 @@ public class ModelDaoGenerator {
                         .build())
 
                 .build();
-
-        MethodSpec.Builder addB = MethodSpec.methodBuilder("add")
-                .addParameter(modelClassName, "object")
-                .returns(TypeName.LONG)
-                .addModifiers(Modifier.PUBLIC)
-                .addStatement("$T database = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
-                .addStatement("$T.insert(database,object)",modelCursorHelperClassName)
-                //.addStatement("database.beginTransaction()")
-                //.addStatement("object.$L = database.insert($S, null, $T.getValues(object,null))", Constants.FIELD_ID, TABLE_NAME, modelCursorHelperClassName)
-                //.addStatement("database.setTransactionSuccessful()")
-                //.addStatement("database.endTransaction()")
-                .addStatement("$T.getInstance().close()", Constants.daoClassName)
-                .addStatement("return object.$L", Constants.FIELD_ID);
 
         this.dao = TypeSpec.classBuilder(FridgeUtils.getModelDaoName(modelName)) //UserDAO
                 .addModifiers(Modifier.PUBLIC)
@@ -171,7 +188,28 @@ public class ModelDaoGenerator {
                         .addStatement("return new $T()", queryBuilderClassName)
                         .build())
 
-                .addMethod(addB.build())
+                .addMethod(MethodSpec.methodBuilder("where")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addModifiers(Modifier.STATIC)
+                        .returns(queryBuilderClassName)
+                        .addStatement("return new $T(true)", queryBuilderClassName)
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("add")
+                        .addParameter(modelClassName, "object")
+                        .returns(TypeName.LONG)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("$T database = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
+                        .addStatement("$T.insert(database,object)", modelCursorHelperClassName)
+                        .addStatement("$T.getInstance().close()", Constants.daoClassName)
+                        .addStatement("return object.$L", Constants.FIELD_ID)
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("add")
+                        .addParameter(FridgeUtils.listOf(modelClassName), "objects")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("for($T object : objects) add(object)", modelClassName)
+                        .build())
 
                 .addMethod(MethodSpec.methodBuilder("delete")
                         .addParameter(modelClassName, "object")
@@ -214,8 +252,27 @@ public class ModelDaoGenerator {
                     .addModifiers(Modifier.PUBLIC)
 
                     .addParameter(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString())
+                    .addStatement("if(named) queryBuilder.append($S)", Constants.QUERY_NAMED+".")
                     .addStatement("queryBuilder.append(\"$L = ?\")", variableElement.getSimpleName())
                     .addStatement("args.add(" + FridgeUtils.getQueryCast(variableElement) + ")", variableElement.getSimpleName())
+                    .addStatement("return this")
+                    .build());
+        }
+
+        for (VariableElement variableElement : otherClassFields) {
+
+            String JOINTABLE = FridgeUtils.getTableName(modelName) + "_" + FridgeUtils.getTableName(variableElement);
+
+            methodSpecs.add(MethodSpec.methodBuilder(variableElement.getSimpleName().toString())
+                    .returns(queryBuilderClassName)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addParameter(FridgeUtils.getFieldQueryBuilderClass(variableElement), "query")
+
+                    .addStatement("$T joinTable = $S + fromTables.size()", ClassName.get(String.class), Constants.QUERY_TABLE_VARIABLE)
+                    .addStatement("fromTables.add($S + joinTable)", JOINTABLE + " ")
+                    .addStatement("$T table = $S + fromTables.size()", ClassName.get(String.class), Constants.QUERY_TABLE_VARIABLE)
+                    .addStatement("fromTables.add($S + table)", FridgeUtils.getTableName(variableElement) + " ")
+                    .addStatement("queryBuilder.append(query.query($S,joinTable,$S,$S,table,$S,args))", TABLE_NAME, FridgeUtils.getKeyName(modelName), FridgeUtils.getKeyName(variableElement), FridgeUtils.getObjectName(variableElement))
                     .addStatement("return this")
                     .build());
         }

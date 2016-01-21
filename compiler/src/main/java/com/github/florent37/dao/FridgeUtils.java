@@ -181,6 +181,10 @@ public class FridgeUtils {
         return ClassName.bestGuess(getFieldClass(element).toString() + Constants.CURSOR_HELPER_SUFFIX);
     }
 
+    public static TypeName getFieldQueryBuilderClass(VariableElement element) {
+        return ClassName.bestGuess(getFieldClass(element).toString() + Constants.QUERY_BUILDER_SUFFIX);
+    }
+
     public static TypeName getFieldClass(Element element) {
         TypeName enclosed = getEnclosedTypeName(element);
         if(enclosed != null)

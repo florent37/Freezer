@@ -18,4 +18,11 @@ public class Car {
     public Car(int color) {
         this.color = color;
     }
+
+    @Override public String toString() {
+        return "Car{" +
+                "_id=" + _id +
+                ", color=" + color +
+                '}';
+    }
 }

@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.github.florent37.dao.model.Car;
+import com.github.florent37.dao.model.CarFridge;
 import com.github.florent37.dao.model.User;
 import com.github.florent37.dao.model.UserFridge;
 
@@ -22,12 +23,16 @@ public class MainActivity extends AppCompatActivity {
 
         userFridge = new UserFridge();
 
-        userFridge.add(
-                new User("florent", Arrays.asList(new Car(Color.RED), new Car(Color.BLUE)))
+        userFridge.deleteAll();
+
+        userFridge.add(Arrays.asList(
+                        new User("florent", Arrays.asList(new Car(Color.RED), new Car(Color.BLUE))),
+                        new User("florent", Arrays.asList(new Car(Color.YELLOW)))
+                )
         );
 
         Log.d("DAO all", userFridge.selectWhere()
-                .nameEquals("florent")
+                .cars(CarFridge.where().colorEquals(Color.RED))
                 .asList()
                 .toString());
     }
