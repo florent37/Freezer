@@ -1,4 +1,4 @@
-# Fridge
+# Android ORM
 
 Simply add @Model on your objects
 
@@ -6,29 +6,60 @@ Simply add @Model on your objects
 @Model
 public class User {
     String name;
-    List<Car> cars;
+    Cat cat;
+    List<Dog> dogs;
 }
 ```
 
 ```java
 @Model
-public class Car {
-    int color;
+public class Dog {
+    String name;
 }
 ```
 
-Will generate Fridges
 ```java
-UserFridge userFridge = new UserFridge();
+@Model
+public class Cat {
+    String shortName;
+```
 
-userFridge.add(new User("florent", Arrays.asList(new Car(Color.RED), new Car(Color.BLUE))));
+#Add Data
+```java
+UserORM userORM = new UserORM();
+userORM.add(new User("florent", new Cat("Java"), Arrays.asList(new Dog("Loulou"))));
+```
 
-List<User> allUsers = userDAO.selectWhere()
-                .asList());
+#Add Datas
+```java
+userORM.add(Arrays.asList(
+                new User("florent", new Cat("Java"), Arrays.asList(new Dog("Loulou"))),
+                new User("kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty"))),
+                new User("alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")))
+        )
+);
+```
 
-User userFlorent = userDAO.selectWhere()
-                .nameEquals("florent")
-                .first();
+#Querying
+
+##Simple
+```java  
+List<User> allUsers = userORM.selectWhere()
+                             .asList()
+                             .toString()
+```
+
+##Complex
+
+```java  
+List<User> allUsers = userORM.selectWhere()
+                                .nameEquals("florent")
+                             .or()
+                                .cat(CatORM.where().shortNameEquals("Java"))
+                             .or()
+                                .dogs(DogORM.where().nameEquals("Sasha"))
+                             .asList()
+                             .toString()
 ```
 
 #Accepted types
@@ -44,9 +75,7 @@ User userFlorent = userDAO.selectWhere()
 ```java
 @Model
 public class User {
-
-    Car car;
-
+    Cat cat;
 }
 
 ```
@@ -56,9 +85,7 @@ public class User {
 ```java
 @Model
 public class User {
-
-    List<Car> cars;
-
+    List<Dog> dogs;
 }
 
 ```
