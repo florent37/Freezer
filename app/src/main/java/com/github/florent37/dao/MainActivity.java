@@ -26,13 +26,16 @@ public class MainActivity extends AppCompatActivity {
         userFridge.deleteAll();
 
         userFridge.add(Arrays.asList(
-                        new User("florent", Arrays.asList(new Car(Color.RED), new Car(Color.BLUE))),
-                        new User("florent", Arrays.asList(new Car(Color.YELLOW)))
+                        new User("florent", Arrays.asList(new Car(Color.RED), new Car(Color.BLUE)), new Car(Color.WHITE)),
+                        new User("kevin", Arrays.asList(new Car(Color.RED)), new Car(Color.RED)),
+                        new User("alex", Arrays.asList(new Car(Color.YELLOW)), new Car(Color.BLACK))
                 )
         );
 
-        Log.d("DAO all", userFridge.selectWhere()
+        Log.d("DAO", userFridge.selectWhere()
                 .cars(CarFridge.where().colorEquals(Color.RED))
+                .or()
+                .car(CarFridge.where().colorEquals(Color.BLACK))
                 .asList()
                 .toString());
     }

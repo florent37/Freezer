@@ -71,6 +71,8 @@ public class ModelDaoGenerator {
                 .addField(ClassName.get(StringBuilder.class), "queryBuilder")
                 .addField(FridgeUtils.listOf(String.class), "args")
                 .addField(FridgeUtils.listOf(String.class), "fromTables")
+                .addField(FridgeUtils.listOf(String.class), "fromTablesNames")
+                .addField(FridgeUtils.listOf(String.class), "fromTablesId")
                 .addField(TypeName.BOOLEAN, "named")
 
                 .addMethod(MethodSpec.constructorBuilder()
@@ -78,6 +80,8 @@ public class ModelDaoGenerator {
                         .addStatement("this.queryBuilder = new $T()", ClassName.get(StringBuilder.class))
                         .addStatement("this.args = new $T()", FridgeUtils.arraylistOf(String.class))
                         .addStatement("this.fromTables = new $T()", FridgeUtils.arraylistOf(String.class))
+                        .addStatement("this.fromTablesNames = new $T()", FridgeUtils.arraylistOf(String.class))
+                        .addStatement("this.fromTablesId = new $T()", FridgeUtils.arraylistOf(String.class))
                         .build())
 
                 .addMethod(MethodSpec.constructorBuilder()
@@ -133,6 +137,18 @@ public class ModelDaoGenerator {
                         .addStatement("return query.toString()")
                         .build())
 
+                .addMethod(MethodSpec.methodBuilder("getTableId")
+                        .addModifiers(Modifier.PRIVATE)
+                        .returns(ClassName.get(String.class))
+                        .addParameter(ClassName.get(String.class), "tableName")
+                        .addStatement("$T tableId", ClassName.get(String.class))
+                        .addStatement("int tablePos = fromTablesNames.indexOf(tableName)")
+                        .addStatement("if(tablePos != -1) tableId = fromTablesId.get(tablePos)")
+                        .addStatement("else{ tableId = $S + fromTables.size(); fromTablesId.add(tableId); fromTables.add(tableName + \" \" + tableId); fromTablesNames.add(tableName); }", "t")
+                        .addStatement("return tableId")
+
+                        .build())
+
                 .addMethod(MethodSpec.methodBuilder("query")
                         .returns(TypeName.get(String.class))
                         .addModifiers(Modifier.PUBLIC)
@@ -154,7 +170,7 @@ public class ModelDaoGenerator {
                         .returns(listObjectsClassName)
                         .addModifiers(Modifier.PRIVATE)
                         .addStatement("$T db = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
-                        .addStatement("$T cursor = db.rawQuery($S + constructQuery(), constructArgs())", Constants.cursorClassName, String.format("select %s.* from %s ", TABLE_NAME, TABLE_NAME))
+                        .addStatement("$T cursor = db.rawQuery($S + constructQuery(), constructArgs())", Constants.cursorClassName, String.format("select distinct %s.* from %s ", TABLE_NAME, TABLE_NAME))
                         .addStatement("$T objects = $T.get(cursor,db)", listObjectsClassName, modelCursorHelperClassName)
                         .addStatement("cursor.close()")
                         .addStatement("$T.getInstance().close()", Constants.daoClassName)
@@ -252,7 +268,7 @@ public class ModelDaoGenerator {
                     .addModifiers(Modifier.PUBLIC)
 
                     .addParameter(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString())
-                    .addStatement("if(named) queryBuilder.append($S)", Constants.QUERY_NAMED+".")
+                    .addStatement("if(named) queryBuilder.append($S)", Constants.QUERY_NAMED + ".")
                     .addStatement("queryBuilder.append(\"$L = ?\")", variableElement.getSimpleName())
                     .addStatement("args.add(" + FridgeUtils.getQueryCast(variableElement) + ")", variableElement.getSimpleName())
                     .addStatement("return this")
@@ -267,12 +283,7 @@ public class ModelDaoGenerator {
                     .returns(queryBuilderClassName)
                     .addModifiers(Modifier.PUBLIC)
                     .addParameter(FridgeUtils.getFieldQueryBuilderClass(variableElement), "query")
-
-                    .addStatement("$T joinTable = $S + fromTables.size()", ClassName.get(String.class), Constants.QUERY_TABLE_VARIABLE)
-                    .addStatement("fromTables.add($S + joinTable)", JOINTABLE + " ")
-                    .addStatement("$T table = $S + fromTables.size()", ClassName.get(String.class), Constants.QUERY_TABLE_VARIABLE)
-                    .addStatement("fromTables.add($S + table)", FridgeUtils.getTableName(variableElement) + " ")
-                    .addStatement("queryBuilder.append(query.query($S,joinTable,$S,$S,table,$S,args))", TABLE_NAME, FridgeUtils.getKeyName(modelName), FridgeUtils.getKeyName(variableElement), FridgeUtils.getObjectName(variableElement))
+                    .addStatement("queryBuilder.append('(').append(query.query($S,getTableId($S),$S,$S,getTableId($S),$S,args)).append(')')", TABLE_NAME, JOINTABLE, FridgeUtils.getKeyName(modelName), FridgeUtils.getKeyName(variableElement), FridgeUtils.getTableName(variableElement), FridgeUtils.getObjectName(variableElement))
                     .addStatement("return this")
                     .build());
         }

@@ -18,17 +18,15 @@ public class User {
     public User() {
     }
 
-    public User(String name, List<Car> cars) {
+    public User(String name, List<Car> cars, Car car) {
         this.name = name;
         this.cars = cars;
+        this.car = car;
     }
 
     @Override public String toString() {
         return "User{" +
-                "_id=" + _id +
-                ", name='" + name + '\'' +
-                ", cars=" + cars +
-                ", car=" + car +
+                " name='" + name + '\'' +
                 '}';
     }
 }
