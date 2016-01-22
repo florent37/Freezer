@@ -5,6 +5,7 @@ Use Annotations to mark classes to be Persisted
 ```java
 @Model
 public class User {
+    int age;
     String name;
     Cat cat;
     List<Dog> dogs;
@@ -31,7 +32,7 @@ Persist your data easily
 
 ```java
 UserORM userORM = new UserORM();
-userORM.add(new User("florent", new Cat("Java"), Arrays.asList(new Dog("Loulou"))));
+userORM.add(new User(25, "florent", new Cat("Java"), Arrays.asList(new Dog("Medor"), new Dog("Milou"))));
 ```
 
 #Querying
