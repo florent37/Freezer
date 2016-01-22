@@ -1,6 +1,6 @@
 # Android ORM
 
-Simply add @Model on your objects
+Use Annotations to mark classes to be Persisted
 
 ```java
 @Model
@@ -25,20 +25,13 @@ public class Cat {
 }
 ```
 
-#Add Data
+#Persist datas
+
+Persist your data easily
+
 ```java
 UserORM userORM = new UserORM();
 userORM.add(new User("florent", new Cat("Java"), Arrays.asList(new Dog("Loulou"))));
-```
-
-#Add Datas
-```java
-userORM.add(Arrays.asList(
-                new User("florent", new Cat("Java"), Arrays.asList(new Dog("Loulou"))),
-                new User("kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty"))),
-                new User("alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")))
-        )
-);
 ```
 
 #Querying
@@ -51,6 +44,8 @@ List<User> allUsers = userORM.selectWhere()
 ```
 
 ##Complex
+
+Android-ORM query engine uses a Fluent interface to construct multi-clause queries
 
 ```java  
 List<User> allUsers = userORM.selectWhere()

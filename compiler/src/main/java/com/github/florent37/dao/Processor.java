@@ -4,6 +4,7 @@ import com.github.florent37.dao.annotations.Model;
 import com.github.florent37.dao.generator.CursorHelperGenerator;
 import com.github.florent37.dao.generator.DAOGenerator;
 import com.github.florent37.dao.generator.DatabaseHelperGenerator;
+import com.github.florent37.dao.generator.EnumColumnGenerator;
 import com.github.florent37.dao.generator.ModelDaoGenerator;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
@@ -44,12 +45,19 @@ public class Processor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for (Element element : roundEnv.getElementsAnnotatedWith(Model.class)) {
             models.add(element);
+            generateColumnEnums(element);
             generateCursorHelperFiles(element);
             generateModelDaoFiles(element);
         }
         resolveDependencies();
         writeJavaFiles();
         return true;
+    }
+
+    private void generateColumnEnums(Element element) {
+        EnumColumnGenerator columnGenerator = new EnumColumnGenerator(element);
+
+        writeFile(JavaFile.builder(ProcessUtils.getObjectPackage(element), columnGenerator.generate()).build());
     }
 
     private void resolveDependencies() {

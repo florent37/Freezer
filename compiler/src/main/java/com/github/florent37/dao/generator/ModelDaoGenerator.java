@@ -11,6 +11,7 @@ import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.lang.model.element.Element;
@@ -119,6 +120,46 @@ public class ModelDaoGenerator {
                         .addStatement("$T objects = asList()", listObjectsClassName)
                         .addStatement("if(objects.isEmpty()) return null")
                         .addStatement("else return objects.get(0)")
+                        .build())
+
+                //TODO
+                .addMethod(MethodSpec.methodBuilder("sort")
+                        .returns(queryBuilderClassName)
+                        .addParameter(ClassName.get(Object.class), "column")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("return this")
+                        .build())
+
+                        //TODO
+                .addMethod(MethodSpec.methodBuilder("sum")
+                        .returns(TypeName.get(Number.class))
+                        .addParameter(ClassName.get(Object.class), "column")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("return Float.valueOf(3)")
+                        .build())
+
+                        //TODO
+                .addMethod(MethodSpec.methodBuilder("min")
+                        .returns(TypeName.get(Number.class))
+                        .addParameter(ClassName.get(Object.class), "column")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("return Float.valueOf(3)")
+                        .build())
+
+                        //TODO
+                .addMethod(MethodSpec.methodBuilder("max")
+                        .returns(TypeName.get(Number.class))
+                        .addParameter(ClassName.get(Object.class), "column")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("return Float.valueOf(3)")
+                        .build())
+
+                        //TODO
+                .addMethod(MethodSpec.methodBuilder("average")
+                        .returns(TypeName.get(Number.class))
+                        .addParameter(ClassName.get(Object.class), "column")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("return Float.valueOf(3)")
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("constructArgs")
