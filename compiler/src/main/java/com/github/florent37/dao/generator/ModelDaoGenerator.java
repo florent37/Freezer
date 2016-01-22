@@ -11,7 +11,6 @@ import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import javax.lang.model.element.Element;
@@ -73,6 +72,7 @@ public class ModelDaoGenerator {
                 .addModifiers(Modifier.PUBLIC)
 
                 .addField(ClassName.get(StringBuilder.class), "queryBuilder")
+                .addField(ClassName.get(StringBuilder.class), "orderBuilder")
                 .addField(ProcessUtils.listOf(String.class), "args")
                 .addField(ProcessUtils.listOf(String.class), "fromTables")
                 .addField(ProcessUtils.listOf(String.class), "fromTablesNames")
@@ -82,6 +82,7 @@ public class ModelDaoGenerator {
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("this.queryBuilder = new $T()", ClassName.get(StringBuilder.class))
+                        .addStatement("this.orderBuilder = new $T()", ClassName.get(StringBuilder.class))
                         .addStatement("this.args = new $T()", ProcessUtils.arraylistOf(String.class))
                         .addStatement("this.fromTables = new $T()", ProcessUtils.arraylistOf(String.class))
                         .addStatement("this.fromTablesNames = new $T()", ProcessUtils.arraylistOf(String.class))
@@ -139,67 +140,85 @@ public class ModelDaoGenerator {
                         .addStatement("else return objects.get(0)")
                         .build())
 
-                //TODO
                 .addMethod(MethodSpec.methodBuilder("sortAsc")
                         .returns(queryBuilderClassName)
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(ArrayTypeName.of(enumColums), "columns")
-                        .varargs()
-                        .addStatement("queryBuilder.append($S);", " ORDER BY ")
-                        .addStatement("boolean first = true")
-                        .beginControlFlow("for($T c : columns)", enumColums)
-                        .addStatement("if(!first) queryBuilder.append(','); else first = false ")
-                        .addStatement("queryBuilder.append($S).append(c)", " " + TABLE_NAME + " .")
-                        .endControlFlow()
-                        .addStatement("queryBuilder.append($S)", " ASC ")
+                        .addParameter(enumColums, "column")
+                        .addStatement("if(orderBuilder.length() != 0) queryBuilder.append(',')")
+                        .addStatement("orderBuilder.append($S).append(column)", " " + TABLE_NAME + " .")
+                        .addStatement("orderBuilder.append($S)", " ASC ")
                         .addStatement("return this")
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("sortDesc")
                         .returns(queryBuilderClassName)
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(ArrayTypeName.of(enumColums), "columns")
-                        .varargs()
-                        .addStatement("queryBuilder.append($S);", " ORDER BY ")
-                        .addStatement("boolean first = true")
-                        .beginControlFlow("for($T c : columns)", enumColums)
-                        .addStatement("if(!first) queryBuilder.append(','); else first = false ")
-                        .addStatement("queryBuilder.append($S).append(c)", " " + TABLE_NAME + " .")
-                        .endControlFlow()
-                        .addStatement("queryBuilder.append($S)", " DESC ")
+                        .addParameter(enumColums, "column")
+                        .addStatement("if(orderBuilder.length() != 0) queryBuilder.append(',')")
+                        .addStatement("orderBuilder.append($S).append(column)", " " + TABLE_NAME + " .")
+                        .addStatement("orderBuilder.append($S)", " DESC ")
                         .addStatement("return this")
                         .build())
 
-                        //TODO
                 .addMethod(MethodSpec.methodBuilder("sum")
-                        .returns(TypeName.get(Number.class))
+                        .returns(TypeName.FLOAT)
                         .addParameter(enumColums, "column")
                         .addModifiers(Modifier.PUBLIC)
-                        .addStatement("return Float.valueOf(3)")
+                        .addStatement("$T db = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
+                        .addStatement("$T cursor = db.rawQuery($S + column.getName() + $S + constructQuery(), constructArgs())", Constants.cursorClassName, String.format("select sum(%s.", TABLE_NAME), String.format(") from %s ", TABLE_NAME))
+                        .addStatement("cursor.moveToNext()")
+                        .addStatement("float value = cursor.getFloat(0)")
+
+                        .addStatement("cursor.close()")
+                        .addStatement("$T.getInstance().close()", Constants.daoClassName)
+
+                        .addStatement("return value")
                         .build())
 
-                        //TODO
                 .addMethod(MethodSpec.methodBuilder("min")
-                        .returns(TypeName.get(Number.class))
+                        .returns(TypeName.FLOAT)
                         .addParameter(enumColums, "column")
                         .addModifiers(Modifier.PUBLIC)
-                        .addStatement("return Float.valueOf(3)")
+                        .addStatement("$T db = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
+                        .addStatement("$T cursor = db.rawQuery($S + column.getName() + $S + constructQuery(), constructArgs())", Constants.cursorClassName, String.format("select min(%s.", TABLE_NAME), String.format(") from %s ", TABLE_NAME))
+                        .addStatement("cursor.moveToNext()")
+                        .addStatement("float value = cursor.getFloat(0)")
+
+                        .addStatement("cursor.close()")
+                        .addStatement("$T.getInstance().close()", Constants.daoClassName)
+
+                        .addStatement("return value")
                         .build())
 
-                        //TODO
                 .addMethod(MethodSpec.methodBuilder("max")
-                        .returns(TypeName.get(Number.class))
+                        .returns(TypeName.FLOAT)
                         .addParameter(enumColums, "column")
                         .addModifiers(Modifier.PUBLIC)
-                        .addStatement("return Float.valueOf(3)")
+                        .addStatement("$T db = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
+                        .addStatement("$T cursor = db.rawQuery($S + column.getName() + $S + constructQuery(), constructArgs())", Constants.cursorClassName, String.format("select max(%s.", TABLE_NAME), String.format(") from %s ", TABLE_NAME))
+                        .addStatement("cursor.moveToNext()")
+                        .addStatement("float value = cursor.getFloat(0)")
+
+                        .addStatement("cursor.close()")
+                        .addStatement("$T.getInstance().close()", Constants.daoClassName)
+
+                        .addStatement("return value")
                         .build())
 
                         //TODO
                 .addMethod(MethodSpec.methodBuilder("average")
-                        .returns(TypeName.get(Number.class))
+                        .returns(TypeName.FLOAT)
                         .addParameter(enumColums, "column")
                         .addModifiers(Modifier.PUBLIC)
-                        .addStatement("return Float.valueOf(3)")
+                        .addStatement("$T db = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
+                        .addStatement("$T cursor = db.rawQuery($S + column.getName() + $S + constructQuery(), constructArgs())", Constants.cursorClassName, String.format("select avg(%s.", TABLE_NAME), String.format(") from %s ", TABLE_NAME))
+                        .addStatement("cursor.moveToNext()")
+                        .addStatement("float value = cursor.getFloat(0)")
+
+                        .addStatement("cursor.close()")
+                        .addStatement("$T.getInstance().close()", Constants.daoClassName)
+                        .addStatement("return value")
+
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("constructArgs")
@@ -215,6 +234,8 @@ public class ModelDaoGenerator {
                         .addStatement("for($T s : fromTables) query.append($S).append(s)", ClassName.get(String.class), ", ")
                         .addStatement("if (args.size() != 0) query.append($S)", " where ")
                         .addStatement("query.append(queryBuilder.toString())")
+                        .addStatement("if(orderBuilder.length() != 0) query.append($S)", " ORDER BY ")
+                        .addStatement("query.append(orderBuilder.toString())")
                         .addStatement("return query.toString()")
                         .build())
 

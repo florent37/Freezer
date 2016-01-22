@@ -29,9 +29,9 @@ public class MainActivity extends AppCompatActivity {
         userORM.deleteAll();
 
         userORM.add(Arrays.asList(
-                        new User("florent", new Cat("Java"), Arrays.asList(new Dog("Loulou"))),
-                        new User("kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty"))),
-                        new User("alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")))
+                        new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou"))),
+                        new User(30, "kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty"))),
+                        new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")))
                 )
         );
 
@@ -53,16 +53,16 @@ public class MainActivity extends AppCompatActivity {
                 .asList()
                 .toString());
 
-        Long agesSum = userORM.selectWhere()
-                .sum(UserColumns.age).longValue();
+        float agesSum = userORM.selectWhere()
+                .sum(UserColumns.age);
 
-        Long agesAverage = userORM.selectWhere()
-                .average(UserColumns.age).longValue();
+        float agesAverage = userORM.selectWhere()
+                .average(UserColumns.age);
 
-        Long ageMin = userORM.selectWhere()
-                .min(UserColumns.age).longValue();
+        float ageMin = userORM.selectWhere()
+                .min(UserColumns.age);
 
-        Long ageMax = userORM.selectWhere()
-                .max(UserColumns.age).longValue();
+        float ageMax = userORM.selectWhere()
+                .max(UserColumns.age);
     }
 }

@@ -18,7 +18,8 @@ public class User {
 
     public User(){}
 
-    public User(String name, Cat cat, List<Dog> dogs) {
+    public User(int age, String name, Cat cat, List<Dog> dogs) {
+        this.age = age;
         this.name = name;
         this.cat = cat;
         this.dogs = dogs;
