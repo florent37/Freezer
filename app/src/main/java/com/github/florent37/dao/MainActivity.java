@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("DAO", userORM.selectWhere()
                 .cat(CatORM.where().shortNameEquals("Java"))
                 .and()
-                        //.beginGroup()     (
+                .beginGroup()
                 .dogs(DogORM.where().nameEquals("Sasha"))
                 .or()
                 .dogs(DogORM.where().nameEquals("Florent"))

@@ -108,6 +108,20 @@ public class ModelDaoGenerator {
                         .addStatement("return this")
                         .build())
 
+                .addMethod(MethodSpec.methodBuilder("beginGroup")
+                        .returns(queryBuilderClassName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("queryBuilder.append($S)", " ( ")
+                        .addStatement("return this")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("endGroup")
+                        .returns(queryBuilderClassName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("queryBuilder.append($S)", " ) ")
+                        .addStatement("return this")
+                        .build())
+
                 .addMethod(MethodSpec.methodBuilder("asList")
                         .returns(listObjectsClassName)
                         .addModifiers(Modifier.PUBLIC)
