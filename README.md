@@ -32,7 +32,9 @@ Persist your data easily
 
 ```java
 UserORM userORM = new UserORM();
-userORM.add(new User(25, "florent", new Cat("Java"), Arrays.asList(new Dog("Medor"), new Dog("Milou"))));
+
+User user = ...
+userORM.add(user);
 ```
 
 #Querying
@@ -40,8 +42,7 @@ userORM.add(new User(25, "florent", new Cat("Java"), Arrays.asList(new Dog("Medo
 ##Simple
 ```java  
 List<User> allUsers = userORM.select()
-                             .asList()
-                             .toString()
+                             .asList();
 ```
 
 ##Complex
@@ -55,8 +56,7 @@ List<User> allUsers = userORM.select()
                                 .cat(CatORM.where().shortNameEquals("Java"))
                              .or()
                                 .dogs(DogORM.where().nameEquals("Sasha"))
-                             .asList()
-                             .toString()
+                             .asList();
 ```
 
 ##Aggregation
@@ -100,8 +100,6 @@ public class User {
 #Contributing
 This project was first developed by Xebia and has been open-sourced since. We will continue working and investing on it.
 We encourage the community to contribute to the project by opening tickets and/or pull requests.
-
-[![logo xebia](https://raw.githubusercontent.com/florent37/Android-ORM/master/logo_xebia.jpg)](http://www.xebia.fr/)
 
 License
 --------
