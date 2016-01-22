@@ -58,6 +58,16 @@ List<User> allUsers = userORM.selectWhere()
                              .toString()
 ```
 
+##Aggregation
+
+```java
+float agesSum      = userORM.selectWhere().sum(UserColumns.age);
+float agesAverage  = userORM.selectWhere().average(UserColumns.age);
+float ageMin       = userORM.selectWhere().min(UserColumns.age);
+float ageMax       = userORM.selectWhere().max(UserColumns.age);
+int count          = userORM.count();
+```
+
 #Accepted types
 
 ##Primitives
