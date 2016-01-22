@@ -39,7 +39,7 @@ userORM.add(new User(25, "florent", new Cat("Java"), Arrays.asList(new Dog("Medo
 
 ##Simple
 ```java  
-List<User> allUsers = userORM.selectWhere()
+List<User> allUsers = userORM.select()
                              .asList()
                              .toString()
 ```
@@ -49,7 +49,7 @@ List<User> allUsers = userORM.selectWhere()
 Android-ORM query engine uses a Fluent interface to construct multi-clause queries
 
 ```java  
-List<User> allUsers = userORM.selectWhere()
+List<User> allUsers = userORM.select()
                                 .nameEquals("florent")
                              .or()
                                 .cat(CatORM.where().shortNameEquals("Java"))
@@ -62,10 +62,10 @@ List<User> allUsers = userORM.selectWhere()
 ##Aggregation
 
 ```java
-float agesSum      = userORM.selectWhere().sum(UserColumns.age);
-float agesAverage  = userORM.selectWhere().average(UserColumns.age);
-float ageMin       = userORM.selectWhere().min(UserColumns.age);
-float ageMax       = userORM.selectWhere().max(UserColumns.age);
+float agesSum      = userORM.select().sum(UserColumns.age);
+float agesAverage  = userORM.select().average(UserColumns.age);
+float ageMin       = userORM.select().min(UserColumns.age);
+float ageMax       = userORM.select().max(UserColumns.age);
 int count          = userORM.count();
 ```
 

@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
                 )
         );
 
-        Log.d("DAO", userORM.selectWhere()
+        Log.d("DAO", userORM.select()
                 .cat(CatORM.where().shortNameEquals("Java"))
                 .and()
 
@@ -48,21 +48,21 @@ public class MainActivity extends AppCompatActivity {
                 .asList()
                 .toString());
 
-        Log.d("DAO", userORM.selectWhere()
+        Log.d("DAO", userORM.select()
                 .sortAsc(UserColumns.name)
                 .asList()
                 .toString());
 
-        float agesSum = userORM.selectWhere()
+        float agesSum = userORM.select()
                 .sum(UserColumns.age);
 
-        float agesAverage = userORM.selectWhere()
+        float agesAverage = userORM.select()
                 .average(UserColumns.age);
 
-        float ageMin = userORM.selectWhere()
+        float ageMin = userORM.select()
                 .min(UserColumns.age);
 
-        float ageMax = userORM.selectWhere()
+        float ageMax = userORM.select()
                 .max(UserColumns.age);
     }
 }

@@ -300,7 +300,7 @@ public class ModelDaoGenerator {
                         .addStatement("return $S", "")
                         .build())
 
-                .addMethod(MethodSpec.methodBuilder("selectWhere")
+                .addMethod(MethodSpec.methodBuilder("select")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(queryBuilderClassName)
                         .addStatement("return new $T()", queryBuilderClassName)
