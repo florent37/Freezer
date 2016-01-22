@@ -31,6 +31,8 @@ public class ModelDaoGenerator {
 
     TypeName queryBuilderClassName;
 
+    TypeName enumColums;
+
     String TABLE_NAME;
 
     TypeSpec queryBuilder;
@@ -49,6 +51,7 @@ public class ModelDaoGenerator {
         this.TABLE_NAME = ProcessUtils.getTableName(element);
 
         this.queryBuilderClassName = ProcessUtils.getQueryBuilder(element);
+        this.enumColums = ProcessUtils.getElementEnumColumn(element);
 
         this.fields = ProcessUtils.getPrimitiveFields(element);
         this.otherClassFields = ProcessUtils.getNonPrimitiveClassFields(element);
@@ -137,17 +140,40 @@ public class ModelDaoGenerator {
                         .build())
 
                 //TODO
-                .addMethod(MethodSpec.methodBuilder("sort")
+                .addMethod(MethodSpec.methodBuilder("sortAsc")
                         .returns(queryBuilderClassName)
-                        .addParameter(ClassName.get(Object.class), "column")
                         .addModifiers(Modifier.PUBLIC)
+                        .addParameter(ArrayTypeName.of(enumColums), "columns")
+                        .varargs()
+                        .addStatement("queryBuilder.append($S);", " ORDER BY ")
+                        .addStatement("boolean first = true")
+                        .beginControlFlow("for($T c : columns)", enumColums)
+                        .addStatement("if(!first) queryBuilder.append(','); else first = false ")
+                        .addStatement("queryBuilder.append($S).append(c)", " " + TABLE_NAME + " .")
+                        .endControlFlow()
+                        .addStatement("queryBuilder.append($S)", " ASC ")
+                        .addStatement("return this")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("sortDesc")
+                        .returns(queryBuilderClassName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(ArrayTypeName.of(enumColums), "columns")
+                        .varargs()
+                        .addStatement("queryBuilder.append($S);", " ORDER BY ")
+                        .addStatement("boolean first = true")
+                        .beginControlFlow("for($T c : columns)", enumColums)
+                        .addStatement("if(!first) queryBuilder.append(','); else first = false ")
+                        .addStatement("queryBuilder.append($S).append(c)", " " + TABLE_NAME + " .")
+                        .endControlFlow()
+                        .addStatement("queryBuilder.append($S)", " DESC ")
                         .addStatement("return this")
                         .build())
 
                         //TODO
                 .addMethod(MethodSpec.methodBuilder("sum")
                         .returns(TypeName.get(Number.class))
-                        .addParameter(ClassName.get(Object.class), "column")
+                        .addParameter(enumColums, "column")
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("return Float.valueOf(3)")
                         .build())
@@ -155,7 +181,7 @@ public class ModelDaoGenerator {
                         //TODO
                 .addMethod(MethodSpec.methodBuilder("min")
                         .returns(TypeName.get(Number.class))
-                        .addParameter(ClassName.get(Object.class), "column")
+                        .addParameter(enumColums, "column")
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("return Float.valueOf(3)")
                         .build())
@@ -163,7 +189,7 @@ public class ModelDaoGenerator {
                         //TODO
                 .addMethod(MethodSpec.methodBuilder("max")
                         .returns(TypeName.get(Number.class))
-                        .addParameter(ClassName.get(Object.class), "column")
+                        .addParameter(enumColums, "column")
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("return Float.valueOf(3)")
                         .build())
@@ -171,7 +197,7 @@ public class ModelDaoGenerator {
                         //TODO
                 .addMethod(MethodSpec.methodBuilder("average")
                         .returns(TypeName.get(Number.class))
-                        .addParameter(ClassName.get(Object.class), "column")
+                        .addParameter(enumColums, "column")
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("return Float.valueOf(3)")
                         .build())
@@ -187,7 +213,7 @@ public class ModelDaoGenerator {
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("$T query = new $T()", ClassName.get(StringBuilder.class), ClassName.get(StringBuilder.class))
                         .addStatement("for($T s : fromTables) query.append($S).append(s)", ClassName.get(String.class), ", ")
-                        .addStatement("if (queryBuilder.length() != 0) query.append($S)", " where ")
+                        .addStatement("if (args.size() != 0) query.append($S)", " where ")
                         .addStatement("query.append(queryBuilder.toString())")
                         .addStatement("return query.toString()")
                         .build())

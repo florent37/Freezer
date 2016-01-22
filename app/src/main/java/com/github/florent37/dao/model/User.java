@@ -11,6 +11,7 @@ import java.util.List;
 public class User {
     public long _id;
 
+    int age;
     String name;
     Cat cat;
     List<Dog> dogs;

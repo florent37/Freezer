@@ -218,4 +218,8 @@ public class ProcessUtils {
             names.add(methodSpec.name + methodSpec.parameters.toString());
         return names;
     }
+
+    public static TypeName getElementEnumColumn(Element element) {
+        return ClassName.bestGuess(getFieldClass(element).toString() + Constants.ENUM_COLUMN_SUFFIX);
+    }
 }

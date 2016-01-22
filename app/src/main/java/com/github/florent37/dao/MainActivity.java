@@ -38,30 +38,31 @@ public class MainActivity extends AppCompatActivity {
         Log.d("DAO", userORM.selectWhere()
                 .cat(CatORM.where().shortNameEquals("Java"))
                 .and()
+
                 .beginGroup()
                 .dogs(DogORM.where().nameEquals("Sasha"))
                 .or()
                 .dogs(DogORM.where().nameEquals("Florent"))
-                        //.endGroup()       )
+                .endGroup()
 
                 .asList()
                 .toString());
 
         Log.d("DAO", userORM.selectWhere()
-                .sort(UserColumns.name)
+                .sortAsc(UserColumns.name)
                 .asList()
                 .toString());
 
-        //Long agesSum = userORM.selectWhere()
-        //        .sum(UserColumns.age).longValue();
+        Long agesSum = userORM.selectWhere()
+                .sum(UserColumns.age).longValue();
 
-        //Long agesAverage = userORM.selectWhere()
-        //        .average(UserColumns.age).longValue();
+        Long agesAverage = userORM.selectWhere()
+                .average(UserColumns.age).longValue();
 
-        //Long ageMin = userORM.selectWhere()
-        //        .min(UserColumns.age).longValue();
+        Long ageMin = userORM.selectWhere()
+                .min(UserColumns.age).longValue();
 
-        //Long ageMax = userORM.selectWhere()
-        //        .max(UserColumns.age).longValue();
+        Long ageMax = userORM.selectWhere()
+                .max(UserColumns.age).longValue();
     }
 }

@@ -14,7 +14,7 @@ public class Constants {
 
     public static final String DAO_SUFFIX = "ORM";
     public static final String CURSOR_HELPER_SUFFIX = "CursorHelper";
-    public static final String QUERY_BUILDER_SUFFIX = "FridgeQueryBuilder";
+    public static final String QUERY_BUILDER_SUFFIX = "QueryBuilder";
     public static final String ENUM_COLUMN_SUFFIX = "Columns";
 
     public static final TypeName daoClassName = ClassName.get(Constants.DAO_PACKAGE, DAO_SUFFIX);
