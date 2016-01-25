@@ -489,6 +489,13 @@ public class ModelDaoGenerator {
                         .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\",String.valueOf(value))")
                         .build())
 
+                .addMethod(MethodSpec.methodBuilder("notEqualsTo")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(queryBuilderClassName)
+                        .addParameter(TypeName.INT, "value")
+                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" != ?\",String.valueOf(value))")
+                        .build())
+
                 .addMethod(MethodSpec.methodBuilder("between")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(queryBuilderClassName)
@@ -517,6 +524,13 @@ public class ModelDaoGenerator {
                         .returns(queryBuilderClassName)
                         .addParameter(TypeName.get(String.class), "value")
                         .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\",value)")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("notEqualsTo")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(queryBuilderClassName)
+                        .addParameter(TypeName.get(String.class), "value")
+                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" != ?\",value)")
                         .build())
 
                 .build());

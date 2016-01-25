@@ -40,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
         );
 
         Log.d("DAO", userORM.select()
-                .age().equalsTo(3)
-                .or()
+                .age().notEqualsTo(10)
+                .and()
                 .name().equalsTo("florent")
 
                 .asList()

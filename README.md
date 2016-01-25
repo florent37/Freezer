@@ -45,7 +45,7 @@ List<User> allUsers = userORM.select()
                              .asList();
                              
 User user3 = userORM.select()
-                    .age().isEqualTo(3)
+                    .age().equalsTo(3)
                     .first();
 ```
 
@@ -55,11 +55,11 @@ Android-ORM query engine uses a Fluent interface to construct multi-clause queri
 
 ```java  
 List<User> allUsers = userORM.select()
-                                .name().isEqualTo("florent")
+                                .name().equalsTo("florent")
                              .or()
-                                .cat(CatORM.where().shortName().isEqualTo("Java"))
+                                .cat(CatORM.where().shortName().equalsTo("Java"))
                              .or()
-                                .dogs(DogORM.where().name().isEqualTo("Sasha"))
+                                .dogs(DogORM.where().name().equalsTo("Sasha"))
                              .asList();
 ```
 
