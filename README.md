@@ -33,7 +33,7 @@ Persist your data easily
 ```java
 UserORM userORM = new UserORM();
 
-User user = ...
+User user = ... // Create a new object
 userORM.add(user);
 ```
 
@@ -51,11 +51,11 @@ Android-ORM query engine uses a Fluent interface to construct multi-clause queri
 
 ```java  
 List<User> allUsers = userORM.select()
-                                .nameEquals("florent")
+                                .name.isEqualTo("florent")
                              .or()
-                                .cat(CatORM.where().shortNameEquals("Java"))
+                                .cat(CatORM.where().shortName().isEqualTo("Java"))
                              .or()
-                                .dogs(DogORM.where().nameEquals("Sasha"))
+                                .dogs(DogORM.where().name().isEqualTo("Sasha"))
                              .asList();
 ```
 
@@ -66,7 +66,7 @@ float agesSum      = userORM.select().sum(UserColumns.age);
 float agesAverage  = userORM.select().average(UserColumns.age);
 float ageMin       = userORM.select().min(UserColumns.age);
 float ageMax       = userORM.select().max(UserColumns.age);
-int count          = userORM.count();
+int count          = userORM.select().count();
 ```
 
 #Accepted types
@@ -96,6 +96,18 @@ public class User {
 }
 
 ```
+
+#Logging
+
+```java
+userORM.logQueries((query, datas) -> Log.d(TAG, query) }
+```
+
+#TODO
+
+- Adding Observable support
+- Update an entry
+- Adding selectors operations (no, greater than, between, like, ...)
 
 #Contributing
 This project was first developed by Xebia and has been open-sourced since. We will continue working and investing on it.

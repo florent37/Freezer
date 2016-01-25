@@ -6,6 +6,7 @@ import com.github.florent37.dao.generator.DAOGenerator;
 import com.github.florent37.dao.generator.DatabaseHelperGenerator;
 import com.github.florent37.dao.generator.EnumColumnGenerator;
 import com.github.florent37.dao.generator.ModelDaoGenerator;
+import com.github.florent37.dao.generator.QueryLoggerGenerator;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -105,6 +106,7 @@ public class Processor extends AbstractProcessor {
 
         writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DatabaseHelperGenerator(dbFile, version, daosList).generate()).build());
         writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DAOGenerator().generate()).build());
+        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new QueryLoggerGenerator().generate()).build());
     }
 
     protected void writeFile(JavaFile javaFile) {

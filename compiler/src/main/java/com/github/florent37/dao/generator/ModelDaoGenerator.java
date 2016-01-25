@@ -78,6 +78,7 @@ public class ModelDaoGenerator {
                 .addField(ProcessUtils.listOf(String.class), "fromTablesNames")
                 .addField(ProcessUtils.listOf(String.class), "fromTablesId")
                 .addField(TypeName.BOOLEAN, "named")
+                .addField(ClassName.get(Constants.DAO_PACKAGE, Constants.QUERY_LOGGER), "logger")
 
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
@@ -92,8 +93,10 @@ public class ModelDaoGenerator {
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(TypeName.BOOLEAN, "named")
+                        .addParameter(ClassName.get(Constants.DAO_PACKAGE, Constants.QUERY_LOGGER), "logger")
                         .addStatement("this()")
                         .addStatement("this.named = named")
+                        .addStatement("this.logger = logger")
                         .build())
 
                 .addMethods(generateQueryMethods())
@@ -205,7 +208,6 @@ public class ModelDaoGenerator {
                         .addStatement("return value")
                         .build())
 
-                        //TODO
                 .addMethod(MethodSpec.methodBuilder("average")
                         .returns(TypeName.FLOAT)
                         .addParameter(enumColums, "column")
@@ -214,6 +216,20 @@ public class ModelDaoGenerator {
                         .addStatement("$T cursor = db.rawQuery($S + column.getName() + $S + constructQuery(), constructArgs())", Constants.cursorClassName, String.format("select avg(%s.", TABLE_NAME), String.format(") from %s ", TABLE_NAME))
                         .addStatement("cursor.moveToNext()")
                         .addStatement("float value = cursor.getFloat(0)")
+
+                        .addStatement("cursor.close()")
+                        .addStatement("$T.getInstance().close()", Constants.daoClassName)
+                        .addStatement("return value")
+
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("count")
+                        .returns(TypeName.INT)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("$T db = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
+                        .addStatement("$T cursor = db.rawQuery($S + constructQuery(), constructArgs())", Constants.cursorClassName, String.format("select count(distinct(%s.%s)) from %s ", TABLE_NAME, Constants.FIELD_ID, TABLE_NAME))
+                        .addStatement("cursor.moveToNext()")
+                        .addStatement("int value = cursor.getInt(0)")
 
                         .addStatement("cursor.close()")
                         .addStatement("$T.getInstance().close()", Constants.daoClassName)
@@ -268,21 +284,39 @@ public class ModelDaoGenerator {
                         .addStatement("return queryBuilder.toString().replace($S,table)", Constants.QUERY_NAMED)
                         .build())
 
+                .addMethod(MethodSpec.methodBuilder("appendQuery")
+                        .addModifiers(Modifier.PROTECTED)
+                        .returns(queryBuilderClassName)
+                        .addParameter(TypeName.get(String.class), "conditional")
+                        .addParameter(TypeName.get(String.class), "arg")
+                        .addStatement("if (named) queryBuilder.append($S)", "NAMED.")
+                        .addStatement("queryBuilder.append(conditional)")
+                        .addStatement("args.add(arg)")
+                        .addStatement("return this")
+                        .build())
+
                 .addMethod(MethodSpec.methodBuilder("execute")
                         .returns(listObjectsClassName)
                         .addModifiers(Modifier.PRIVATE)
                         .addStatement("$T db = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
-                        .addStatement("$T cursor = db.rawQuery($S + constructQuery(), constructArgs())", Constants.cursorClassName, String.format("select distinct %s.* from %s ", TABLE_NAME, TABLE_NAME))
+                        .addStatement("$T query = $S + constructQuery()", ClassName.get(String.class), String.format("select distinct %s.* from %s ", TABLE_NAME, TABLE_NAME))
+                        .addStatement("String[] args = constructArgs()")
+                        .addStatement("if(logger != null) logger.onQuery(query,args)")
+                        .addStatement("$T cursor = db.rawQuery(query, args)", Constants.cursorClassName)
                         .addStatement("$T objects = $T.get(cursor,db)", listObjectsClassName, modelCursorHelperClassName)
                         .addStatement("cursor.close()")
                         .addStatement("$T.getInstance().close()", Constants.daoClassName)
                         .addStatement("return objects")
                         .build())
 
+                .addTypes(generateSelectors())
+
                 .build();
 
         this.dao = TypeSpec.classBuilder(ProcessUtils.getModelDaoName(modelName)) //UserDAO
                 .addModifiers(Modifier.PUBLIC)
+
+                .addField(ClassName.get(Constants.DAO_PACKAGE, Constants.QUERY_LOGGER), "logger")
 
                 .addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).build())
 
@@ -303,14 +337,14 @@ public class ModelDaoGenerator {
                 .addMethod(MethodSpec.methodBuilder("select")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(queryBuilderClassName)
-                        .addStatement("return new $T()", queryBuilderClassName)
+                        .addStatement("return new $T(false,logger)", queryBuilderClassName)
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("where")
                         .addModifiers(Modifier.PUBLIC)
                         .addModifiers(Modifier.STATIC)
                         .returns(queryBuilderClassName)
-                        .addStatement("return new $T(true)", queryBuilderClassName)
+                        .addStatement("return new $T(true,null)", queryBuilderClassName)
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("add")
@@ -356,6 +390,12 @@ public class ModelDaoGenerator {
                         .addStatement("return recCount")
                         .build())
 
+                .addMethod(MethodSpec.methodBuilder("logQueries")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(ClassName.get(Constants.DAO_PACKAGE, Constants.QUERY_LOGGER), "logger")
+                        .addStatement("this.logger = logger")
+                        .build())
+
                 .build();
 
         return this;
@@ -365,15 +405,14 @@ public class ModelDaoGenerator {
         List<MethodSpec> methodSpecs = new ArrayList<>();
 
         for (VariableElement variableElement : fields) {
-            methodSpecs.add(MethodSpec.methodBuilder(variableElement.getSimpleName() + "Equals")
-                    .returns(queryBuilderClassName)
+            TypeName selector = getSelectorName(variableElement);
+
+            methodSpecs.add(MethodSpec.methodBuilder(variableElement.getSimpleName().toString())
+                    .returns(selector)
                     .addModifiers(Modifier.PUBLIC)
 
-                    .addParameter(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString())
-                    .addStatement("if(named) queryBuilder.append($S)", Constants.QUERY_NAMED + ".")
-                    .addStatement("queryBuilder.append(\"$L = ?\")", variableElement.getSimpleName())
-                    .addStatement("args.add(" + ProcessUtils.getQueryCast(variableElement) + ")", variableElement.getSimpleName())
-                    .addStatement("return this")
+                    .addStatement("return new $T(this, $T.$L)", selector, enumColums, variableElement.getSimpleName())
+
                     .build());
         }
 
@@ -391,6 +430,15 @@ public class ModelDaoGenerator {
         }
 
         return methodSpecs;
+    }
+
+    protected TypeName getSelectorName(Element element) {
+        TypeName typeName = TypeName.get(element.asType());
+        if (TypeName.INT.equals(typeName) || TypeName.LONG.equals(typeName))
+            return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_INT);
+        if (TypeName.get(String.class).equals(typeName))
+            return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_STRING);
+        return TypeName.VOID;
     }
 
     protected String generateCreationString() {
@@ -416,6 +464,64 @@ public class ModelDaoGenerator {
         }
 
         return stringBuilder.toString();
+    }
+
+    protected List<TypeSpec> generateSelectors() {
+        List<TypeSpec> typeSpecs = new ArrayList<>();
+
+        typeSpecs.add(TypeSpec.classBuilder(Constants.SELECTOR_INT)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addField(queryBuilderClassName, "queryBuilder")
+                .addField(enumColums, "column")
+
+                .addMethod(MethodSpec.constructorBuilder()
+                        .addModifiers(Modifier.PROTECTED)
+                        .addParameter(queryBuilderClassName, "queryBuilder")
+                        .addParameter(enumColums, "column")
+                        .addStatement("this.queryBuilder = queryBuilder")
+                        .addStatement("this.column = column")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("equalsTo")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(queryBuilderClassName)
+                        .addParameter(TypeName.INT, "value")
+                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\",String.valueOf(value))")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("between")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(queryBuilderClassName)
+                        .addParameter(TypeName.INT, "min")
+                        .addParameter(TypeName.INT, "max")
+                        .addStatement("return queryBuilder")
+                        .build())
+
+                .build());
+
+        typeSpecs.add(TypeSpec.classBuilder(Constants.SELECTOR_STRING)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addField(queryBuilderClassName, "queryBuilder")
+                .addField(enumColums, "column")
+
+                .addMethod(MethodSpec.constructorBuilder()
+                        .addModifiers(Modifier.PROTECTED)
+                        .addParameter(queryBuilderClassName, "queryBuilder")
+                        .addParameter(enumColums, "column")
+                        .addStatement("this.queryBuilder = queryBuilder")
+                        .addStatement("this.column = column")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("equalsTo")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(queryBuilderClassName)
+                        .addParameter(TypeName.get(String.class), "value")
+                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\",value)")
+                        .build())
+
+                .build());
+
+        return typeSpecs;
     }
 
     protected String generateTableCreate() {

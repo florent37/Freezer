@@ -1,18 +1,16 @@
 package com.github.florent37.dao;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.github.florent37.dao.model.Cat;
-import com.github.florent37.dao.model.CatORM;
 import com.github.florent37.dao.model.Dog;
-import com.github.florent37.dao.model.DogORM;
 import com.github.florent37.dao.model.User;
-import com.github.florent37.dao.model.UserColumns;
 import com.github.florent37.dao.model.UserORM;
+import com.github.florent37.orm.QueryLogger;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,6 +24,12 @@ public class MainActivity extends AppCompatActivity {
 
         userORM = new UserORM();
 
+        userORM.logQueries(new QueryLogger() {
+            @Override public void onQuery(String query, String[] datas) {
+                Log.d("QUERY", query);
+            }
+        });
+
         userORM.deleteAll();
 
         userORM.add(Arrays.asList(
@@ -36,33 +40,11 @@ public class MainActivity extends AppCompatActivity {
         );
 
         Log.d("DAO", userORM.select()
-                .cat(CatORM.where().shortNameEquals("Java"))
-                .and()
-
-                .beginGroup()
-                .dogs(DogORM.where().nameEquals("Sasha"))
+                .age().equalsTo(3)
                 .or()
-                .dogs(DogORM.where().nameEquals("Florent"))
-                .endGroup()
+                .name().equalsTo("florent")
 
                 .asList()
                 .toString());
-
-        Log.d("DAO", userORM.select()
-                .sortAsc(UserColumns.name)
-                .asList()
-                .toString());
-
-        float agesSum = userORM.select()
-                .sum(UserColumns.age);
-
-        float agesAverage = userORM.select()
-                .average(UserColumns.age);
-
-        float ageMin = userORM.select()
-                .min(UserColumns.age);
-
-        float ageMax = userORM.select()
-                .max(UserColumns.age);
     }
 }
