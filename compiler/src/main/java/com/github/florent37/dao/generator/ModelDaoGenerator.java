@@ -334,6 +334,14 @@ public class ModelDaoGenerator {
                         .addStatement("return $S", "")
                         .build())
 
+                //.addMethod(MethodSpec.methodBuilder("drop")
+                //        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                //        .returns(ArrayTypeName.get(String[].class))
+
+                //                //for
+                //        .addStatement("return new $T[]{$L}", ClassName.get(String.class), generateDropString())
+                //        .build())
+
                 .addMethod(MethodSpec.methodBuilder("select")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(queryBuilderClassName)
@@ -434,8 +442,8 @@ public class ModelDaoGenerator {
 
     protected TypeName getSelectorName(Element element) {
         TypeName typeName = TypeName.get(element.asType());
-        if (TypeName.INT.equals(typeName) || TypeName.LONG.equals(typeName))
-            return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_INT);
+        if (TypeName.INT.equals(typeName) || TypeName.LONG.equals(typeName) || TypeName.FLOAT.equals(typeName) )
+            return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_NUMBER);
         if (TypeName.BOOLEAN.equals(typeName))
             return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_BOOLEAN);
         if (TypeName.get(String.class).equals(typeName))
@@ -445,7 +453,7 @@ public class ModelDaoGenerator {
 
     protected String generateCreationString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append('"').append("create table ").append(TABLE_NAME).append(" (_id integer primary key autoincrement, ").append(generateTableCreate()).append(");").append('"');
+        stringBuilder.append('"').append("create table ").append(TABLE_NAME).append(" (_id integer primary key autoincrement, ").append(generateTableCreate()).append(")").append('"');
 
         Set<String> addedTables = new HashSet<>();
 
@@ -468,10 +476,31 @@ public class ModelDaoGenerator {
         return stringBuilder.toString();
     }
 
+    //protected String generateDropString() {
+    //        StringBuilder stringBuilder = new StringBuilder();
+    //        stringBuilder.append('"').append("drop table ").append(TABLE_NAME).append(")").append('"');
+
+    //        Set<String> dropTables = new HashSet<>();
+
+    //        for (VariableElement variableElement : otherClassFields) {
+    //                String table = TABLE_NAME + "_" + ProcessUtils.getTableName(variableElement);
+    //                if (!dropTables.contains(table)) {
+    //                        stringBuilder
+    //                                .append(",\n")
+    //                                .append('"')
+    //                                .append("drop table ").append(table)
+    //                                .append('"');
+    //                        dropTables.add(table);
+    //                }
+    //        }
+
+    //        return stringBuilder.toString();
+    //}
+
     protected List<TypeSpec> generateSelectors() {
         List<TypeSpec> typeSpecs = new ArrayList<>();
 
-        typeSpecs.add(TypeSpec.classBuilder(Constants.SELECTOR_INT)
+        typeSpecs.add(TypeSpec.classBuilder(Constants.SELECTOR_NUMBER)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addField(queryBuilderClassName, "queryBuilder")
                 .addField(enumColums, "column")
@@ -487,22 +516,22 @@ public class ModelDaoGenerator {
                 .addMethod(MethodSpec.methodBuilder("equalsTo")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(queryBuilderClassName)
-                        .addParameter(TypeName.INT, "value")
+                        .addParameter(TypeName.FLOAT, "value")
                         .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\",String.valueOf(value))")
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("notEqualsTo")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(queryBuilderClassName)
-                        .addParameter(TypeName.INT, "value")
+                        .addParameter(TypeName.FLOAT, "value")
                         .addStatement("return queryBuilder.appendQuery(column.getName()+\" != ?\",String.valueOf(value))")
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("between")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(queryBuilderClassName)
-                        .addParameter(TypeName.INT, "min")
-                        .addParameter(TypeName.INT, "max")
+                        .addParameter(TypeName.FLOAT, "min")
+                        .addParameter(TypeName.FLOAT, "max")
                         .addStatement("queryBuilder.appendQuery(column.getName()+\" > ?\",String.valueOf(min))")
                         .addStatement("queryBuilder.and()")
                         .addStatement("return queryBuilder.appendQuery(column.getName()+\" < ?\",String.valueOf(max))")
@@ -511,14 +540,14 @@ public class ModelDaoGenerator {
                 .addMethod(MethodSpec.methodBuilder("greatherThan")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(queryBuilderClassName)
-                        .addParameter(TypeName.INT, "value")
+                        .addParameter(TypeName.FLOAT, "value")
                         .addStatement("return queryBuilder.appendQuery(column.getName()+\" > ?\",String.valueOf(value))")
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("lessThan")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(queryBuilderClassName)
-                        .addParameter(TypeName.INT, "value")
+                        .addParameter(TypeName.FLOAT, "value")
                         .addStatement("return queryBuilder.appendQuery(column.getName()+\" < ?\",String.valueOf(value))")
                         .build())
 
@@ -560,39 +589,39 @@ public class ModelDaoGenerator {
 
                 .build());
 
-            typeSpecs.add(TypeSpec.classBuilder(Constants.SELECTOR_BOOLEAN)
-                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .addField(queryBuilderClassName, "queryBuilder")
-                    .addField(enumColums, "column")
+        typeSpecs.add(TypeSpec.classBuilder(Constants.SELECTOR_BOOLEAN)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addField(queryBuilderClassName, "queryBuilder")
+                .addField(enumColums, "column")
 
-                    .addMethod(MethodSpec.constructorBuilder()
-                            .addModifiers(Modifier.PROTECTED)
-                            .addParameter(queryBuilderClassName, "queryBuilder")
-                            .addParameter(enumColums, "column")
-                            .addStatement("this.queryBuilder = queryBuilder")
-                            .addStatement("this.column = column")
-                            .build())
+                .addMethod(MethodSpec.constructorBuilder()
+                        .addModifiers(Modifier.PROTECTED)
+                        .addParameter(queryBuilderClassName, "queryBuilder")
+                        .addParameter(enumColums, "column")
+                        .addStatement("this.queryBuilder = queryBuilder")
+                        .addStatement("this.column = column")
+                        .build())
 
-                    .addMethod(MethodSpec.methodBuilder("equalsTo")
-                            .addModifiers(Modifier.PUBLIC)
-                            .returns(queryBuilderClassName)
-                            .addParameter(TypeName.BOOLEAN, "value")
-                            .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\", String.valueOf(value ? 1 : 0))")
-                            .build())
+                .addMethod(MethodSpec.methodBuilder("equalsTo")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(queryBuilderClassName)
+                        .addParameter(TypeName.BOOLEAN, "value")
+                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\", String.valueOf(value ? 1 : 0))")
+                        .build())
 
-                    .addMethod(MethodSpec.methodBuilder("isTrue")
-                            .addModifiers(Modifier.PUBLIC)
-                            .returns(queryBuilderClassName)
-                            .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\", String.valueOf(1))")
-                            .build())
+                .addMethod(MethodSpec.methodBuilder("isTrue")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(queryBuilderClassName)
+                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\", String.valueOf(1))")
+                        .build())
 
-                    .addMethod(MethodSpec.methodBuilder("isFalse")
-                            .addModifiers(Modifier.PUBLIC)
-                            .returns(queryBuilderClassName)
-                            .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\", String.valueOf(0))")
-                            .build())
+                .addMethod(MethodSpec.methodBuilder("isFalse")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(queryBuilderClassName)
+                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\", String.valueOf(0))")
+                        .build())
 
-                    .build());
+                .build());
 
         return typeSpecs;
     }

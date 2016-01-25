@@ -70,7 +70,7 @@ List<User> allUsers = userORM.select()
      .name().equalsTo("florent")
      .name().notEqualsTo("kevin")
      .name().contains("flo")
-//integers
+//numbers
      .age().equalsTo(10)
      .age().notEqualsTo(30)
      .age().greatherThan(5)
@@ -131,6 +131,7 @@ userORM.logQueries((query, datas) -> Log.d(TAG, query) }
 - Update an entry
 - Adding SqlLiterHelper onUpgrade
 - Adding some selectors operations (like, ...)
+- Adding array support (int[], List<Integer>, ...)
 
 #Contributing
 This project was first developed by Xebia and has been open-sourced since. We will continue working and investing on it.

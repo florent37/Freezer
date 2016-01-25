@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d("DAO", userORM.select()
                 .hacker().isTrue()
+                .or()
+                .age().greatherThan(3)
 
                 .asList()
                 .toString());
