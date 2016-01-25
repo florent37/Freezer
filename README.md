@@ -43,6 +43,10 @@ userORM.add(user);
 ```java  
 List<User> allUsers = userORM.select()
                              .asList();
+                             
+User user3 = userORM.select()
+                    .age().isEqualTo(3)
+                    .first();
 ```
 
 ##Complex
