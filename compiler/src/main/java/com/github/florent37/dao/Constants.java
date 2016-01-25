@@ -35,6 +35,7 @@ public class Constants {
     public static final String QUERY_NAMED = "NAMED";
 
     public static final String SELECTOR_INT = "IntSelector";
+    public static final String SELECTOR_BOOLEAN = "BooleanSelector";
     public static final String SELECTOR_STRING = "StringSelector";
 
     public static final String QUERY_LOGGER = "QueryLogger";

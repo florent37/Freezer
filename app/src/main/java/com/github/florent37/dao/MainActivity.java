@@ -10,7 +10,6 @@ import com.github.florent37.dao.model.User;
 import com.github.florent37.dao.model.UserORM;
 import com.github.florent37.orm.QueryLogger;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,14 +32,14 @@ public class MainActivity extends AppCompatActivity {
         userORM.deleteAll();
 
         userORM.add(Arrays.asList(
-                        new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou"))),
-                        new User(30, "kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty"))),
-                        new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")))
+                        new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
+                        new User(30, "kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty")), true),
+                        new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")), false)
                 )
         );
 
         Log.d("DAO", userORM.select()
-                .age().greatherThan(20)
+                .hacker().isTrue()
 
                 .asList()
                 .toString());

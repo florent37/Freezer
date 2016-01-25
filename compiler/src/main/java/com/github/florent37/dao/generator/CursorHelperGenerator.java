@@ -59,10 +59,10 @@ public class CursorHelperGenerator {
         for (int i = 0; i < fields.size(); ++i) {
             VariableElement variableElement = fields.get(i);
             if (ProcessUtils.isPrimitive(variableElement)) {
-                String cursor = "cursor.get$L(start + $L)";
+                String cursor = "cursor.get$L(start)";
                 cursor = String.format(ProcessUtils.getFieldCast(variableElement), cursor);
 
-                fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement), i);
+                fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement));
             } else {
 
                 fromCursorB.addCode("\n");

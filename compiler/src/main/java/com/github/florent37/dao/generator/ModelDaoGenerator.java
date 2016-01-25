@@ -248,7 +248,7 @@ public class ModelDaoGenerator {
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("$T query = new $T()", ClassName.get(StringBuilder.class), ClassName.get(StringBuilder.class))
                         .addStatement("for($T s : fromTables) query.append($S).append(s)", ClassName.get(String.class), ", ")
-                        .addStatement("if (args.size() != 0) query.append($S)", " where ")
+                        .addStatement("if (queryBuilder.length() != 0) query.append($S)", " where ")
                         .addStatement("query.append(queryBuilder.toString())")
                         .addStatement("if(orderBuilder.length() != 0) query.append($S)", " ORDER BY ")
                         .addStatement("query.append(orderBuilder.toString())")
@@ -291,7 +291,7 @@ public class ModelDaoGenerator {
                         .addParameter(TypeName.get(String.class), "arg")
                         .addStatement("if (named) queryBuilder.append($S)", "NAMED.")
                         .addStatement("queryBuilder.append(conditional)")
-                        .addStatement("args.add(arg)")
+                        .addStatement("if(arg != null) args.add(arg)")
                         .addStatement("return this")
                         .build())
 
@@ -436,6 +436,8 @@ public class ModelDaoGenerator {
         TypeName typeName = TypeName.get(element.asType());
         if (TypeName.INT.equals(typeName) || TypeName.LONG.equals(typeName))
             return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_INT);
+        if (TypeName.BOOLEAN.equals(typeName))
+            return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_BOOLEAN);
         if (TypeName.get(String.class).equals(typeName))
             return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_STRING);
         return TypeName.VOID;
@@ -549,7 +551,48 @@ public class ModelDaoGenerator {
                         .addStatement("return queryBuilder.appendQuery(column.getName()+\" != ?\",value)")
                         .build())
 
+                .addMethod(MethodSpec.methodBuilder("contains")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(queryBuilderClassName)
+                        .addParameter(TypeName.get(String.class), "value")
+                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" LIKE '%\"+value+\"%'\",null)")
+                        .build())
+
                 .build());
+
+            typeSpecs.add(TypeSpec.classBuilder(Constants.SELECTOR_BOOLEAN)
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .addField(queryBuilderClassName, "queryBuilder")
+                    .addField(enumColums, "column")
+
+                    .addMethod(MethodSpec.constructorBuilder()
+                            .addModifiers(Modifier.PROTECTED)
+                            .addParameter(queryBuilderClassName, "queryBuilder")
+                            .addParameter(enumColums, "column")
+                            .addStatement("this.queryBuilder = queryBuilder")
+                            .addStatement("this.column = column")
+                            .build())
+
+                    .addMethod(MethodSpec.methodBuilder("equalsTo")
+                            .addModifiers(Modifier.PUBLIC)
+                            .returns(queryBuilderClassName)
+                            .addParameter(TypeName.BOOLEAN, "value")
+                            .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\", String.valueOf(value ? 1 : 0))")
+                            .build())
+
+                    .addMethod(MethodSpec.methodBuilder("isTrue")
+                            .addModifiers(Modifier.PUBLIC)
+                            .returns(queryBuilderClassName)
+                            .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\", String.valueOf(1))")
+                            .build())
+
+                    .addMethod(MethodSpec.methodBuilder("isFalse")
+                            .addModifiers(Modifier.PUBLIC)
+                            .returns(queryBuilderClassName)
+                            .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\", String.valueOf(0))")
+                            .build())
+
+                    .build());
 
         return typeSpecs;
     }

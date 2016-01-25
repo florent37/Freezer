@@ -63,6 +63,24 @@ List<User> allUsers = userORM.select()
                              .asList();
 ```
 
+##Selectors
+
+```java
+//strings
+     .name().equalsTo("florent")
+     .name().notEqualsTo("kevin")
+     .name().contains("flo")
+//integers
+     .age().equalsTo(10)
+     .age().notEqualsTo(30)
+     .age().greatherThan(5)
+     .age().between(10,20)
+//booleans
+     .hacker().equalsTo(true)
+     .hacker().isTrue()
+     .hacker().isFalse()
+```
+
 ##Aggregation
 
 ```java

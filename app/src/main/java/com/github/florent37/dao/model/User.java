@@ -15,14 +15,16 @@ public class User {
     String name;
     Cat cat;
     List<Dog> dogs;
+    boolean hacker;
 
     public User(){}
 
-    public User(int age, String name, Cat cat, List<Dog> dogs) {
+    public User(int age, String name, Cat cat, List<Dog> dogs, boolean hacker) {
         this.age = age;
         this.name = name;
         this.cat = cat;
         this.dogs = dogs;
+        this.hacker = hacker;
     }
 
     @Override public String toString() {
