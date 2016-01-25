@@ -501,7 +501,23 @@ public class ModelDaoGenerator {
                         .returns(queryBuilderClassName)
                         .addParameter(TypeName.INT, "min")
                         .addParameter(TypeName.INT, "max")
-                        .addStatement("return queryBuilder")
+                        .addStatement("queryBuilder.appendQuery(column.getName()+\" > ?\",String.valueOf(min))")
+                        .addStatement("queryBuilder.and()")
+                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" < ?\",String.valueOf(max))")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("greatherThan")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(queryBuilderClassName)
+                        .addParameter(TypeName.INT, "value")
+                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" > ?\",String.valueOf(value))")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("lessThan")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(queryBuilderClassName)
+                        .addParameter(TypeName.INT, "value")
+                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" < ?\",String.valueOf(value))")
                         .build())
 
                 .build());
