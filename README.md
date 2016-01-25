@@ -129,7 +129,8 @@ userORM.logQueries((query, datas) -> Log.d(TAG, query) }
 
 - Adding Observable support
 - Update an entry
-- Adding selectors operations (no, greater than, between, like, ...)
+- Adding SqlLiterHelper onUpgrade
+- Adding some selectors operations (like, ...)
 
 #Contributing
 This project was first developed by Xebia and has been open-sourced since. We will continue working and investing on it.
