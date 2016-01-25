@@ -51,7 +51,7 @@ Android-ORM query engine uses a Fluent interface to construct multi-clause queri
 
 ```java  
 List<User> allUsers = userORM.select()
-                                .name.isEqualTo("florent")
+                                .name().isEqualTo("florent")
                              .or()
                                 .cat(CatORM.where().shortName().isEqualTo("Java"))
                              .or()
