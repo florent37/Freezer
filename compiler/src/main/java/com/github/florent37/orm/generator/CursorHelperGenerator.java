@@ -1,8 +1,8 @@
-package com.github.florent37.dao.generator;
+package com.github.florent37.orm.generator;
 
-import com.github.florent37.dao.Constants;
-import com.github.florent37.dao.Dependency;
-import com.github.florent37.dao.ProcessUtils;
+import com.github.florent37.orm.Constants;
+import com.github.florent37.orm.Dependency;
+import com.github.florent37.orm.ProcessUtils;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;

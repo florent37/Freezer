@@ -1,12 +1,11 @@
-package com.github.florent37.dao;
+package com.github.florent37.orm;
 
 import com.github.florent37.dao.annotations.Model;
-import com.github.florent37.dao.generator.CursorHelperGenerator;
-import com.github.florent37.dao.generator.DAOGenerator;
-import com.github.florent37.dao.generator.DatabaseHelperGenerator;
-import com.github.florent37.dao.generator.EnumColumnGenerator;
-import com.github.florent37.dao.generator.ModelDaoGenerator;
-import com.github.florent37.dao.generator.QueryLoggerGenerator;
+import com.github.florent37.orm.generator.DAOGenerator;
+import com.github.florent37.orm.generator.DatabaseHelperGenerator;
+import com.github.florent37.orm.generator.EnumColumnGenerator;
+import com.github.florent37.orm.generator.ModelDaoGenerator;
+import com.github.florent37.orm.generator.QueryLoggerGenerator;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -27,7 +26,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
-import static com.github.florent37.dao.ProcessUtils.getMethodId;
+import static com.github.florent37.orm.ProcessUtils.getMethodId;
 
 /**
  * Created by florentchampigny on 07/01/2016.
@@ -40,7 +39,7 @@ public class Processor extends AbstractProcessor {
     List<Element> models = new ArrayList<>();
     List<ClassName> daosList = new ArrayList<>();
 
-    List<CursorHelper> cursorHelpers = new ArrayList<>();
+    List<com.github.florent37.orm.CursorHelper> cursorHelpers = new ArrayList<>();
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -58,15 +57,15 @@ public class Processor extends AbstractProcessor {
     private void generateColumnEnums(Element element) {
         EnumColumnGenerator columnGenerator = new EnumColumnGenerator(element);
 
-        writeFile(JavaFile.builder(ProcessUtils.getObjectPackage(element), columnGenerator.generate()).build());
+        writeFile(JavaFile.builder(com.github.florent37.orm.ProcessUtils.getObjectPackage(element), columnGenerator.generate()).build());
     }
 
     private void resolveDependencies() {
-        for (CursorHelper from : cursorHelpers) {
+        for (com.github.florent37.orm.CursorHelper from : cursorHelpers) {
             for (Dependency dependency : from.dependencies) {
-                for (CursorHelper to : cursorHelpers) {
-                    if (dependency.getTypeName().equals(ProcessUtils.getFieldClass(to.element))) {
-                        HashSet<String> methodsNames = new HashSet<>(ProcessUtils.getMethodsNames(to.getTypeSpec()));
+                for (com.github.florent37.orm.CursorHelper to : cursorHelpers) {
+                    if (dependency.getTypeName().equals(com.github.florent37.orm.ProcessUtils.getFieldClass(to.element))) {
+                        HashSet<String> methodsNames = new HashSet<>(com.github.florent37.orm.ProcessUtils.getMethodsNames(to.getTypeSpec()));
 
                         TypeSpec.Builder builder = to.getTypeSpec().toBuilder();
 
@@ -84,29 +83,29 @@ public class Processor extends AbstractProcessor {
     }
 
     private void generateCursorHelperFiles(Element element) {
-        CursorHelperGenerator cursorHelperGenerator = new CursorHelperGenerator(element);
-        cursorHelpers.add(new CursorHelper(element, cursorHelperGenerator.generate(), cursorHelperGenerator.getDependencies()));
+        com.github.florent37.orm.generator.CursorHelperGenerator cursorHelperGenerator = new com.github.florent37.orm.generator.CursorHelperGenerator(element);
+        cursorHelpers.add(new com.github.florent37.orm.CursorHelper(element, cursorHelperGenerator.generate(), cursorHelperGenerator.getDependencies()));
     }
 
     private void generateModelDaoFiles(Element element) {
         ModelDaoGenerator modelDaoGenerator = new ModelDaoGenerator(element).generate();
 
-        writeFile(JavaFile.builder(ProcessUtils.getObjectPackage(element), modelDaoGenerator.getDao()).build());
-        writeFile(JavaFile.builder(ProcessUtils.getObjectPackage(element), modelDaoGenerator.getQueryBuilder()).build());
+        writeFile(JavaFile.builder(com.github.florent37.orm.ProcessUtils.getObjectPackage(element), modelDaoGenerator.getDao()).build());
+        writeFile(JavaFile.builder(com.github.florent37.orm.ProcessUtils.getObjectPackage(element), modelDaoGenerator.getQueryBuilder()).build());
 
-        daosList.add(ProcessUtils.getModelDao(element));
+        daosList.add(com.github.florent37.orm.ProcessUtils.getModelDao(element));
     }
 
     protected void writeJavaFiles() {
         String dbFile = "database.db";
         int version = 1;
 
-        for (CursorHelper cursorHelper : cursorHelpers)
+        for (com.github.florent37.orm.CursorHelper cursorHelper : cursorHelpers)
             writeFile(JavaFile.builder(cursorHelper.getPackage(), cursorHelper.getTypeSpec()).build());
 
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DatabaseHelperGenerator(dbFile, version, daosList).generate()).build());
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DAOGenerator().generate()).build());
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new QueryLoggerGenerator().generate()).build());
+        writeFile(JavaFile.builder(com.github.florent37.orm.Constants.DAO_PACKAGE, new DatabaseHelperGenerator(dbFile, version, daosList).generate()).build());
+        writeFile(JavaFile.builder(com.github.florent37.orm.Constants.DAO_PACKAGE, new DAOGenerator().generate()).build());
+        writeFile(JavaFile.builder(com.github.florent37.orm.Constants.DAO_PACKAGE, new QueryLoggerGenerator().generate()).build());
     }
 
     protected void writeFile(JavaFile javaFile) {

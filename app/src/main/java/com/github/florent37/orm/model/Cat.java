@@ -1,4 +1,4 @@
-package com.github.florent37.dao.model;
+package com.github.florent37.orm.model;
 
 import com.github.florent37.dao.annotations.Model;
 

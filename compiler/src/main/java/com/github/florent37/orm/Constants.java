@@ -1,4 +1,4 @@
-package com.github.florent37.dao;
+package com.github.florent37.orm;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;

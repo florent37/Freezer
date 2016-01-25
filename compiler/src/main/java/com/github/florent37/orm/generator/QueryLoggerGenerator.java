@@ -1,14 +1,12 @@
-package com.github.florent37.dao.generator;
+package com.github.florent37.orm.generator;
 
-import com.github.florent37.dao.Constants;
+import com.github.florent37.orm.Constants;
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Modifier;
-import javax.lang.model.type.ArrayType;
 
 /**
  * Created by florentchampigny on 25/01/2016.

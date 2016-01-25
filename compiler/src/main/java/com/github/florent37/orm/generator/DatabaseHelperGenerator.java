@@ -1,6 +1,5 @@
-package com.github.florent37.dao.generator;
+package com.github.florent37.orm.generator;
 
-import com.github.florent37.dao.Constants;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
@@ -30,13 +29,13 @@ public class DatabaseHelperGenerator {
 
         MethodSpec.Builder onCreate = MethodSpec.methodBuilder("onCreate")
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(Constants.databaseClassName, "database");
+                .addParameter(com.github.florent37.orm.Constants.databaseClassName, "database");
         for (ClassName dao : daos)
             onCreate.addStatement("for($T s : $T.create()) database.execSQL(s);", ClassName.get(String.class), dao);
 
         MethodSpec.Builder onUpgrade = MethodSpec.methodBuilder("onUpgrade")
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(Constants.databaseClassName, "database")
+                .addParameter(com.github.florent37.orm.Constants.databaseClassName, "database")
                 .addParameter(TypeName.INT, "oldVersion")
                 .addParameter(TypeName.INT, "newVersion");
 
@@ -45,13 +44,13 @@ public class DatabaseHelperGenerator {
 
         onUpgrade.addStatement("onCreate(database)");
 
-        return TypeSpec.classBuilder(Constants.DATABASE_HELPER_CLASS_NAME)
-                .superclass(Constants.sqliteOpenHelperClassName)
+        return TypeSpec.classBuilder(com.github.florent37.orm.Constants.DATABASE_HELPER_CLASS_NAME)
+                .superclass(com.github.florent37.orm.Constants.sqliteOpenHelperClassName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
 
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(Constants.contextClassName, "context")
+                        .addParameter(com.github.florent37.orm.Constants.contextClassName, "context")
                         .addStatement("super(context, $S, null, $L)", fileName, version)
                         .build())
 
