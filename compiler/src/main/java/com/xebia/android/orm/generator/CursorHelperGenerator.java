@@ -1,12 +1,12 @@
-package com.github.florent37.orm.generator;
+package com.xebia.android.orm.generator;
 
-import com.github.florent37.orm.Constants;
-import com.github.florent37.orm.Dependency;
-import com.github.florent37.orm.ProcessUtils;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.xebia.android.orm.Constants;
+import com.xebia.android.orm.Dependency;
+import com.xebia.android.orm.ProcessUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,7 +53,7 @@ public class CursorHelperGenerator {
                 .addParameter(Constants.cursorClassName, "cursor")
                 .addParameter(Constants.databaseClassName, "db")
                 .addParameter(TypeName.INT, "start")
-                .addStatement("$T object = new $T()", modelType, modelType);
+                .addStatement("$T object = new $T()", modelType, ProcessUtils.getModelProxy(element));
 
         //for
         for (int i = 0; i < fields.size(); ++i) {
@@ -68,7 +68,7 @@ public class CursorHelperGenerator {
                 fromCursorB.addCode("\n");
                 String JOIN_NAME = ProcessUtils.getTableName(objectName) + "_" + ProcessUtils.getTableName(variableElement);
 
-                fromCursorB.addStatement("$T cursor$L = db.rawQuery($S,new String[]{String.valueOf(object._id), $S})", Constants.cursorClassName, i, "SELECT * FROM " + ProcessUtils.getTableName(variableElement) + ", " + JOIN_NAME + " WHERE " + JOIN_NAME + "." + ProcessUtils.getKeyName(objectName) + " = ? AND " + ProcessUtils.getTableName(variableElement) + "." + Constants.FIELD_ID + " = " + JOIN_NAME + "." + ProcessUtils.getKeyName(variableElement) + " AND " + JOIN_NAME + "." + Constants.FIELD_NAME + "= ?", ProcessUtils.getObjectName(variableElement));
+                fromCursorB.addStatement("$T cursor$L = db.rawQuery($S,new String[]{String.valueOf($L), $S})", Constants.cursorClassName, i, "SELECT * FROM " + ProcessUtils.getTableName(variableElement) + ", " + JOIN_NAME + " WHERE " + JOIN_NAME + "." + ProcessUtils.getKeyName(objectName) + " = ? AND " + ProcessUtils.getTableName(variableElement) + "." + Constants.FIELD_ID + " = " + JOIN_NAME + "." + ProcessUtils.getKeyName(variableElement) + " AND " + JOIN_NAME + "." + Constants.FIELD_NAME + "= ?", ProcessUtils.getModelId("object"), ProcessUtils.getObjectName(variableElement));
 
                 if (ProcessUtils.isCollection(variableElement)) {
                     fromCursorB.addStatement("object.$L = $T.get(cursor$L,db)", ProcessUtils.getObjectName(variableElement), ProcessUtils.getFieldCursorHelperClass(variableElement), i);
@@ -97,7 +97,7 @@ public class CursorHelperGenerator {
             if (ProcessUtils.isPrimitive(variableElement)) {
                 String statement = "values.put($S,object.$L)";
                 if (ProcessUtils.isModelId(variableElement))
-                    statement = "if(object." + Constants.FIELD_ID + " != 0) " + statement;
+                    statement = "if(" + ProcessUtils.getCursorHelperName("object") + " != 0) " + statement;
                 getValuesB.addStatement(statement, variableElement.getSimpleName(), variableElement.getSimpleName());
             }
         }
@@ -158,10 +158,10 @@ public class CursorHelperGenerator {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(Constants.databaseClassName, "database")
                 .addParameter(modelType, "object")
-                .addStatement("object.$L = database.insert($S, null, getValues(object,null))", Constants.FIELD_ID, ProcessUtils.getTableName(objectName));
+                .addStatement("$L(database.insert($S, null, getValues(object,null)))", ProcessUtils.setModelId("object"), ProcessUtils.getTableName(objectName));
 
         for (VariableElement variableElement : otherClassFields) {
-            insertB.addStatement("$T.insertFor$L(database,object.$L,object.$L, $S)", ProcessUtils.getFieldCursorHelperClass(variableElement), objectName, ProcessUtils.getObjectName(variableElement), Constants.FIELD_ID, ProcessUtils.getObjectName(variableElement));
+            insertB.addStatement("$T.insertFor$L(database,object.$L,$L, $S)", ProcessUtils.getFieldCursorHelperClass(variableElement), objectName, ProcessUtils.getObjectName(variableElement), ProcessUtils.getModelId("object"), ProcessUtils.getObjectName(variableElement));
 
             String JOINTABLE = ProcessUtils.getTableName(objectName) + "_" + ProcessUtils.getTableName(variableElement);
 
@@ -173,8 +173,8 @@ public class CursorHelperGenerator {
                     .addParameter(ClassName.get(String.class), "variable")
 
                     .beginControlFlow("if(child != null)")
-                    .addStatement("child._id = database.insert($S, null, $T.getValues(child,null))", ProcessUtils.getTableName(variableElement), ProcessUtils.getFieldCursorHelperClass(variableElement))
-                    .addStatement("database.insert($S, null, get$LValues(parentId,child._id, variable))", JOINTABLE, JOINTABLE)
+                    .addStatement("$L(database.insert($S, null, $T.getValues(child,null)))", ProcessUtils.setModelId("child"), ProcessUtils.getTableName(variableElement), ProcessUtils.getFieldCursorHelperClass(variableElement))
+                    .addStatement("database.insert($S, null, get$LValues(parentId, $L, variable))", JOINTABLE, JOINTABLE, ProcessUtils.getModelId("child"))
                     .endControlFlow()
 
                     .build();

@@ -1,4 +1,4 @@
-package com.github.florent37.orm;
+package com.xebia.android.orm;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
@@ -221,5 +221,17 @@ public class ProcessUtils {
 
     public static TypeName getElementEnumColumn(Element element) {
         return ClassName.bestGuess(getFieldClass(element).toString() + Constants.ENUM_COLUMN_SUFFIX);
+    }
+
+    public static String getModelId(String variable) {
+        return String.format("((%s.%s)%s).%s()", Constants.DAO_PACKAGE, Constants.MODEL_ENTITY_PROXY_INTERFACE, variable, Constants.MODEL_ENTITY_PROXY_GET_ID_METHOD);
+    }
+
+    public static String setModelId(String variable) {
+        return String.format("((%s.%s)%s).%s",Constants.DAO_PACKAGE, Constants.MODEL_ENTITY_PROXY_INTERFACE, variable, Constants.MODEL_ENTITY_PROXY_SET_ID_METHOD);
+    }
+
+    public static TypeName getModelProxy(Element element) {
+        return ClassName.get(getObjectPackage(element),getObjectName(element)+Constants.MODEL_ENTITY_PROXY);
     }
 }

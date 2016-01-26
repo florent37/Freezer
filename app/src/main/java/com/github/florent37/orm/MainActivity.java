@@ -8,6 +8,7 @@ import com.github.florent37.orm.model.Cat;
 import com.github.florent37.orm.model.Dog;
 import com.github.florent37.orm.model.User;
 import com.github.florent37.orm.model.UserORM;
+import com.xebia.android.orm.QueryLogger;
 
 import java.util.Arrays;
 

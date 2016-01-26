@@ -1,8 +1,10 @@
-package com.github.florent37.orm.generator;
+package com.xebia.android.orm.generator;
 
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.xebia.android.orm.Constants;
+import com.xebia.android.orm.ProcessUtils;
 
 import java.util.List;
 
@@ -20,25 +22,25 @@ public class EnumColumnGenerator {
 
     public EnumColumnGenerator(Element element) {
         this.element = element;
-        this.fields = com.github.florent37.orm.ProcessUtils.getPrimitiveFields(element);
+        this.fields = ProcessUtils.getPrimitiveFields(element);
     }
 
     public TypeSpec generate() {
-        TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(com.github.florent37.orm.ProcessUtils.getObjectName(element) + com.github.florent37.orm.Constants.ENUM_COLUMN_SUFFIX)
+        TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(ProcessUtils.getObjectName(element) + Constants.ENUM_COLUMN_SUFFIX)
                 .addModifiers(Modifier.PUBLIC)
-                .addField(String.class, com.github.florent37.orm.Constants.ENUM_COLUMN_ELEMENT_NAME, Modifier.PRIVATE, Modifier.FINAL)
+                .addField(String.class, Constants.ENUM_COLUMN_ELEMENT_NAME, Modifier.PRIVATE, Modifier.FINAL)
                 .addMethod(MethodSpec.methodBuilder("getName")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(TypeName.get(String.class))
-                        .addStatement("return this.$L", com.github.florent37.orm.Constants.ENUM_COLUMN_ELEMENT_NAME)
+                        .addStatement("return this.$L", Constants.ENUM_COLUMN_ELEMENT_NAME)
                         .build())
                 .addMethod(MethodSpec.constructorBuilder()
                         .addParameter(String.class, "name")
-                        .addStatement("this.$L = name", com.github.florent37.orm.Constants.ENUM_COLUMN_ELEMENT_NAME)
+                        .addStatement("this.$L = name", Constants.ENUM_COLUMN_ELEMENT_NAME)
                         .build());
 
         for (VariableElement variableElement : fields) {
-            enumBuilder.addEnumConstant(com.github.florent37.orm.ProcessUtils.getObjectName(variableElement), TypeSpec.anonymousClassBuilder("$S", com.github.florent37.orm.ProcessUtils.getObjectName(variableElement))
+            enumBuilder.addEnumConstant(ProcessUtils.getObjectName(variableElement), TypeSpec.anonymousClassBuilder("$S", ProcessUtils.getObjectName(variableElement))
                     .build());
         }
 

@@ -1,4 +1,4 @@
-package com.github.florent37.orm;
+package com.xebia.android.orm;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
@@ -7,9 +7,9 @@ import com.squareup.javapoet.TypeName;
  * Created by florentchampigny on 18/01/2016.
  */
 public class Constants {
-    public static final String DAO_PACKAGE = "com.github.florent37.orm";
+    public static final String DAO_PACKAGE = "com.xebia.android.orm";
 
-    public static final String DAO_CLASS_NAME = "ORM";
+    public static final String DAO_CLASS_NAME = "AndroidORM";
     public static final String DATABASE_HELPER_CLASS_NAME = "DatabaseHelper";
 
     public static final String DAO_SUFFIX = "ORM";
@@ -17,7 +17,7 @@ public class Constants {
     public static final String QUERY_BUILDER_SUFFIX = "QueryBuilder";
     public static final String ENUM_COLUMN_SUFFIX = "Columns";
 
-    public static final TypeName daoClassName = ClassName.get(Constants.DAO_PACKAGE, DAO_SUFFIX);
+    public static final TypeName daoClassName = ClassName.get(Constants.DAO_PACKAGE, DAO_CLASS_NAME);
     public static final TypeName dbHelperClassName = ClassName.get(Constants.DAO_PACKAGE, DATABASE_HELPER_CLASS_NAME);
 
     public static final TypeName applicationClassName = ClassName.get("android.app", "Application");
@@ -39,4 +39,8 @@ public class Constants {
     public static final String SELECTOR_STRING = "StringSelector";
 
     public static final String QUERY_LOGGER = "QueryLogger";
+    public static final String MODEL_ENTITY_PROXY = "Entity";
+    public static final String MODEL_ENTITY_PROXY_INTERFACE = "DataBaseModel";
+    public static final String MODEL_ENTITY_PROXY_GET_ID_METHOD = "getDatabaseModelId";
+    public static final String MODEL_ENTITY_PROXY_SET_ID_METHOD = "setDatabaseModelId";
 }

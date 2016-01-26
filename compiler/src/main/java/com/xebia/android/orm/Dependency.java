@@ -1,4 +1,4 @@
-package com.github.florent37.orm;
+package com.xebia.android.orm;
 
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;

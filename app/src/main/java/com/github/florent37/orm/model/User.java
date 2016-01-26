@@ -1,6 +1,6 @@
 package com.github.florent37.orm.model;
 
-import com.github.florent37.dao.annotations.Model;
+import com.xebia.android.orm.annotations.Model;
 
 import java.util.List;
 
@@ -9,8 +9,6 @@ import java.util.List;
  */
 @Model
 public class User {
-    public long _id;
-
     int age;
     String name;
     Cat cat;

@@ -1,10 +1,10 @@
-package com.github.florent37.orm.generator;
+package com.xebia.android.orm.generator;
 
-import com.github.florent37.orm.Constants;
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+import com.xebia.android.orm.Constants;
 
 import javax.lang.model.element.Modifier;
 
