@@ -6,6 +6,7 @@ android:
     - build-tools-23.0.2
     - android-23
     - extra-android-m2repository
+    - sys-img-x86-android-17
   licenses:
     - android-sdk-license-5be876d5
 
@@ -27,3 +28,5 @@ sudo: false
 cache:
   directories:
     - $HOME/.m2
+
+script: ./gradlew clean build
