@@ -55,13 +55,15 @@ public class CursorHelperGenerator {
                 .addParameter(Constants.cursorClassName, "cursor")
                 .addParameter(Constants.databaseClassName, "db")
                 .addParameter(TypeName.INT, "start")
-                .addStatement("$T object = new $T()", modelType, ProcessUtils.getModelProxy(element));
+                .addStatement("$T object = new $T()", modelType, ProcessUtils.getModelProxy(element))
+
+                .addStatement("$L(cursor.getLong(start))", ProcessUtils.setModelId("object"));
 
         //for
         for (int i = 0; i < fields.size(); ++i) {
             VariableElement variableElement = fields.get(i);
             if (ProcessUtils.isPrimitive(variableElement)) {
-                String cursor = "cursor.get$L(start)";
+                String cursor = "cursor.get$L(start+"+(i+1)+")";
                 cursor = String.format(ProcessUtils.getFieldCast(variableElement), cursor);
 
                 fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement));
@@ -226,7 +228,7 @@ public class CursorHelperGenerator {
 
         for (int i = 0; i < collections.size(); ++i) {
             VariableElement variableElement = collections.get(i);
-            insertB.addStatement("$T.$L(database,$L,$S,object.$L)", Constants.primitiveCursorHelper, ProcessUtils.addPrimitiveCursorHelperFunction(variableElement), ProcessUtils.getModelId("object"), ProcessUtils.getObjectName(variableElement), ProcessUtils.getObjectName(variableElement));
+            insertB.addStatement("if(object.$L != null) $T.$L(database,objectId,$S,object.$L)", ProcessUtils.getObjectName(variableElement), Constants.primitiveCursorHelper, ProcessUtils.addPrimitiveCursorHelperFunction(variableElement), ProcessUtils.getObjectName(variableElement), ProcessUtils.getObjectName(variableElement));
         }
 
         methodSpecs.add(insertB.addStatement("return objectId").build());

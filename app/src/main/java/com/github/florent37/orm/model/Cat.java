@@ -10,7 +10,11 @@ import java.util.List;
 @Model
 public class Cat {
     String shortName;
+    String name;
     List<Integer> ages;
+    List<String> names;
+    List<Boolean> oks;
+    List<Float> prices;
 
     public Cat() {
     }
