@@ -133,9 +133,12 @@ userORM.logQueries((query, datas) -> Log.d(TAG, query) }
 - Adding some selectors operations (like, ...)
 - Adding array support (int[], List<Integer>, ...)
 
-#Contributing
+#A project initiated by Xebia
+
 This project was first developed by Xebia and has been open-sourced since. We will continue working and investing on it.
 We encourage the community to contribute to the project by opening tickets and/or pull requests.
+
+-[![logo xebia](https://raw.githubusercontent.com/florent37/Android-ORM/master/logo_xebia.jpg)](http://www.xebia.fr/)
 
 License
 --------
