@@ -105,6 +105,24 @@ public class QueryBuilderGenerator {
                         .addStatement("return queryBuilder.toString().replace($S,table)", Constants.QUERY_NAMED)
                         .build())
 
+                .addMethod(MethodSpec.methodBuilder("constructArgs")
+                        .returns(TypeName.get(String[].class))
+                        .addModifiers(Modifier.PROTECTED)
+                        .addStatement("return args.toArray(new String[args.size()])")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("constructQuery")
+                        .returns(TypeName.get(String.class))
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("$T query = new $T()", ClassName.get(StringBuilder.class), ClassName.get(StringBuilder.class))
+                        .addStatement("for($T s : fromTables) query.append($S).append(s)", ClassName.get(String.class), ", ")
+                        .addStatement("if (queryBuilder.length() != 0) query.append($S)", " where ")
+                        .addStatement("query.append(queryBuilder.toString())")
+                        .addStatement("if(orderBuilder.length() != 0) query.append($S)", " ORDER BY ")
+                        .addStatement("query.append(orderBuilder.toString())")
+                        .addStatement("return query.toString()")
+                        .build())
+
                 .addMethod(MethodSpec.methodBuilder("appendQuery")
                         .addModifiers(Modifier.PROTECTED)
                         .addParameter(TypeName.get(String.class), "conditional")
@@ -112,6 +130,18 @@ public class QueryBuilderGenerator {
                         .addStatement("if (named) queryBuilder.append($S)", "NAMED.")
                         .addStatement("queryBuilder.append(conditional)")
                         .addStatement("if(arg != null) args.add(arg)")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("getTableId")
+                        .addModifiers(Modifier.PROTECTED)
+                        .returns(ClassName.get(String.class))
+                        .addParameter(ClassName.get(String.class), "tableName")
+                        .addStatement("$T tableId", ClassName.get(String.class))
+                        .addStatement("int tablePos = fromTablesNames.indexOf(tableName)")
+                        .addStatement("if(tablePos != -1) tableId = fromTablesId.get(tablePos)")
+                        .addStatement("else{ tableId = $S + fromTables.size(); fromTablesId.add(tableId); fromTables.add(tableName + \" \" + tableId); fromTablesNames.add(tableName); }", Constants.QUERY_TABLE_VARIABLE)
+                        .addStatement("return tableId")
+
                         .build())
 
                 .addTypes(generateSelectors())
