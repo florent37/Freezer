@@ -282,14 +282,14 @@ public class ProcessUtils {
         return null;
     }
 
-    public static TypeName getSelectorName(TypeName queryBuilderClassName, Element element) {
-        TypeName typeName = TypeName.get(element.asType());
+    public static ClassName getSelectorName(Element element) {
+        TypeName typeName = getFieldClass(element);
         if (TypeName.INT.equals(typeName) || TypeName.LONG.equals(typeName) || TypeName.FLOAT.equals(typeName) )
-            return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_NUMBER);
+            return Constants.queryBuilder_NumberSelectorClassName;
         if (TypeName.BOOLEAN.equals(typeName))
-            return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_BOOLEAN);
+            return Constants.queryBuilder_BooleanSelectorClassName;
         if (TypeName.get(String.class).equals(typeName))
-            return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_STRING);
-        return TypeName.VOID;
+            return Constants.queryBuilder_StringSelectorClassName;
+        return null;
     }
 }

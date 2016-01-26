@@ -3,6 +3,7 @@ package com.xebia.android.orm.generator;
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.xebia.android.orm.Constants;
@@ -73,23 +74,11 @@ public class ModelORMGenerator {
         this.queryBuilder = TypeSpec.classBuilder(ProcessUtils.getQueryBuilderName(modelName)) //UserDAOQueryBuilder
                 .addModifiers(Modifier.PUBLIC)
 
-                .addField(ClassName.get(StringBuilder.class), "queryBuilder")
-                .addField(ClassName.get(StringBuilder.class), "orderBuilder")
-                .addField(ProcessUtils.listOf(String.class), "args")
-                .addField(ProcessUtils.listOf(String.class), "fromTables")
-                .addField(ProcessUtils.listOf(String.class), "fromTablesNames")
-                .addField(ProcessUtils.listOf(String.class), "fromTablesId")
-                .addField(TypeName.BOOLEAN, "named")
-                .addField(ClassName.get(Constants.DAO_PACKAGE, Constants.QUERY_LOGGER), "logger")
+                .superclass(Constants.queryBuilderClassName)
 
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
-                        .addStatement("this.queryBuilder = new $T()", ClassName.get(StringBuilder.class))
-                        .addStatement("this.orderBuilder = new $T()", ClassName.get(StringBuilder.class))
-                        .addStatement("this.args = new $T()", ProcessUtils.arraylistOf(String.class))
-                        .addStatement("this.fromTables = new $T()", ProcessUtils.arraylistOf(String.class))
-                        .addStatement("this.fromTablesNames = new $T()", ProcessUtils.arraylistOf(String.class))
-                        .addStatement("this.fromTablesId = new $T()", ProcessUtils.arraylistOf(String.class))
+                        .addStatement("super()")
                         .build())
 
                 .addMethod(MethodSpec.constructorBuilder()
@@ -106,28 +95,28 @@ public class ModelORMGenerator {
                 .addMethod(MethodSpec.methodBuilder("or")
                         .returns(queryBuilderClassName)
                         .addModifiers(Modifier.PUBLIC)
-                        .addStatement("queryBuilder.append($S)", " or ")
+                        .addStatement("super.appendOr()")
                         .addStatement("return this")
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("and")
                         .returns(queryBuilderClassName)
                         .addModifiers(Modifier.PUBLIC)
-                        .addStatement("queryBuilder.append($S)", " and ")
+                        .addStatement("super.appendAnd()")
                         .addStatement("return this")
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("beginGroup")
                         .returns(queryBuilderClassName)
                         .addModifiers(Modifier.PUBLIC)
-                        .addStatement("queryBuilder.append($S)", " ( ")
+                        .addStatement("super.appendBeginGroup()")
                         .addStatement("return this")
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("endGroup")
                         .returns(queryBuilderClassName)
                         .addModifiers(Modifier.PUBLIC)
-                        .addStatement("queryBuilder.append($S)", " ) ")
+                        .addStatement("super.appendEndGroup()")
                         .addStatement("return this")
                         .build())
 
@@ -149,9 +138,7 @@ public class ModelORMGenerator {
                         .returns(queryBuilderClassName)
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(enumColums, "column")
-                        .addStatement("if(orderBuilder.length() != 0) queryBuilder.append(',')")
-                        .addStatement("orderBuilder.append($S).append(column)", " " + TABLE_NAME + " .")
-                        .addStatement("orderBuilder.append($S)", " ASC ")
+                        .addStatement("super.appendSortAsc($S,column.getName())", " " + TABLE_NAME + " .")
                         .addStatement("return this")
                         .build())
 
@@ -159,9 +146,7 @@ public class ModelORMGenerator {
                         .returns(queryBuilderClassName)
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(enumColums, "column")
-                        .addStatement("if(orderBuilder.length() != 0) queryBuilder.append(',')")
-                        .addStatement("orderBuilder.append($S).append(column)", " " + TABLE_NAME + " .")
-                        .addStatement("orderBuilder.append($S)", " DESC ")
+                        .addStatement("super.appendSortDesc($S,column.getName())", " " + TABLE_NAME + " .")
                         .addStatement("return this")
                         .build())
 
@@ -286,17 +271,6 @@ public class ModelORMGenerator {
                         .addStatement("return queryBuilder.toString().replace($S,table)", Constants.QUERY_NAMED)
                         .build())
 
-                .addMethod(MethodSpec.methodBuilder("appendQuery")
-                        .addModifiers(Modifier.PROTECTED)
-                        .returns(queryBuilderClassName)
-                        .addParameter(TypeName.get(String.class), "conditional")
-                        .addParameter(TypeName.get(String.class), "arg")
-                        .addStatement("if (named) queryBuilder.append($S)", "NAMED.")
-                        .addStatement("queryBuilder.append(conditional)")
-                        .addStatement("if(arg != null) args.add(arg)")
-                        .addStatement("return this")
-                        .build())
-
                 .addMethod(MethodSpec.methodBuilder("execute")
                         .returns(listObjectsClassName)
                         .addModifiers(Modifier.PRIVATE)
@@ -310,8 +284,6 @@ public class ModelORMGenerator {
                         .addStatement("$T.getInstance().close()", Constants.daoClassName)
                         .addStatement("return objects")
                         .build())
-
-                .addTypes(generateSelectors())
 
                 .build();
 
@@ -415,17 +387,33 @@ public class ModelORMGenerator {
         List<MethodSpec> methodSpecs = new ArrayList<>();
 
         for (VariableElement variableElement : fields) {
-            TypeName selector = ProcessUtils.getSelectorName(queryBuilderClassName, variableElement);
-            if (!selector.equals(TypeName.VOID)) { //TODO
+            ClassName className = ProcessUtils.getSelectorName(variableElement);
+            if (className != null) {
+                TypeName selector = ParameterizedTypeName.get(className, queryBuilderClassName);
                 methodSpecs.add(MethodSpec.methodBuilder(variableElement.getSimpleName().toString())
                         .returns(selector)
                         .addModifiers(Modifier.PUBLIC)
 
-                        .addStatement("return new $T(this, $T.$L)", selector, enumColums, variableElement.getSimpleName())
+                        .addStatement("return new $T(this, $T.$L.getName())", selector, enumColums, variableElement.getSimpleName())
 
                         .build());
             }
         }
+
+        for (VariableElement variableElement : collections) {
+            ClassName className = ProcessUtils.getSelectorName(variableElement);
+            if (className != null) {
+                TypeName selector = ParameterizedTypeName.get(className, queryBuilderClassName);
+                methodSpecs.add(MethodSpec.methodBuilder(variableElement.getSimpleName().toString())
+                        .returns(selector)
+                        .addModifiers(Modifier.PUBLIC)
+
+                        .addStatement("return new $T(this, $T.$L.getName())", selector, enumColums, variableElement.getSimpleName())
+
+                        .build());
+            }
+        }
+
 
         for (VariableElement variableElement : otherClassFields) {
 
@@ -488,135 +476,6 @@ public class ModelORMGenerator {
 
     //        return stringBuilder.toString();
     //}
-
-    protected List<TypeSpec> generateSelectors() {
-        List<TypeSpec> typeSpecs = new ArrayList<>();
-
-        typeSpecs.add(TypeSpec.classBuilder(Constants.SELECTOR_NUMBER)
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addField(queryBuilderClassName, "queryBuilder")
-                .addField(enumColums, "column")
-
-                .addMethod(MethodSpec.constructorBuilder()
-                        .addModifiers(Modifier.PROTECTED)
-                        .addParameter(queryBuilderClassName, "queryBuilder")
-                        .addParameter(enumColums, "column")
-                        .addStatement("this.queryBuilder = queryBuilder")
-                        .addStatement("this.column = column")
-                        .build())
-
-                .addMethod(MethodSpec.methodBuilder("equalsTo")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(queryBuilderClassName)
-                        .addParameter(TypeName.FLOAT, "value")
-                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\",String.valueOf(value))")
-                        .build())
-
-                .addMethod(MethodSpec.methodBuilder("notEqualsTo")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(queryBuilderClassName)
-                        .addParameter(TypeName.FLOAT, "value")
-                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" != ?\",String.valueOf(value))")
-                        .build())
-
-                .addMethod(MethodSpec.methodBuilder("between")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(queryBuilderClassName)
-                        .addParameter(TypeName.FLOAT, "min")
-                        .addParameter(TypeName.FLOAT, "max")
-                        .addStatement("queryBuilder.appendQuery(column.getName()+\" > ?\",String.valueOf(min))")
-                        .addStatement("queryBuilder.and()")
-                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" < ?\",String.valueOf(max))")
-                        .build())
-
-                .addMethod(MethodSpec.methodBuilder("greatherThan")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(queryBuilderClassName)
-                        .addParameter(TypeName.FLOAT, "value")
-                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" > ?\",String.valueOf(value))")
-                        .build())
-
-                .addMethod(MethodSpec.methodBuilder("lessThan")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(queryBuilderClassName)
-                        .addParameter(TypeName.FLOAT, "value")
-                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" < ?\",String.valueOf(value))")
-                        .build())
-
-                .build());
-
-        typeSpecs.add(TypeSpec.classBuilder(Constants.SELECTOR_STRING)
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addField(queryBuilderClassName, "queryBuilder")
-                .addField(enumColums, "column")
-
-                .addMethod(MethodSpec.constructorBuilder()
-                        .addModifiers(Modifier.PROTECTED)
-                        .addParameter(queryBuilderClassName, "queryBuilder")
-                        .addParameter(enumColums, "column")
-                        .addStatement("this.queryBuilder = queryBuilder")
-                        .addStatement("this.column = column")
-                        .build())
-
-                .addMethod(MethodSpec.methodBuilder("equalsTo")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(queryBuilderClassName)
-                        .addParameter(TypeName.get(String.class), "value")
-                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\",value)")
-                        .build())
-
-                .addMethod(MethodSpec.methodBuilder("notEqualsTo")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(queryBuilderClassName)
-                        .addParameter(TypeName.get(String.class), "value")
-                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" != ?\",value)")
-                        .build())
-
-                .addMethod(MethodSpec.methodBuilder("contains")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(queryBuilderClassName)
-                        .addParameter(TypeName.get(String.class), "value")
-                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" LIKE '%\"+value+\"%'\",null)")
-                        .build())
-
-                .build());
-
-        typeSpecs.add(TypeSpec.classBuilder(Constants.SELECTOR_BOOLEAN)
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addField(queryBuilderClassName, "queryBuilder")
-                .addField(enumColums, "column")
-
-                .addMethod(MethodSpec.constructorBuilder()
-                        .addModifiers(Modifier.PROTECTED)
-                        .addParameter(queryBuilderClassName, "queryBuilder")
-                        .addParameter(enumColums, "column")
-                        .addStatement("this.queryBuilder = queryBuilder")
-                        .addStatement("this.column = column")
-                        .build())
-
-                .addMethod(MethodSpec.methodBuilder("equalsTo")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(queryBuilderClassName)
-                        .addParameter(TypeName.BOOLEAN, "value")
-                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\", String.valueOf(value ? 1 : 0))")
-                        .build())
-
-                .addMethod(MethodSpec.methodBuilder("isTrue")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(queryBuilderClassName)
-                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\", String.valueOf(1))")
-                        .build())
-
-                .addMethod(MethodSpec.methodBuilder("isFalse")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(queryBuilderClassName)
-                        .addStatement("return queryBuilder.appendQuery(column.getName()+\" = ?\", String.valueOf(0))")
-                        .build())
-
-                .build());
-
-        return typeSpecs;
-    }
 
     protected String generateTableCreate() {
         StringBuilder stringBuilder = new StringBuilder();

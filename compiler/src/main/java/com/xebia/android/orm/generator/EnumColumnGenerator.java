@@ -22,7 +22,7 @@ public class EnumColumnGenerator {
 
     public EnumColumnGenerator(Element element) {
         this.element = element;
-        this.fields = ProcessUtils.getPrimitiveFields(element);
+        this.fields = ProcessUtils.getFields(element);
     }
 
     public TypeSpec generate() {

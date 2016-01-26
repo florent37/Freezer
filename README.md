@@ -101,6 +101,12 @@ int count          = userORM.select().count();
 - boolean
 - String
 
+##Collections
+- List<Integer>
+- List<Float>
+- List<Boolean>
+- List<String>
+
 ##One To One
 
 ```java
@@ -129,7 +135,6 @@ userORM.logQueries((query, datas) -> Log.d(TAG, query) }
 
 #TODO
 
-- Adding array support (int[], List<Integer>, ...)
 - Update an entry
 - Adding SqlLiterHelper onUpgrade
 - Adding some selectors operations (like, ...)

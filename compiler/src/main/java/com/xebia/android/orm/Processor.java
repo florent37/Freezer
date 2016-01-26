@@ -8,6 +8,7 @@ import com.xebia.android.orm.generator.EnumColumnGenerator;
 import com.xebia.android.orm.generator.ModelEntityProxyGenerator;
 import com.xebia.android.orm.generator.ModelORMGenerator;
 import com.xebia.android.orm.generator.PrimitiveCursorHelperGenerator;
+import com.xebia.android.orm.generator.QueryBuilderGenerator;
 import com.xebia.android.orm.generator.QueryLoggerGenerator;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
@@ -110,6 +111,7 @@ public class Processor extends AbstractProcessor {
         writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new QueryLoggerGenerator().generate()).build());
         writeFile(JavaFile.builder(Constants.DAO_PACKAGE, ModelEntityProxyGenerator.generateModelProxyInterface()).build());
         writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new PrimitiveCursorHelperGenerator().generate()).build());
+        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new QueryBuilderGenerator().generate()).build());
     }
 
     protected void writeJavaFiles() {
