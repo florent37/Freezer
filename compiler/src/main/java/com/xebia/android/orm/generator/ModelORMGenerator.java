@@ -360,9 +360,9 @@ public class ModelORMGenerator {
                         .returns(TypeName.LONG)
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("$T database = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
-                        .addStatement("$T.insert(database,object)", modelCursorHelperClassName)
+                        .addStatement("long objectId = $T.insert(database,object)", modelCursorHelperClassName)
                         .addStatement("$T.getInstance().close()", Constants.daoClassName)
-                        .addStatement("return $L", ProcessUtils.getModelId("object"))
+                        .addStatement("return objectId")
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("add")

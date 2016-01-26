@@ -156,12 +156,13 @@ public class CursorHelperGenerator {
 
         MethodSpec.Builder insertB = MethodSpec.methodBuilder("insert")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(TypeName.LONG)
                 .addParameter(Constants.databaseClassName, "database")
                 .addParameter(modelType, "object")
-                .addStatement("$L(database.insert($S, null, getValues(object,null)))", ProcessUtils.setModelId("object"), ProcessUtils.getTableName(objectName));
+                .addStatement("long objectId = database.insert($S, null, getValues(object,null))", ProcessUtils.getTableName(objectName));
 
         for (VariableElement variableElement : otherClassFields) {
-            insertB.addStatement("$T.insertFor$L(database,object.$L,$L, $S)", ProcessUtils.getFieldCursorHelperClass(variableElement), objectName, ProcessUtils.getObjectName(variableElement), ProcessUtils.getModelId("object"), ProcessUtils.getObjectName(variableElement));
+            insertB.addStatement("$T.insertFor$L(database,object.$L, objectId , $S)", ProcessUtils.getFieldCursorHelperClass(variableElement), objectName, ProcessUtils.getObjectName(variableElement), ProcessUtils.getObjectName(variableElement));
 
             String JOINTABLE = ProcessUtils.getTableName(objectName) + "_" + ProcessUtils.getTableName(variableElement);
 
@@ -173,8 +174,8 @@ public class CursorHelperGenerator {
                     .addParameter(ClassName.get(String.class), "variable")
 
                     .beginControlFlow("if(child != null)")
-                    .addStatement("$L(database.insert($S, null, $T.getValues(child,null)))", ProcessUtils.setModelId("child"), ProcessUtils.getTableName(variableElement), ProcessUtils.getFieldCursorHelperClass(variableElement))
-                    .addStatement("database.insert($S, null, get$LValues(parentId, $L, variable))", JOINTABLE, JOINTABLE, ProcessUtils.getModelId("child"))
+                    .addStatement("long objectId = database.insert($S, null, $T.getValues(child,null))", ProcessUtils.getTableName(variableElement), ProcessUtils.getFieldCursorHelperClass(variableElement))
+                    .addStatement("database.insert($S, null, get$LValues(parentId, objectId, variable))", JOINTABLE, JOINTABLE)
                     .endControlFlow()
 
                     .build();
@@ -221,7 +222,7 @@ public class CursorHelperGenerator {
             //}
         }
 
-        methodSpecs.add(insertB.build());
+        methodSpecs.add(insertB.addStatement("return objectId").build());
 
         methodSpecs.add(MethodSpec.methodBuilder("insert")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
