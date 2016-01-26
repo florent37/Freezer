@@ -96,16 +96,22 @@ int count          = userORM.select().count();
 #Accepted types
 
 ##Primitives
+
+```java
 - int
 - float
 - boolean
 - String
+```
 
 ##Collections
+
+```java
 - List<Integer>
 - List<Float>
 - List<Boolean>
 - List<String>
+```
 
 ##One To One
 
