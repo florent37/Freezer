@@ -1,5 +1,7 @@
 # Android ORM
 
+[![Build Status](https://travis-ci.org/florent37/Android-ORM.svg?branch=master)](https://travis-ci.org/florent37/Android-ORM)
+
 Use Annotations to mark classes to be Persisted
 
 ```java
