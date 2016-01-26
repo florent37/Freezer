@@ -25,7 +25,16 @@ public class ProcessUtils {
     public static List<VariableElement> getPrimitiveFields(Element element) {
         List<VariableElement> primitives = new ArrayList<>();
         for (VariableElement e : getFields(element)) {
-            if (isPrimitive(e))
+            if (isPrimitive(e) && !isCollectionOfPrimitive(e))
+                primitives.add(e);
+        }
+        return primitives;
+    }
+
+    public static List<VariableElement> getCollectionsOfPrimitiveFields(Element element) {
+        List<VariableElement> primitives = new ArrayList<>();
+        for (VariableElement e : getFields(element)) {
+            if (isCollectionOfPrimitive(e))
                 primitives.add(e);
         }
         return primitives;
@@ -34,7 +43,7 @@ public class ProcessUtils {
     public static List<VariableElement> getNonPrimitiveClassFields(Element element) {
         List<VariableElement> nonPrimitive = new ArrayList<>();
         for (VariableElement e : getFields(element)) {
-            if (!isPrimitive(e))
+            if (!isPrimitive(e) && !isCollectionOfPrimitive(e))
                 nonPrimitive.add(e);
         }
         return nonPrimitive;
@@ -133,8 +142,20 @@ public class ProcessUtils {
         return Constants.FIELD_ID.equals(variableElement.getSimpleName().toString());
     }
 
+    public static TypeName unbox(TypeName typeName){
+        try {
+            return typeName.unbox();
+        }catch (Exception e){
+            return typeName;
+        }
+    }
+
     public static boolean isPrimitive(TypeName typeName) {
-        return typeName.isPrimitive() || (ClassName.get(String.class).equals(typeName));
+        return typeName.isPrimitive() || unbox(typeName).isPrimitive() || (ClassName.get(String.class).equals(typeName));
+    }
+
+    public static boolean isCollectionOfPrimitive(Element element) {
+        return isCollection(element) && isPrimitive(getFieldClass(element));
     }
 
     public static String getQueryCast(VariableElement variableElement) {
@@ -166,7 +187,7 @@ public class ProcessUtils {
     public static List<TypeName> getParameters(Element element) {
         try {
             return ((ParameterizedTypeName) ParameterizedTypeName.get(element.asType())).typeArguments;
-        }catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
@@ -186,20 +207,20 @@ public class ProcessUtils {
     }
 
     public static TypeName getFieldClass(Element element) {
-        TypeName enclosed = getEnclosedTypeName(element);
-        if(enclosed != null)
+        TypeName enclosed = unbox(getEnclosedTypeName(element));
+        if (enclosed != null)
             return enclosed;
         else return ClassName.get(element.asType());
     }
 
-    public static String getFieldClassName(Element element){
+    public static String getFieldClassName(Element element) {
         String name;
 
         TypeName t = getFieldClass(element);
-        if(t instanceof ClassName){
-            ClassName className = (ClassName)t;
+        if (t instanceof ClassName) {
+            ClassName className = (ClassName) t;
             name = className.simpleName();
-        }else name = t.toString();
+        } else name = t.toString();
 
         return name;
     }
@@ -208,8 +229,8 @@ public class ProcessUtils {
         return getEnclosedTypeName(element) != null;
     }
 
-    public static String getMethodId(MethodSpec methodSpec){
-        return methodSpec.name+methodSpec.parameters.toString();
+    public static String getMethodId(MethodSpec methodSpec) {
+        return methodSpec.name + methodSpec.parameters.toString();
     }
 
     protected static List<String> getMethodsNames(TypeSpec typeSpec) {
@@ -228,10 +249,47 @@ public class ProcessUtils {
     }
 
     public static String setModelId(String variable) {
-        return String.format("((%s.%s)%s).%s",Constants.DAO_PACKAGE, Constants.MODEL_ENTITY_PROXY_INTERFACE, variable, Constants.MODEL_ENTITY_PROXY_SET_ID_METHOD);
+        return String.format("((%s.%s)%s).%s", Constants.DAO_PACKAGE, Constants.MODEL_ENTITY_PROXY_INTERFACE, variable, Constants.MODEL_ENTITY_PROXY_SET_ID_METHOD);
     }
 
     public static TypeName getModelProxy(Element element) {
-        return ClassName.get(getObjectPackage(element),getObjectName(element)+Constants.MODEL_ENTITY_PROXY);
+        return ClassName.get(getObjectPackage(element), getObjectName(element) + Constants.MODEL_ENTITY_PROXY);
+    }
+
+    public static String getPrimitiveCursorHelperFunction(Element element) {
+        TypeName typeName = getFieldClass(element);
+        if (ClassName.get(String.class).equals(typeName))
+            return "getStrings";
+        else if (TypeName.INT.equals(typeName))
+            return "getIntegers";
+        else if (TypeName.FLOAT.equals(typeName))
+            return "getFloats";
+        else if (TypeName.BOOLEAN.equals(typeName))
+            return "getBooleans";
+        return null;
+    }
+
+    public static String addPrimitiveCursorHelperFunction(Element element) {
+        TypeName typeName = getFieldClass(element);
+        if (ClassName.get(String.class).equals(typeName))
+            return "addStrings";
+        else if (TypeName.INT.equals(typeName))
+            return "addIntegers";
+        else if (TypeName.FLOAT.equals(typeName))
+            return "addFloats";
+        else if (TypeName.BOOLEAN.equals(typeName))
+            return "addBooleans";
+        return null;
+    }
+
+    public static TypeName getSelectorName(TypeName queryBuilderClassName, Element element) {
+        TypeName typeName = TypeName.get(element.asType());
+        if (TypeName.INT.equals(typeName) || TypeName.LONG.equals(typeName) || TypeName.FLOAT.equals(typeName) )
+            return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_NUMBER);
+        if (TypeName.BOOLEAN.equals(typeName))
+            return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_BOOLEAN);
+        if (TypeName.get(String.class).equals(typeName))
+            return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_STRING);
+        return TypeName.VOID;
     }
 }

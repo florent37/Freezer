@@ -39,6 +39,7 @@ public class ModelORMGenerator {
 
     List<VariableElement> fields;
     List<VariableElement> otherClassFields;
+    List<VariableElement> collections;
 
     public ModelORMGenerator(Element element) {
         this.modelName = ProcessUtils.getObjectName(element);
@@ -54,6 +55,7 @@ public class ModelORMGenerator {
 
         this.fields = ProcessUtils.getPrimitiveFields(element);
         this.otherClassFields = ProcessUtils.getNonPrimitiveClassFields(element);
+        this.collections = ProcessUtils.getCollectionsOfPrimitiveFields(element);
     }
 
     public TypeSpec getDao() {
@@ -334,13 +336,13 @@ public class ModelORMGenerator {
                         .addStatement("return $S", "")
                         .build())
 
-                //.addMethod(MethodSpec.methodBuilder("drop")
-                //        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                //        .returns(ArrayTypeName.get(String[].class))
+                        //.addMethod(MethodSpec.methodBuilder("drop")
+                        //        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        //        .returns(ArrayTypeName.get(String[].class))
 
-                //                //for
-                //        .addStatement("return new $T[]{$L}", ClassName.get(String.class), generateDropString())
-                //        .build())
+                        //                //for
+                        //        .addStatement("return new $T[]{$L}", ClassName.get(String.class), generateDropString())
+                        //        .build())
 
                 .addMethod(MethodSpec.methodBuilder("select")
                         .addModifiers(Modifier.PUBLIC)
@@ -413,15 +415,16 @@ public class ModelORMGenerator {
         List<MethodSpec> methodSpecs = new ArrayList<>();
 
         for (VariableElement variableElement : fields) {
-            TypeName selector = getSelectorName(variableElement);
+            TypeName selector = ProcessUtils.getSelectorName(queryBuilderClassName, variableElement);
+            if (!selector.equals(TypeName.VOID)) { //TODO
+                methodSpecs.add(MethodSpec.methodBuilder(variableElement.getSimpleName().toString())
+                        .returns(selector)
+                        .addModifiers(Modifier.PUBLIC)
 
-            methodSpecs.add(MethodSpec.methodBuilder(variableElement.getSimpleName().toString())
-                    .returns(selector)
-                    .addModifiers(Modifier.PUBLIC)
+                        .addStatement("return new $T(this, $T.$L)", selector, enumColums, variableElement.getSimpleName())
 
-                    .addStatement("return new $T(this, $T.$L)", selector, enumColums, variableElement.getSimpleName())
-
-                    .build());
+                        .build());
+            }
         }
 
         for (VariableElement variableElement : otherClassFields) {
@@ -438,17 +441,6 @@ public class ModelORMGenerator {
         }
 
         return methodSpecs;
-    }
-
-    protected TypeName getSelectorName(Element element) {
-        TypeName typeName = TypeName.get(element.asType());
-        if (TypeName.INT.equals(typeName) || TypeName.LONG.equals(typeName) || TypeName.FLOAT.equals(typeName) )
-            return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_NUMBER);
-        if (TypeName.BOOLEAN.equals(typeName))
-            return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_BOOLEAN);
-        if (TypeName.get(String.class).equals(typeName))
-            return ClassName.bestGuess(queryBuilderClassName + "." + Constants.SELECTOR_STRING);
-        return TypeName.VOID;
     }
 
     protected String generateCreationString() {

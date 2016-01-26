@@ -32,7 +32,9 @@ public class DatabaseHelperGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(Constants.databaseClassName, "database");
         for (ClassName dao : daos)
-            onCreate.addStatement("for($T s : $T.create()) database.execSQL(s);", ClassName.get(String.class), dao);
+            onCreate.addStatement("for($T s : $T.create()) database.execSQL(s)", ClassName.get(String.class), dao);
+
+        onCreate.addStatement("for($T s : $T.create()) database.execSQL(s)", ClassName.get(String.class), ClassName.get(Constants.DAO_PACKAGE, Constants.PRIMITIVE_CURSOR_HELPER));
 
         MethodSpec.Builder onUpgrade = MethodSpec.methodBuilder("onUpgrade")
                 .addModifiers(Modifier.PUBLIC)

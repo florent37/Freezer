@@ -28,14 +28,16 @@ public class CursorHelperGenerator {
     TypeName modelType;
     List<VariableElement> fields;
     List<VariableElement> otherClassFields;
+    List<VariableElement> collections;
     List<Dependency> dependencies = new ArrayList();
 
     public CursorHelperGenerator(Element element) {
         this.element = element;
         this.objectName = ProcessUtils.getObjectName(element);
         this.modelType = TypeName.get(element.asType());
-        this.fields = ProcessUtils.getFields(element);
+        this.fields = ProcessUtils.getPrimitiveFields(element);
         this.otherClassFields = ProcessUtils.getNonPrimitiveClassFields(element);
+        this.collections = ProcessUtils.getCollectionsOfPrimitiveFields(element);
     }
 
     public TypeSpec generate() {
@@ -64,21 +66,21 @@ public class CursorHelperGenerator {
 
                 fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement));
             } else {
-
                 fromCursorB.addCode("\n");
                 String JOIN_NAME = ProcessUtils.getTableName(objectName) + "_" + ProcessUtils.getTableName(variableElement);
 
                 fromCursorB.addStatement("$T cursor$L = db.rawQuery($S,new String[]{String.valueOf($L), $S})", Constants.cursorClassName, i, "SELECT * FROM " + ProcessUtils.getTableName(variableElement) + ", " + JOIN_NAME + " WHERE " + JOIN_NAME + "." + ProcessUtils.getKeyName(objectName) + " = ? AND " + ProcessUtils.getTableName(variableElement) + "." + Constants.FIELD_ID + " = " + JOIN_NAME + "." + ProcessUtils.getKeyName(variableElement) + " AND " + JOIN_NAME + "." + Constants.FIELD_NAME + "= ?", ProcessUtils.getModelId("object"), ProcessUtils.getObjectName(variableElement));
 
-                if (ProcessUtils.isCollection(variableElement)) {
-                    fromCursorB.addStatement("object.$L = $T.get(cursor$L,db)", ProcessUtils.getObjectName(variableElement), ProcessUtils.getFieldCursorHelperClass(variableElement), i);
-                } else {
-                    fromCursorB.addStatement("$T objects$L = $T.get(cursor$L,db)", ProcessUtils.listOf(variableElement), i, ProcessUtils.getFieldCursorHelperClass(variableElement), i);
-                    fromCursorB.addStatement("if(!objects$L.isEmpty()) object.$L = objects$L.get(0)", i, ProcessUtils.getObjectName(variableElement), i);
-                }
+                fromCursorB.addStatement("$T objects$L = $T.get(cursor$L,db)", ProcessUtils.listOf(variableElement), i, ProcessUtils.getFieldCursorHelperClass(variableElement), i);
+                fromCursorB.addStatement("if(!objects$L.isEmpty()) object.$L = objects$L.get(0)", i, ProcessUtils.getObjectName(variableElement), i);
 
                 fromCursorB.addStatement("cursor$L.close()", i);
             }
+        }
+
+        for (int i = 0; i < collections.size(); ++i) {
+            VariableElement variableElement = collections.get(i);
+            fromCursorB.addStatement("object.$L = $T.$L(db,$L,$S)", ProcessUtils.getObjectName(variableElement), Constants.primitiveCursorHelper, ProcessUtils.getPrimitiveCursorHelperFunction(variableElement), ProcessUtils.getModelId("object"), ProcessUtils.getObjectName(variableElement));
         }
 
         fromCursorB.addCode("\n").addStatement("return object");
@@ -166,7 +168,7 @@ public class CursorHelperGenerator {
 
             String JOINTABLE = ProcessUtils.getTableName(objectName) + "_" + ProcessUtils.getTableName(variableElement);
 
-            MethodSpec insert = MethodSpec.methodBuilder("insertFor"+objectName)
+            MethodSpec insert = MethodSpec.methodBuilder("insertFor" + objectName)
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                     .addParameter(Constants.databaseClassName, "database")
                     .addParameter(ProcessUtils.getFieldClass(variableElement), "child")
@@ -174,13 +176,13 @@ public class CursorHelperGenerator {
                     .addParameter(ClassName.get(String.class), "variable")
 
                     .beginControlFlow("if(child != null)")
-                    .addStatement("long objectId = database.insert($S, null, $T.getValues(child,null))", ProcessUtils.getTableName(variableElement), ProcessUtils.getFieldCursorHelperClass(variableElement))
+                    .addStatement("long objectId = insert(database,child)")
                     .addStatement("database.insert($S, null, get$LValues(parentId, objectId, variable))", JOINTABLE, JOINTABLE)
                     .endControlFlow()
 
                     .build();
 
-            MethodSpec insertAll = MethodSpec.methodBuilder("insertFor"+objectName)
+            MethodSpec insertAll = MethodSpec.methodBuilder("insertFor" + objectName)
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                     .addParameter(Constants.databaseClassName, "database")
                     .addParameter(ProcessUtils.listOf(ProcessUtils.getFieldClass(variableElement)), "objects")
@@ -189,7 +191,7 @@ public class CursorHelperGenerator {
 
                     .beginControlFlow("if(objects != null)")
                     .beginControlFlow("for($T child : objects)", ProcessUtils.getFieldClass(variableElement))
-                    .addStatement("insertFor$L(database,child, parentId, variable)",objectName)
+                    .addStatement("insertFor$L(database,child, parentId, variable)", objectName)
                     .endControlFlow()
                     .endControlFlow()
 
@@ -220,6 +222,11 @@ public class CursorHelperGenerator {
             //            .endControlFlow()
             //            .endControlFlow();
             //}
+        }
+
+        for (int i = 0; i < collections.size(); ++i) {
+            VariableElement variableElement = collections.get(i);
+            insertB.addStatement("$T.$L(database,$L,$S,object.$L)", Constants.primitiveCursorHelper, ProcessUtils.addPrimitiveCursorHelperFunction(variableElement), ProcessUtils.getModelId("object"), ProcessUtils.getObjectName(variableElement), ProcessUtils.getObjectName(variableElement));
         }
 
         methodSpecs.add(insertB.addStatement("return objectId").build());

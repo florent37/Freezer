@@ -7,6 +7,7 @@ import com.xebia.android.orm.generator.DatabaseHelperGenerator;
 import com.xebia.android.orm.generator.EnumColumnGenerator;
 import com.xebia.android.orm.generator.ModelEntityProxyGenerator;
 import com.xebia.android.orm.generator.ModelORMGenerator;
+import com.xebia.android.orm.generator.PrimitiveCursorHelperGenerator;
 import com.xebia.android.orm.generator.QueryLoggerGenerator;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
@@ -43,6 +44,7 @@ public class Processor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        writeStaticJavaFiles();
         for (Element element : roundEnv.getElementsAnnotatedWith(Model.class)) {
             models.add(element);
             generateColumnEnums(element);
@@ -103,6 +105,13 @@ public class Processor extends AbstractProcessor {
         daosList.add(ProcessUtils.getModelDao(element));
     }
 
+    protected void writeStaticJavaFiles(){
+        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DAOGenerator().generate()).build());
+        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new QueryLoggerGenerator().generate()).build());
+        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, ModelEntityProxyGenerator.generateModelProxyInterface()).build());
+        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new PrimitiveCursorHelperGenerator().generate()).build());
+    }
+
     protected void writeJavaFiles() {
         String dbFile = "database.db"; //TODO
         int version = 1; //TODO
@@ -111,9 +120,6 @@ public class Processor extends AbstractProcessor {
             writeFile(JavaFile.builder(cursorHelper.getPackage(), cursorHelper.getTypeSpec()).build());
 
         writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DatabaseHelperGenerator(dbFile, version, daosList).generate()).build());
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DAOGenerator().generate()).build());
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new QueryLoggerGenerator().generate()).build());
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, ModelEntityProxyGenerator.generateModelProxyInterface()).build());
     }
 
     protected void writeFile(JavaFile javaFile) {

@@ -14,7 +14,7 @@ public class User {
     Cat cat;
     List<Dog> dogs;
     boolean hacker;
-
+    
     public User(){}
 
     public User(int age, String name, Cat cat, List<Dog> dogs, boolean hacker) {
