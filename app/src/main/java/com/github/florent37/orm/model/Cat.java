@@ -11,10 +11,7 @@ import java.util.List;
 public class Cat {
     String shortName;
     String name;
-    List<Integer> ages;
-    List<String> names;
-    List<Boolean> oks;
-    List<Float> prices;
+    int[] ages;
 
     public Cat() {
     }

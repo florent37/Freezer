@@ -145,7 +145,6 @@ userORM.logQueries((query, datas) -> Log.d(TAG, query) }
 - Adding SqlLiterHelper onUpgrade
 - Adding some selectors operations (like, ...)
 - Adding Observable support
-- Support arrays : int, float, String, boolean
 
 #A project initiated by Xebia
 

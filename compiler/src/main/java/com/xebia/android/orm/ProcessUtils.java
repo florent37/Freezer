@@ -1,5 +1,6 @@
 package com.xebia.android.orm;
 
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -32,12 +33,12 @@ public class ProcessUtils {
     }
 
     public static List<VariableElement> getCollectionsOfPrimitiveFields(Element element) {
-        List<VariableElement> primitives = new ArrayList<>();
+        List<VariableElement> collectionsOfPrimitives = new ArrayList<>();
         for (VariableElement e : getFields(element)) {
             if (isCollectionOfPrimitive(e))
-                primitives.add(e);
+                collectionsOfPrimitives.add(e);
         }
-        return primitives;
+        return collectionsOfPrimitives;
     }
 
     public static List<VariableElement> getNonPrimitiveClassFields(Element element) {
@@ -207,10 +208,14 @@ public class ProcessUtils {
     }
 
     public static TypeName getFieldClass(Element element) {
-        TypeName enclosed = unbox(getEnclosedTypeName(element));
-        if (enclosed != null)
-            return enclosed;
-        else return ClassName.get(element.asType());
+        if (isArray(element)) {
+            return getArrayEnclosedType(element);
+        }else {
+            TypeName enclosed = unbox(getEnclosedTypeName(element));
+            if (enclosed != null)
+                return enclosed;
+            else return ClassName.get(element.asType());
+        }
     }
 
     public static String getFieldClassName(Element element) {
@@ -225,8 +230,20 @@ public class ProcessUtils {
         return name;
     }
 
+    public static boolean isArray(Element element) {
+        try {
+            return getArrayEnclosedType(element) != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static TypeName getArrayEnclosedType(Element element) {
+        return ((ArrayTypeName) ArrayTypeName.get(element.asType())).componentType;
+    }
+
     public static boolean isCollection(Element element) {
-        return getEnclosedTypeName(element) != null;
+        return isArray(element) || getEnclosedTypeName(element) != null;
     }
 
     public static String getMethodId(MethodSpec methodSpec) {
@@ -258,14 +275,25 @@ public class ProcessUtils {
 
     public static String getPrimitiveCursorHelperFunction(Element element) {
         TypeName typeName = getFieldClass(element);
-        if (ClassName.get(String.class).equals(typeName))
-            return "getStrings";
-        else if (TypeName.INT.equals(typeName))
-            return "getIntegers";
-        else if (TypeName.FLOAT.equals(typeName))
-            return "getFloats";
-        else if (TypeName.BOOLEAN.equals(typeName))
-            return "getBooleans";
+        if(isArray(element)){
+            if (ClassName.get(String.class).equals(typeName))
+                return "getStringsArray";
+            else if (TypeName.INT.equals(typeName))
+                return "getIntegersArray";
+            else if (TypeName.FLOAT.equals(typeName))
+                return "getFloatsArray";
+            else if (TypeName.BOOLEAN.equals(typeName))
+                return "getBooleansArray";
+        }else {
+            if (ClassName.get(String.class).equals(typeName))
+                return "getStrings";
+            else if (TypeName.INT.equals(typeName))
+                return "getIntegers";
+            else if (TypeName.FLOAT.equals(typeName))
+                return "getFloats";
+            else if (TypeName.BOOLEAN.equals(typeName))
+                return "getBooleans";
+        }
         return null;
     }
 
