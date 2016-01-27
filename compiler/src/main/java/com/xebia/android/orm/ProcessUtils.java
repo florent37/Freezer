@@ -142,10 +142,10 @@ public class ProcessUtils {
         return Constants.FIELD_ID.equals(variableElement.getSimpleName().toString());
     }
 
-    public static TypeName unbox(TypeName typeName){
+    public static TypeName unbox(TypeName typeName) {
         try {
             return typeName.unbox();
-        }catch (Exception e){
+        } catch (Exception e) {
             return typeName;
         }
     }
@@ -284,12 +284,21 @@ public class ProcessUtils {
 
     public static ClassName getSelectorName(Element element) {
         TypeName typeName = getFieldClass(element);
-        if (TypeName.INT.equals(typeName) || TypeName.LONG.equals(typeName) || TypeName.FLOAT.equals(typeName) )
-            return Constants.queryBuilder_NumberSelectorClassName;
-        if (TypeName.BOOLEAN.equals(typeName))
-            return Constants.queryBuilder_BooleanSelectorClassName;
-        if (TypeName.get(String.class).equals(typeName))
-            return Constants.queryBuilder_StringSelectorClassName;
+        if (isCollection(element)) {
+            if (TypeName.INT.equals(typeName) || TypeName.LONG.equals(typeName) || TypeName.FLOAT.equals(typeName))
+                return Constants.queryBuilder_ListNumberSelectorClassName;
+            if (TypeName.BOOLEAN.equals(typeName))
+                return Constants.queryBuilder_ListBooleanSelectorClassName;
+            if (TypeName.get(String.class).equals(typeName))
+                return Constants.queryBuilder_ListStringSelectorClassName;
+        } else {
+            if (TypeName.INT.equals(typeName) || TypeName.LONG.equals(typeName) || TypeName.FLOAT.equals(typeName))
+                return Constants.queryBuilder_NumberSelectorClassName;
+            if (TypeName.BOOLEAN.equals(typeName))
+                return Constants.queryBuilder_BooleanSelectorClassName;
+            if (TypeName.get(String.class).equals(typeName))
+                return Constants.queryBuilder_StringSelectorClassName;
+        }
         return null;
     }
 }

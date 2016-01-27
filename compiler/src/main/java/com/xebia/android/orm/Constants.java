@@ -43,12 +43,18 @@ public class Constants {
     public static final String PRIMITIVE_TABLE_BOOLEAN = "MODEL_BOOLEAN";
 
     public static final String SELECTOR_NUMBER = "NumberSelector";
+    public static final String SELECTOR_NUMBER_LIST = "ListNumberSelector";
     public static final String SELECTOR_BOOLEAN = "BooleanSelector";
+    public static final String SELECTOR_BOOLEAN_LIST = "ListBooleanSelector";
     public static final String SELECTOR_STRING = "StringSelector";
+    public static final String SELECTOR_STRING_LIST = "ListStringSelector";
 
     public static final ClassName queryBuilder_NumberSelectorClassName = ClassName.bestGuess(Constants.DAO_PACKAGE + "." + QUERY_BUILDER_SUFFIX + "." + SELECTOR_NUMBER);
+    public static final ClassName queryBuilder_ListNumberSelectorClassName = ClassName.bestGuess(Constants.DAO_PACKAGE + "." + QUERY_BUILDER_SUFFIX + "." + SELECTOR_NUMBER_LIST);
     public static final ClassName queryBuilder_BooleanSelectorClassName = ClassName.bestGuess(Constants.DAO_PACKAGE + "." + QUERY_BUILDER_SUFFIX + "." + SELECTOR_BOOLEAN);
+    public static final ClassName queryBuilder_ListBooleanSelectorClassName = ClassName.bestGuess(Constants.DAO_PACKAGE + "." + QUERY_BUILDER_SUFFIX + "." + SELECTOR_BOOLEAN_LIST);
     public static final ClassName queryBuilder_StringSelectorClassName = ClassName.bestGuess(Constants.DAO_PACKAGE + "." + QUERY_BUILDER_SUFFIX + "." + SELECTOR_STRING);
+    public static final ClassName queryBuilder_ListStringSelectorClassName = ClassName.bestGuess(Constants.DAO_PACKAGE + "." + QUERY_BUILDER_SUFFIX + "." + SELECTOR_STRING_LIST);
 
     public static final String QUERY_LOGGER = "QueryLogger";
     public static final String MODEL_ENTITY_PROXY = "Entity";
