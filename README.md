@@ -141,6 +141,8 @@ userEntityManager.logQueries((query, datas) -> Log.d(TAG, query) }
 - Adding some selectors operations (like, ...)
 - Adding Observable support
 - Provide an Asynchronous API
+- Support dates
+- Adding @Ignore annotation
 
 #A project initiated by Xebia
 
