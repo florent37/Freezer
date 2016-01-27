@@ -168,7 +168,25 @@ public class MyApplication extends Application {
 This project was first developed by Xebia and has been open-sourced since. We will continue working and investing on it.
 We encourage the community to contribute to the project by opening tickets and/or pull requests.
 
-[![logo xebia](https://raw.githubusercontent.com/florent37/FREEZER/master/logo_xebia.jpg)](http://www.xebia.fr/)
+[![logo xebia](https://raw.githubusercontent.com/florent37/Freezer/master/logo_xebia.jpg)](http://www.xebia.fr/)
+
+#Download
+
+[![Download](https://api.bintray.com/packages/florent37/maven/Freezer/images/download.svg)](https://bintray.com/florent37/maven/Freezer/_latestVersion)
+```java
+buildscript {
+  dependencies {
+    classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+  }
+}
+
+apply plugin: 'com.neenbedankt.android-apt'
+
+dependencies {
+  provided 'com.xebia.android.freezer:freezer:(lastest-version)'
+  apt 'com.xebia.android.freezer:freezer-compiler:(lastest-version)'
+}
+```
 
 License
 --------
