@@ -5,26 +5,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.github.florent37.orm.model.Cat;
-import com.github.florent37.orm.model.CatORM;
+import com.github.florent37.orm.model.CatEntityManager;
 import com.github.florent37.orm.model.Dog;
 import com.github.florent37.orm.model.User;
-import com.github.florent37.orm.model.UserORM;
+import com.github.florent37.orm.model.UserEntityManager;
 import com.xebia.android.orm.QueryLogger;
 
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
-    UserORM userORM;
-    CatORM catORM;
+    UserEntityManager userORM;
+    CatEntityManager catORM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        userORM = new UserORM();
-        catORM = new CatORM();
+        userORM = new UserEntityManager();
+        catORM = new CatEntityManager();
 
         userORM.logQueries(new QueryLogger() {
             @Override public void onQuery(String query, String[] datas) {

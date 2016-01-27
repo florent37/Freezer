@@ -1,6 +1,6 @@
-# Android ORM
+# Freezer
 
-[![Build Status](https://travis-ci.org/florent37/Android-ORM.svg?branch=master)](https://travis-ci.org/florent37/Android-ORM)
+[![Build Status](https://travis-ci.org/florent37/Freezer.svg?branch=master)](https://travis-ci.org/florent37/Freezer)
 
 Use Annotations to mark classes to be Persisted
 
@@ -33,35 +33,35 @@ public class Cat {
 Persist your data easily
 
 ```java
-UserORM userORM = new UserORM();
+UserORM userEntityManager = new UserEntityManager();
 
 User user = ... // Create a new object
-userORM.add(user);
+userEntityManager.add(user);
 ```
 
 #Querying
 
 ##Simple
 ```java  
-List<User> allUsers = userORM.select()
+List<User> allUsers = userEntityManager.select()
                              .asList();
                              
-User user3 = userORM.select()
+User user3 = userEntityManager.select()
                     .age().equalsTo(3)
                     .first();
 ```
 
 ##Complex
 
-Android-ORM query engine uses a Fluent interface to construct multi-clause queries
+Freezer query engine uses a Fluent interface to construct multi-clause queries
 
 ```java  
-List<User> allUsers = userORM.select()
+List<User> allUsers = userEntityManager.select()
                                 .name().equalsTo("florent")
                              .or()
-                                .cat(CatORM.where().shortName().equalsTo("Java"))
+                                .cat(CatEntityManager.where().shortName().equalsTo("Java"))
                              .or()
-                                .dogs(DogORM.where().name().equalsTo("Sasha"))
+                                .dogs(DogEntityManager.where().name().equalsTo("Sasha"))
                              .asList();
 ```
 
@@ -86,11 +86,11 @@ List<User> allUsers = userORM.select()
 ##Aggregation
 
 ```java
-float agesSum      = userORM.select().sum(UserColumns.age);
-float agesAverage  = userORM.select().average(UserColumns.age);
-float ageMin       = userORM.select().min(UserColumns.age);
-float ageMax       = userORM.select().max(UserColumns.age);
-int count          = userORM.select().count();
+float agesSum      = userEntityManager.select().sum(UserColumns.age);
+float agesAverage  = userEntityManager.select().average(UserColumns.age);
+float ageMin       = userEntityManager.select().min(UserColumns.age);
+float ageMax       = userEntityManager.select().max(UserColumns.age);
+int count          = userEntityManager.select().count();
 ```
 
 #Accepted types
@@ -145,7 +145,7 @@ public class User {
 #Logging
 
 ```java
-userORM.logQueries((query, datas) -> Log.d(TAG, query) }
+userEntityManager.logQueries((query, datas) -> Log.d(TAG, query) }
 ```
 
 #TODO

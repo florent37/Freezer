@@ -9,10 +9,10 @@ import com.squareup.javapoet.TypeName;
 public class Constants {
     public static final String DAO_PACKAGE = "com.xebia.android.orm";
 
-    public static final String DAO_CLASS_NAME = "AndroidORM";
+    public static final String DAO_CLASS_NAME = "Freezer";
     public static final String DATABASE_HELPER_CLASS_NAME = "DatabaseHelper";
 
-    public static final String DAO_SUFFIX = "ORM";
+    public static final String DAO_SUFFIX = "EntityManager";
     public static final String CURSOR_HELPER_SUFFIX = "CursorHelper";
     public static final String QUERY_BUILDER_SUFFIX = "QueryBuilder";
     public static final String ENUM_COLUMN_SUFFIX = "Columns";
