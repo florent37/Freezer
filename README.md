@@ -134,6 +134,25 @@ You can log all SQL queries from Entities Managers
 userEntityManager.logQueries((query, datas) -> Log.d(TAG, query) }
 ```
 
+#It's always better with a context
+
+Don't forget to attach Freezer to your application
+
+```java
+public class MyApplication extends Application {
+
+    @Override public void onCreate() {
+        super.onCreate();
+        Freezer.onCreate(this);
+    }
+
+    @Override public void onTerminate() {
+        super.onTerminate();
+        Freezer.onDestroy();
+    }
+}
+```
+
 #TODO
 
 - Update an entry
