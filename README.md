@@ -162,6 +162,7 @@ public class MyApplication extends Application {
 - Provide an Asynchronous API
 - Support dates
 - Adding @Ignore annotation
+- Unit tests
 
 #A project initiated by Xebia
 
@@ -183,8 +184,8 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  provided 'com.xebia.android.freezer:freezer-annotations:0.0.1'
-  apt 'com.xebia.android.freezer:freezer-compiler:0.0.1'
+  provided 'com.xebia.android.freezer:freezer-annotations:1.0.0'
+  apt 'com.xebia.android.freezer:freezer-compiler:1.0.0'
 }
 ```
 
