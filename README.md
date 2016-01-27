@@ -33,7 +33,7 @@ public class Cat {
 Persist your data easily
 
 ```java
-UserORM userEntityManager = new UserEntityManager();
+UserEntityManager userEntityManager = new UserEntityManager();
 
 User user = ... // Create a new object
 userEntityManager.add(user);
