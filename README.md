@@ -41,11 +41,18 @@ userEntityManager.add(user);
 
 #Querying
 
+Freezer query engine uses a Fluent interface to construct multi-clause queries.
+
 ##Simple
+
+To find all users you would write :
 ```java  
 List<User> allUsers = userEntityManager.select()
                              .asList();
-                             
+```
+                                                  
+To find an user with 3 years you would write:             
+```java                              
 User user3 = userEntityManager.select()
                     .age().equalsTo(3)
                     .first();
@@ -53,8 +60,7 @@ User user3 = userEntityManager.select()
 
 ##Complex
 
-Freezer query engine uses a Fluent interface to construct multi-clause queries
-
+To find an user named "florent", or having a cat short named "Java" or having a dog named "Sasha" you would write:             
 ```java  
 List<User> allUsers = userEntityManager.select()
                                 .name().equalsTo("florent")
@@ -85,6 +91,8 @@ List<User> allUsers = userEntityManager.select()
 
 ##Aggregation
 
+The QueryBuilder offers various aggregation methods
+
 ```java
 float agesSum      = userEntityManager.select().sum(UserColumns.age);
 float agesAverage  = userEntityManager.select().average(UserColumns.age);
@@ -93,56 +101,34 @@ float ageMax       = userEntityManager.select().max(UserColumns.age);
 int count          = userEntityManager.select().count();
 ```
 
-#Accepted types
+#Entities
 
-##Primitives
-
-```java
-- int
-- float
-- boolean
-- String
-```
-
-##Collections
-
-```java
-- List<Integer>
-- List<Float>
-- List<Boolean>
-- List<String>
-```
-
-##Arrays
-
-```java
-- int[]
-- float[]
-- boolean[]
-- String[]
-```
-
-##One To One
+Freezer made it possible, yes you can design your entities as your wish
 
 ```java
 @Model
-public class User {
-    Cat cat;
+public class MyEntity {
+
+    //primitives
+    [ int / float / boolean / String ] field;
+
+    //arrays
+    [ int[] / float[] / boolean[] / String[] ] array; 
+    
+    //collections
+    [ List<Integer> / List<Float> / List<Boolean> / List<String> ] collection;
+    
+    //One To One
+    MySecondEntity child;
+    
+    //One To Many
+    List<MySecondEntity> childs;
 }
-
-```
-
-##One To Many
-
-```java
-@Model
-public class User {
-    List<Dog> dogs;
-}
-
 ```
 
 #Logging
+
+You can log all SQL queries from Entities Managers
 
 ```java
 userEntityManager.logQueries((query, datas) -> Log.d(TAG, query) }
@@ -154,6 +140,7 @@ userEntityManager.logQueries((query, datas) -> Log.d(TAG, query) }
 - Adding SqlLiterHelper onUpgrade
 - Adding some selectors operations (like, ...)
 - Adding Observable support
+- Provide an Asynchronous API
 
 #A project initiated by Xebia
 
