@@ -2,7 +2,7 @@ package com.github.florent37.orm;
 
 import android.app.Application;
 
-import com.xebia.android.orm.Freezer;
+import com.xebia.android.freezer.Freezer;
 
 /**
  * Created by florentchampigny on 07/01/2016.
