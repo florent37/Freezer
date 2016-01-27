@@ -113,6 +113,15 @@ int count          = userORM.select().count();
 - List<String>
 ```
 
+##Arrays
+
+```java
+- int[]
+- float[]
+- boolean[]
+- String[]
+```
+
 ##One To One
 
 ```java
