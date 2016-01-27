@@ -172,7 +172,7 @@ We encourage the community to contribute to the project by opening tickets and/o
 
 #Download
 
-[![Download](https://api.bintray.com/packages/florent37/maven/Freezer/images/download.svg)](https://bintray.com/florent37/maven/Freezer/_latestVersion)
+[ ![Download](https://api.bintray.com/packages/florent37/maven/freezer-compiler/images/download.svg) ](https://bintray.com/florent37/maven/freezer-compiler/_latestVersion)
 ```java
 buildscript {
   dependencies {
@@ -183,8 +183,8 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  provided 'com.xebia.android.freezer:freezer:(lastest-version)'
-  apt 'com.xebia.android.freezer:freezer-compiler:(lastest-version)'
+  provided 'com.xebia.android.freezer:freezer-annotations:0.0.1'
+  apt 'com.xebia.android.freezer:freezer-compiler:0.0.1'
 }
 ```
 

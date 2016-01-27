@@ -9,9 +9,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/annotations" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/compiler" />
+            <option value="$PROJECT_DIR$/freezer-annotations" />
+            <option value="$PROJECT_DIR$/freezer-compiler" />
           </set>
         </option>
       </GradleProjectSettings>

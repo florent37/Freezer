@@ -3,9 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Android-ORM.iml" filepath="$PROJECT_DIR$/Android-ORM.iml" />
-      <module fileurl="file://$PROJECT_DIR$/annotations/annotations.iml" filepath="$PROJECT_DIR$/annotations/annotations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/freezer-annotations/annotations.iml" filepath="$PROJECT_DIR$/freezer-annotations/annotations.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/compiler/compiler.iml" filepath="$PROJECT_DIR$/compiler/compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/freezer-compiler/compiler.iml" filepath="$PROJECT_DIR$/freezer-compiler/compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/freezer-annotations/freezer-annotations.iml" filepath="$PROJECT_DIR$/freezer-annotations/freezer-annotations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/freezer-compiler/freezer-compiler.iml" filepath="$PROJECT_DIR$/freezer-compiler/freezer-compiler.iml" />
     </modules>
   </component>
 </project>
