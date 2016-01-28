@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/florent37/Freezer.svg?branch=master)](https://travis-ci.org/florent37/Freezer)
 
+[![logo freezer](https://raw.githubusercontent.com/florent37/Freezer/master/freezer-logo.jpg)](https://github.com/florent37/Freezer)
+
 Use Annotations to mark classes to be Persisted
 
 ```java
