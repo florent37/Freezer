@@ -62,7 +62,7 @@ User user3 = userEntityManager.select()
 
 ##Complex
 
-To find an user named "florent", or having a cat short named "Java" or having a dog named "Sasha" you would write:             
+To find a user named "florent", or having a cat short named "Java" or having a dog named "Sasha" you would write:             
 ```java  
 List<User> allUsers = userEntityManager.select()
                                 .name().equalsTo("florent")
@@ -148,10 +148,6 @@ public class MyApplication extends Application {
         Freezer.onCreate(this);
     }
 
-    @Override public void onTerminate() {
-        super.onTerminate();
-        Freezer.onDestroy();
-    }
 }
 ```
 
