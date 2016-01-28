@@ -29,9 +29,9 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
 
-    //apt project(":freezer-compiler")
-    //provided project(":freezer-annotations")
+    apt project(":freezer-compiler")
+    provided project(":freezer-annotations")
 
-    apt "fr.xebia.android.freezer:freezer-compiler:0.0.1"
-    provided "fr.xebia.android.freezer:freezer-annotations:0.0.1"
+    //apt "fr.xebia.android.freezer:freezer-compiler:0.0.1"
+    //provided "fr.xebia.android.freezer:freezer-annotations:0.0.1"
 }

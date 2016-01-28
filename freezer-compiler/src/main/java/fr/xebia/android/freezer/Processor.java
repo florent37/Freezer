@@ -34,7 +34,7 @@ import javax.lang.model.element.TypeElement;
  * Created by florentchampigny on 07/01/2016.
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
-@SupportedAnnotationTypes("fr.xebia.android.freezer.annotations.Model;\n")
+@SupportedAnnotationTypes("fr.xebia.android.freezer.annotations.Model")
 @AutoService(javax.annotation.processing.Processor.class)
 public class Processor extends AbstractProcessor {
 

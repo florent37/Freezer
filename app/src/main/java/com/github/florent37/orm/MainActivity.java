@@ -9,7 +9,7 @@ import com.github.florent37.orm.model.CatEntityManager;
 import com.github.florent37.orm.model.Dog;
 import com.github.florent37.orm.model.User;
 import com.github.florent37.orm.model.UserEntityManager;
-import com.xebia.android.freezer.QueryLogger;
+import fr.xebia.android.freezer.QueryLogger;
 
 import java.util.Arrays;
 

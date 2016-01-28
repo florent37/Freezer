@@ -7,7 +7,7 @@ import com.squareup.javapoet.TypeName;
  * Created by florentchampigny on 18/01/2016.
  */
 public class Constants {
-    public static final String DAO_PACKAGE = "com.xebia.android.freezer";
+    public static final String DAO_PACKAGE = "fr.xebia.android.freezer";
 
     public static final String DAO_CLASS_NAME = "Freezer";
     public static final String DATABASE_HELPER_CLASS_NAME = "DatabaseHelper";
