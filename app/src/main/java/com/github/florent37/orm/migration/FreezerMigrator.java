@@ -1,5 +1,9 @@
 package com.github.florent37.orm.migration;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,7 +89,33 @@ public class FreezerMigrator {
         }
 
         public TableTransformer type(ColumnType fromType, ColumnType newType) {
-            //TODO
+            //primitive
+            {
+                SQLiteDatabase db;
+
+                //TODO
+                //rename the column to old_column
+                String tmp_column = columnName + "_tmp";
+                db.execSQL(String.format("ALTER TABLE %s RENAME COLUMN %s TO %s", getTableName(objectName), columnName, tmp_column));
+                //create the new column
+                db.execSQL(String.format("ALTER TABLE %s ADD COLUMN %s %s", getTableName(objectName), columnName, newType));
+
+                //get the old values
+                //transform the values
+                //insert them into newType
+
+                Cursor cursor = db.rawQuery("SELECT _id, .${old_column} FROM ${tableName}", null);
+                while (!cursor.isAfterLast()) {
+                    long id = cursor.getLong(0);
+                    String newValue = ""; //TRANSFORM(cursor.get**(1));
+
+                    db.execSQL(String.format("UPDATE %s SET %s = '%s' WHERE _id = %d", getTableName(objectName), newValue, id));
+
+                    cursor.moveToNext();
+                }
+                cursor.close();
+
+            }
             return tableTransformer;
         }
     }
