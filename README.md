@@ -148,10 +148,6 @@ public class MyApplication extends Application {
         Freezer.onCreate(this);
     }
 
-    @Override public void onTerminate() {
-        super.onTerminate();
-        Freezer.onDestroy();
-    }
 }
 ```
 
