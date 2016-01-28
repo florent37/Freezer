@@ -5,21 +5,13 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
-import fr.xebia.android.freezer.annotations.Model;
-import fr.xebia.android.freezer.generator.CursorHelperGenerator;
-import fr.xebia.android.freezer.generator.DAOGenerator;
-import fr.xebia.android.freezer.generator.DatabaseHelperGenerator;
-import fr.xebia.android.freezer.generator.EnumColumnGenerator;
-import fr.xebia.android.freezer.generator.ModelEntityProxyGenerator;
-import fr.xebia.android.freezer.generator.ModelORMGenerator;
-import fr.xebia.android.freezer.generator.PrimitiveCursorHelperGenerator;
-import fr.xebia.android.freezer.generator.QueryBuilderGenerator;
-import fr.xebia.android.freezer.generator.QueryLoggerGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -29,6 +21,19 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+
+import fr.xebia.android.freezer.annotations.Migration;
+import fr.xebia.android.freezer.annotations.Model;
+import fr.xebia.android.freezer.annotations.Version;
+import fr.xebia.android.freezer.generator.CursorHelperGenerator;
+import fr.xebia.android.freezer.generator.DAOGenerator;
+import fr.xebia.android.freezer.generator.DatabaseHelperGenerator;
+import fr.xebia.android.freezer.generator.EnumColumnGenerator;
+import fr.xebia.android.freezer.generator.ModelEntityProxyGenerator;
+import fr.xebia.android.freezer.generator.ModelORMGenerator;
+import fr.xebia.android.freezer.generator.PrimitiveCursorHelperGenerator;
+import fr.xebia.android.freezer.generator.QueryBuilderGenerator;
+import fr.xebia.android.freezer.generator.QueryLoggerGenerator;
 
 /**
  * Created by florentchampigny on 07/01/2016.
@@ -43,9 +48,17 @@ public class Processor extends AbstractProcessor {
 
     List<CursorHelper> cursorHelpers = new ArrayList<>();
 
+    Map<Integer,Element> migrators = new HashMap<>();
+    String dbFile = "database.db";
+    int version = 1;
+
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         writeStaticJavaFiles();
+
+        migrators = getMigrators(roundEnv);
+        version = getVersion(roundEnv);
+
         for (Element element : roundEnv.getElementsAnnotatedWith(Model.class)) {
             models.add(element);
             generateColumnEnums(element);
@@ -57,6 +70,22 @@ public class Processor extends AbstractProcessor {
         writeJavaFiles();
         return true;
     }
+
+    private static int getVersion(RoundEnvironment roundEnv) {
+        for (Element element : roundEnv.getElementsAnnotatedWith(Version.class)) {
+            return element.getAnnotation(Version.class).value();
+        }
+        return 1;
+    }
+
+    private static Map<Integer,Element> getMigrators(RoundEnvironment roundEnv) {
+        Map<Integer,Element> migrators = new HashMap<>();
+        for (Element element : roundEnv.getElementsAnnotatedWith(Migration.class)) {
+            migrators.put(element.getAnnotation(Migration.class).value(),element);
+        }
+        return migrators;
+    }
+
 
     private void generateEntityProxies(Element element) {
         ModelEntityProxyGenerator entityProxyGenerator = new ModelEntityProxyGenerator(element);
@@ -115,13 +144,10 @@ public class Processor extends AbstractProcessor {
     }
 
     protected void writeJavaFiles() {
-        String dbFile = "database.db"; //TODO
-        int version = 1; //TODO
-
         for (CursorHelper cursorHelper : cursorHelpers)
             writeFile(JavaFile.builder(cursorHelper.getPackage(), cursorHelper.getTypeSpec()).build());
 
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DatabaseHelperGenerator(dbFile, version, daosList).generate()).build());
+        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DatabaseHelperGenerator(dbFile, version, daosList, migrators).generate()).build());
     }
 
     protected void writeFile(JavaFile javaFile) {

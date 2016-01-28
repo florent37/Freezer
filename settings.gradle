@@ -1,1 +1,1 @@
-include ':app', ':freezer-compiler', ':freezer-annotations'
+include ':app', ':freezer', ':freezer-compiler', ':freezer-annotations'

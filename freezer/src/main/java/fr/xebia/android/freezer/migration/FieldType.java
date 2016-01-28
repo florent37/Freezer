@@ -1,4 +1,4 @@
-package com.github.florent37.orm.migration;
+package fr.xebia.android.freezer.migration;
 
 /**
  * Created by florentchampigny on 28/01/2016.
