@@ -82,15 +82,15 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider editor-type-id="MultiMarkdownFxPreviewEditor">
             <state />
           </provider>
           <provider selected="true" editor-type-id="split-provider[text-editor;MultiMarkdownPreviewEditor]">
             <state split_layout="FIRST">
-              <first_editor vertical-scroll-proportion="0.67848104">
-                <caret line="187" column="27" selection-start-line="187" selection-start-column="27" selection-end-line="187" selection-end-column="27" />
+              <first_editor vertical-scroll-proportion="3.341772">
+                <caret line="176" column="55" selection-start-line="176" selection-start-column="55" selection-end-line="176" selection-end-column="55" />
                 <folding />
               </first_editor>
               <second_editor />
@@ -123,6 +123,16 @@
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
               <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/build.gradle">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.46153846">
+              <caret line="26" column="25" selection-start-line="26" selection-start-column="25" selection-end-line="26" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -602,9 +612,9 @@
                 <option name="name" value="prepareDebugUnitTestDependencies" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
-                <option name="description" value="Prepare fr.xebia.android.freezer:freezer:1.0.0" />
+                <option name="description" value="Prepare fr.xebia.android.freezer:freezer:1.0.1" />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="prepareFrXebiaAndroidFreezerFreezer100Library" />
+                <option name="name" value="prepareFrXebiaAndroidFreezerFreezer101Library" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
@@ -1278,9 +1288,9 @@
                 <option name="name" value="prepareDebugUnitTestDependencies" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
-                <option name="description" value="Prepare fr.xebia.android.freezer:freezer:1.0.0" />
+                <option name="description" value="Prepare fr.xebia.android.freezer:freezer:1.0.1" />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
-                <option name="name" value="prepareFrXebiaAndroidFreezerFreezer100Library" />
+                <option name="name" value="prepareFrXebiaAndroidFreezerFreezer101Library" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
@@ -2316,7 +2326,7 @@
     </option>
     <option name="modificationStamps">
       <map>
-        <entry key="$PROJECT_DIR$" value="8723907297000" />
+        <entry key="$PROJECT_DIR$" value="8724071852000" />
       </map>
     </option>
     <option name="projectBuildClasspath">
@@ -3385,7 +3395,6 @@
         <option value="$PROJECT_DIR$/compiler/build.gradle" />
         <option value="$PROJECT_DIR$/freezer-compiler/freezer-compiler.iml" />
         <option value="$PROJECT_DIR$/freezer-annotations/freezer-annotations.iml" />
-        <option value="$PROJECT_DIR$/build.gradle" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/orm/model/Cat.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/orm/model/Dog.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/orm/MyApplication.java" />
@@ -3418,6 +3427,7 @@
         <option value="$PROJECT_DIR$/freezer/src/main/java/fr/xebia/android/freezer/migration/Migrator.java" />
         <option value="$PROJECT_DIR$/freezer/build.gradle" />
         <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/build.gradle" />
       </list>
     </option>
   </component>
@@ -4291,14 +4301,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="8" column="43" selection-start-line="8" selection-start-column="23" selection-end-line="8" selection-end-column="43" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/freezer/src/main/java/fr/xebia/android/freezer/migration/DatabaseHelper.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -4316,14 +4318,6 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/freezer-compiler/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -4386,11 +4380,27 @@
       </provider>
       <provider selected="true" editor-type-id="split-provider[text-editor;MultiMarkdownPreviewEditor]">
         <state split_layout="FIRST">
-          <first_editor vertical-scroll-proportion="0.67848104">
-            <caret line="187" column="27" selection-start-line="187" selection-start-column="27" selection-end-line="187" selection-end-column="27" />
+          <first_editor vertical-scroll-proportion="3.341772">
+            <caret line="176" column="55" selection-start-line="176" selection-start-column="55" selection-end-line="176" selection-end-column="55" />
             <folding />
           </first_editor>
           <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/freezer-compiler/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.46153846">
+          <caret line="26" column="25" selection-start-line="26" selection-start-column="25" selection-end-line="26" selection-end-column="25" />
+          <folding />
         </state>
       </provider>
     </entry>
