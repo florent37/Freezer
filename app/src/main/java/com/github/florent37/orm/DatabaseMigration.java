@@ -1,6 +1,7 @@
 package com.github.florent37.orm;
 
 import fr.xebia.android.freezer.annotations.Migration;
+import fr.xebia.android.freezer.migration.ColumnType;
 import fr.xebia.android.freezer.migration.Migrator;
 
 /**
@@ -11,33 +12,30 @@ public class DatabaseMigration {
     @Migration(2)
     public static void migrateTo2(Migrator migrator) {
         migrator.update("User")
+                .removeField("age")
                 .renameTo("Man");
-
-        //migrator.update("User")
-        //        .removeField("age");
-                //.addField("birth", ColumnType.Primitive.Int)
-                //.name("User");
     }
 
-    //@Migration(3)
-    //public static void migrateTo3(Migrator migrator) {
-    //    migrator.update("User")
-    //            .addField("birth", ColumnType.Primitive.Int);
-    //}
+    @Migration(3)
+    public static void migrateTo3(Migrator migrator) {
+        migrator.update("Man")
+                .addField("birth", ColumnType.Primitive.Int);
+    }
 
-    //@Migration(4)
-    //public static void migrateTo4(Migrator migrator) {
-    //    migrator.update("User")
-    //            .name("User");
-    //}
+    @Migration(4)
+    public static void migrateTo4(Migrator migrator) {
+        migrator.update("Man")
+                .addField("lastName", ColumnType.Primitive.String);
+    }
 
-
-    //@Migration(3)
-    //public static void migrateTo3(Migrator migrator) {
-    //    migrator.update("User")
-    //            .removeField("name")
-    //            .addField("lastName", ColumnType.Primitive.String);
-    //}
+    @Migration(5)
+    public static void migrateTo5(Migrator migrator) {
+        migrator.addTable(migrator.createModel("Woman")
+                .field("name", ColumnType.Primitive.String)
+                .field("age", ColumnType.Primitive.Int)
+                .build()
+        );
+    }
 
     //@Migration(4)
     //public static void migrateTo4(FreezerMigrator freezerMigrator) {

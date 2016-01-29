@@ -48,4 +48,10 @@ public class ColumnType {
         }
 
     }
+
+    public static String getSqlName(Object type){
+        if(type instanceof Primitive)
+            return ((Primitive)type).getSqlName();
+        return ""; //TODO
+    }
 }

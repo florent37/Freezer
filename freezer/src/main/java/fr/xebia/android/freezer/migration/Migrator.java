@@ -17,7 +17,7 @@ public class Migrator {
         return objectName.toUpperCase();
     }
 
-    public TableCreator createObject(String objectName) {
+    public TableCreator createModel(String objectName) {
         return new TableCreator(databaseHelper, objectName);
     }
 
@@ -30,9 +30,9 @@ public class Migrator {
         return this;
     }
 
-    @Deprecated
     public Migrator addTable(TableCreator tableCreator) {
-        //TODO
+        String creationQuery = tableCreator.creationQuery;
+        databaseHelper.executeSql(creationQuery);
         return this;
     }
 
@@ -218,18 +218,4 @@ public class Migrator {
         }
     }
 
-    public static class TableCreator {
-        DatabaseHelper database;
-        String objectName;
-
-        public TableCreator(DatabaseHelper database, String objectName) {
-            this.database = database;
-            this.objectName = objectName;
-        }
-
-        public TableCreator field(String name, ColumnType type) {
-            //TODO
-            return this;
-        }
-    }
 }
