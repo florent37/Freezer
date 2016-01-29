@@ -185,11 +185,12 @@ Migration don't allow yet to
 - change type of field
 - add/modify One To One
 - add/modify One To Many
+- handle collections/arrays
  
 #TODO
 
 - Update an entry
-- Adding SqlLiterHelper onUpgrade
+- Improve migration
 - Adding some selectors operations (like, ...)
 - Adding Observable support
 - Provide an Asynchronous API
