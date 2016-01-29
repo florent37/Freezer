@@ -10,20 +10,12 @@ android {
         versionCode 1
         versionName "1.0"
     }
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> master
     android {
         lintOptions {
             abortOnError false
         }
-<<<<<<< HEAD
     }
-=======
-  }
->>>>>>> master
 }
 
 dependencies {
