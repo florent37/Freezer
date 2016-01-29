@@ -224,9 +224,14 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
+<<<<<<< HEAD
   compile 'fr.xebia.android.freezer:freezer-annotations:1.0.1'
   provided 'fr.xebia.android.freezer:freezer-annotations:1.0.1'
   apt 'fr.xebia.android.freezer:freezer-compiler:1.0.1'
+=======
+  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.0'
+  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.0'
+>>>>>>> master
 }
 ```
 
