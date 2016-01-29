@@ -9,6 +9,7 @@ import com.github.florent37.orm.model.CatEntityManager;
 import com.github.florent37.orm.model.Dog;
 import com.github.florent37.orm.model.User;
 import com.github.florent37.orm.model.UserEntityManager;
+
 import fr.xebia.android.freezer.QueryLogger;
 
 import java.util.Arrays;
@@ -23,6 +24,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        queries();
+    }
+
+    protected void queries(){
         userORM = new UserEntityManager();
         catORM = new CatEntityManager();
 

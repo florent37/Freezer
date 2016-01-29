@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/freezer-annotations/annotations.iml" filepath="$PROJECT_DIR$/freezer-annotations/annotations.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/freezer-compiler/compiler.iml" filepath="$PROJECT_DIR$/freezer-compiler/compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/freezer/freezer.iml" filepath="$PROJECT_DIR$/freezer/freezer.iml" />
       <module fileurl="file://$PROJECT_DIR$/freezer-annotations/freezer-annotations.iml" filepath="$PROJECT_DIR$/freezer-annotations/freezer-annotations.iml" />
       <module fileurl="file://$PROJECT_DIR$/freezer-compiler/freezer-compiler.iml" filepath="$PROJECT_DIR$/freezer-compiler/freezer-compiler.iml" />
     </modules>

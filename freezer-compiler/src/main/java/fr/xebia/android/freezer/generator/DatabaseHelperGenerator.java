@@ -7,7 +7,9 @@ import com.squareup.javapoet.TypeSpec;
 import fr.xebia.android.freezer.Constants;
 
 import java.util.List;
+import java.util.Map;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 
 /**
@@ -19,11 +21,13 @@ public class DatabaseHelperGenerator {
     int version;
 
     List<ClassName> daos;
+    Map<Integer,Element> migrators;
 
-    public DatabaseHelperGenerator(String fileName, int version, List<ClassName> daos) {
+    public DatabaseHelperGenerator(String fileName, int version, List<ClassName> daos, Map<Integer,Element> migrators) {
         this.fileName = fileName;
         this.version = version;
         this.daos = daos;
+        this.migrators = migrators;
     }
 
     public TypeSpec generate() {
@@ -40,12 +44,21 @@ public class DatabaseHelperGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(Constants.databaseClassName, "database")
                 .addParameter(TypeName.INT, "oldVersion")
-                .addParameter(TypeName.INT, "newVersion");
+                .addParameter(TypeName.INT, "newVersion")
 
-        for (ClassName dao : daos)
-            onUpgrade.addStatement("database.execSQL($T.update())", dao);
+                .addStatement("int version = oldVersion")
+                .addStatement("$T freezerMigrator = new $T(database)", Constants.migrator, Constants.migrator)
+                ;
 
-        onUpgrade.addStatement("onCreate(database)");
+        for(int i=1;i<version;++i){
+            int v = i+1;
+            String objectName = migrators.get(v).getEnclosingElement().toString();
+            String methodName = migrators.get(v).getSimpleName().toString();
+            onUpgrade.beginControlFlow("if(version < $L)",v)
+                    .addStatement("$T.$L(freezerMigrator)", ClassName.bestGuess(objectName), methodName)
+                    .addStatement("version++")
+                    .endControlFlow();
+        }
 
         return TypeSpec.classBuilder(Constants.DATABASE_HELPER_CLASS_NAME)
                 .superclass(Constants.sqliteOpenHelperClassName)
