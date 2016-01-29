@@ -1,40 +1,53 @@
 package fr.xebia.android.freezer.migration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by florentchampigny on 28/01/2016.
  */
 public class ColumnType {
 
-    @Deprecated
     public static ModelType ofModel(String objectName) {
-        return new ModelType(objectName);
+        return new ModelType(objectName,false);
     }
 
-    @Deprecated
     public static ModelType collectionOfModel(String objectName) {
-        return new ModelType(objectName);
+        return new ModelType(objectName,true);
     }
 
     public enum Collection {
-        @Deprecated
-        ListOfInts,
-        @Deprecated
-        ListOfFloats,
-        @Deprecated
-        ListOfBooleans,
-        @Deprecated
-        ListOfStrings
+        ListOfInts("MODEL_INT"),
+        ListOfFloats("MODEL_FLOAT"),
+        ListOfBooleans("MODEL_BOOLEAN"),
+        ListOfStrings("MODEL_STRING");
+
+        private String associationTable;
+
+        Collection(String associationTable) {
+            this.associationTable = associationTable;
+        }
+
+        public java.lang.String getAssociationTable() {
+            return associationTable;
+        }
     }
 
     public enum Array {
-        @Deprecated
-        ArrayOfInts,
-        @Deprecated
-        ArrayOfFloats,
-        @Deprecated
-        ArrayOfBooleans,
-        @Deprecated
-        ArrayOfStrings;
+        ArrayOfInts("MODEL_INT"),
+        ArrayOfFloats("MODEL_FLOAT"),
+        ArrayOfBooleans("MODEL_BOOLEAN"),
+        ArrayOfStrings("MODEL_STRING");
+
+        private String associationTable;
+
+        Array(String associationTable) {
+            this.associationTable = associationTable;
+        }
+
+        public java.lang.String getAssociationTable() {
+            return associationTable;
+        }
     }
 
     public enum Primitive {
@@ -54,12 +67,13 @@ public class ColumnType {
         }
     }
 
-    @Deprecated
     public static class ModelType {
         String objectName;
+        boolean collection;
 
-        protected ModelType(String objectName) {
+        protected ModelType(String objectName, boolean collection) {
             this.objectName = objectName;
+            this.collection = collection;
         }
 
     }

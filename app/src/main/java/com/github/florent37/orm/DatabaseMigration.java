@@ -25,6 +25,7 @@ public class DatabaseMigration {
     @Migration(4)
     public static void migrateTo4(Migrator migrator) {
         migrator.update("Man")
+                .transform("name").renameTo("myName")
                 .addField("lastName", ColumnType.Primitive.String);
     }
 

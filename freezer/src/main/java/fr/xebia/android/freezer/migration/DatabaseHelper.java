@@ -39,7 +39,7 @@ public class DatabaseHelper {
 
     }
 
-    public String createTable(String tableName, List<TableColumn> columns) {
+    public String createTableString(String tableName, List<TableColumn> columns) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("CREATE TABLE ").append(tableName).append("(");
 
@@ -56,6 +56,25 @@ public class DatabaseHelper {
         return stringBuilder.toString();
     }
 
+    public void createTable(String tableName, List<TableColumn> columns) {
+        executeSql(createTableString(tableName, columns));
+    }
+
+    public void createAssociationTable(String tableNameFrom, String tableNameTo) {
+        executeSql(createAssociationTableString(tableNameFrom, tableNameTo));
+    }
+
+    public String createAssociationTableString(String tableNameFrom, String tableNameTo) {
+        String tableName = tableNameFrom.toUpperCase() + "_" + tableNameTo.toUpperCase();
+        List<TableColumn> columns = new ArrayList<>();
+
+        columns.add(new TableColumn("_id", "number", true));
+        columns.add(new TableColumn(getIdAssociationColumn(tableNameFrom), "number", false));
+        columns.add(new TableColumn(getIdAssociationColumn(tableNameTo), "number", false));
+
+        return createTableString(tableName, columns);
+    }
+
     public void dropColumn(String tableName, String colToRemove) {
         final List<TableColumn> updatedTableColumns = getTableColumns(tableName, colToRemove);
         final String columnsSeperated = TextUtils.join(",", TableColumn.getNames(updatedTableColumns));
@@ -64,7 +83,7 @@ public class DatabaseHelper {
         renameTable(tableName, oldTable);
 
         // Creating the table on its new format (no redundant columns)
-        executeSql(createTable(tableName, updatedTableColumns));
+        createTable(tableName, updatedTableColumns);
 
         // Populating the table with the data
         executeSql("INSERT INTO " + tableName + "(" + columnsSeperated + ") SELECT " + columnsSeperated + " FROM " + tableName + "_old;");
@@ -82,7 +101,7 @@ public class DatabaseHelper {
         renameTable(tableName, oldTable);
 
         // Creating the table on its new format (no redundant columns)
-        executeSql(createTable(tableName, updatedTableColumns));
+        createTable(tableName, updatedTableColumns);
 
         // Populating the table with the data
         executeSql("INSERT INTO " + tableName + "(" + newColumnsSeperated + ") SELECT " + oldColumnsSeperated + " FROM " + tableName + "_old;");

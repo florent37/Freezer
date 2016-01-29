@@ -2,6 +2,9 @@ package fr.xebia.android.freezer.migration;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by florentchampigny on 28/01/2016.
  */
@@ -65,21 +68,18 @@ public class Migrator {
             return this;
         }
 
-        @Deprecated
         public TableTransformer addField(String column, ColumnType.Array type) {
-            //TODO
+            //nothing to do
             return this;
         }
 
-        @Deprecated
         public TableTransformer addField(String column, ColumnType.Collection type) {
-            //TODO
+            //nothing to do
             return this;
         }
 
-        @Deprecated
         public TableTransformer addField(String column, ColumnType.ModelType type) {
-            //TODO
+            database.createAssociationTable(objectName, type.objectName);
             return this;
         }
 
@@ -98,7 +98,6 @@ public class Migrator {
             this.objectName = objectName;
         }
 
-        @Deprecated
         public TableTransformer renameTo(String newName) {
             database.renameColumn(getTableName(objectName),columnName,newName);
             return tableTransformer;
@@ -106,49 +105,22 @@ public class Migrator {
 
         @Deprecated
         public TableTransformer type(ColumnType.Primitive fromType, ColumnType.Primitive newType) {
-            //primitive
-
-            //    //TODO
-            //    //rename the column to old_column
-            //    String tmp_column = columnName + "_tmp";
-            //    database.execSQL(String.format("ALTER TABLE %s RENAME COLUMN %s TO %s", getTableName(objectName), columnName, tmp_column));
-            //    //create the new column
-            //    database.execSQL(String.format("ALTER TABLE %s ADD COLUMN %s %s", getTableName(objectName), columnName, newType));
-
-            //    //get the old values
-            //    //transform the values
-            //    //insert them into newType
-
-            //    Cursor cursor = db.rawQuery("SELECT _id, .${old_column} FROM ${tableName}", null);
-            //    while (!cursor.isAfterLast()) {
-            //        long id = cursor.getLong(0);
-            //        String newValue = ""; //TRANSFORM(cursor.get**(1));
-
-            //        database.execSQL(String.format("UPDATE %s SET %s = '%s' WHERE _id = %d", getTableName(objectName), newValue, id));
-
-            //        cursor.moveToNext();
-            //    }
-            //    cursor.close();
-
+            if(!fromType.equals(newType)) {
+               //try to transform
+            }
             return tableTransformer;
         }
 
         @Deprecated
         public TableTransformer type(ColumnType.Primitive fromType, ColumnType.Array newType) {
-            //TODO
-            //remove old
             tableTransformer.removeField(columnName);
-            //add new
             tableTransformer.addField(columnName, newType);
             return tableTransformer;
         }
 
         @Deprecated
         public TableTransformer type(ColumnType.Primitive fromType, ColumnType.Collection newType) {
-            //TODO
-            //remove old
             tableTransformer.removeField(columnName);
-            //add new
             tableTransformer.addField(columnName, newType);
             return tableTransformer;
         }
@@ -159,7 +131,7 @@ public class Migrator {
                     !(ColumnType.Array.ArrayOfStrings.equals(fromType) && ColumnType.Collection.ListOfStrings.equals(newType)) &&
                     !(ColumnType.Array.ArrayOfInts.equals(fromType) && ColumnType.Collection.ListOfInts.equals(newType)) &&
                     !(ColumnType.Array.ArrayOfFloats.equals(fromType) && ColumnType.Collection.ListOfFloats.equals(newType))) {
-
+                //try to transform
             }
             //else nothing to do
             return tableTransformer;
@@ -171,44 +143,32 @@ public class Migrator {
                     !(ColumnType.Array.ArrayOfStrings.equals(newType) && ColumnType.Collection.ListOfStrings.equals(fromType)) &&
                     !(ColumnType.Array.ArrayOfInts.equals(newType) && ColumnType.Collection.ListOfInts.equals(fromType)) &&
                     !(ColumnType.Array.ArrayOfFloats.equals(newType) && ColumnType.Collection.ListOfFloats.equals(fromType))) {
-
+                //try to transform
             }
             //else nothing to do
             return tableTransformer;
         }
 
         public TableTransformer type(ColumnType.Primitive fromType, ColumnType.ModelType newType) {
-            //TODO
-            //remove old
             tableTransformer.removeField(columnName);
-            //add new
             tableTransformer.addField(columnName, newType);
             return tableTransformer;
         }
 
         public TableTransformer type(ColumnType.Collection fromType, ColumnType.ModelType newType) {
-            //TODO
-            //remove old
             tableTransformer.removeField(columnName);
-            //add new
             tableTransformer.addField(columnName, newType);
             return tableTransformer;
         }
 
         public TableTransformer type(ColumnType.Array fromType, ColumnType.ModelType newType) {
-            //TODO
-            //remove old
             tableTransformer.removeField(columnName);
-            //add new
             tableTransformer.addField(columnName, newType);
             return tableTransformer;
         }
 
         public TableTransformer type(ColumnType.ModelType fromType, ColumnType.ModelType newType) {
-            //TODO
-            //remove old
             tableTransformer.removeField(columnName);
-            //add new
             tableTransformer.addField(columnName, newType);
             return tableTransformer;
         }

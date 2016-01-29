@@ -173,7 +173,7 @@ public class DatabaseMigration {
     }
     
     @Migration(4)
-    public static void migrateTo5(Migrator migrator) {
+    public static void migrateTo4(Migrator migrator) {
         migrator.addTable(migrator.createModel("Woman")
                 .field("name", ColumnType.Primitive.String)
                 .build());
