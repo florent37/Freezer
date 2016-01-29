@@ -32,5 +32,8 @@
     <orderEntry type="library" exported="" name="auto-service-1.0-rc2" level="project" />
     <orderEntry type="library" exported="" name="auto-common-0.3" level="project" />
     <orderEntry type="library" exported="" name="guava-18.0" level="project" />
+    <orderEntry type="library" exported="" name="freezer-compiler.freezer-compiler-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="freezer-compiler.freezer-compiler-1.0.1-javadoc" level="project" />
+    <orderEntry type="library" exported="" name="freezer-compiler.freezer-compiler-1.0.1-sources" level="project" />
   </component>
 </module>
