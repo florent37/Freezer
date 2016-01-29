@@ -11,7 +11,7 @@ public class Constants {
 
     public static final String DAO_CLASS_NAME = "Freezer";
     public static final String DATABASE_HELPER_CLASS_NAME = "DatabaseHelper";
-    public static final String MIGRATOR = "FreezerMigrator";
+    public static final String MIGRATOR = "Migrator";
 
     public static final String DAO_SUFFIX = "EntityManager";
     public static final String CURSOR_HELPER_SUFFIX = "CursorHelper";

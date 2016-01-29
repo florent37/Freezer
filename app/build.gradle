@@ -6,7 +6,7 @@ android {
     buildToolsVersion project.BUILD_TOOL
 
     defaultConfig {
-        applicationId "com.github.florent37.dao"
+        applicationId "com.github.florent37.orm"
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.TARGET_SDK
         versionCode 1
@@ -29,6 +29,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
 
+    provided project(":freezer-annotations")
     apt project(":freezer-compiler")
     compile project(":freezer")
 

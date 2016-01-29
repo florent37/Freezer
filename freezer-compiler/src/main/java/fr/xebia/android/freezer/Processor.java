@@ -24,7 +24,6 @@ import javax.lang.model.element.TypeElement;
 
 import fr.xebia.android.freezer.annotations.Migration;
 import fr.xebia.android.freezer.annotations.Model;
-import fr.xebia.android.freezer.annotations.Version;
 import fr.xebia.android.freezer.generator.CursorHelperGenerator;
 import fr.xebia.android.freezer.generator.DAOGenerator;
 import fr.xebia.android.freezer.generator.DatabaseHelperGenerator;
@@ -39,7 +38,8 @@ import fr.xebia.android.freezer.generator.QueryLoggerGenerator;
  * Created by florentchampigny on 07/01/2016.
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
-@SupportedAnnotationTypes("fr.xebia.android.freezer.annotations.Model")
+@SupportedAnnotationTypes(
+        {"fr.xebia.android.freezer.annotations.Model", "fr.xebia.android.freezer.annotations.Migration"})
 @AutoService(javax.annotation.processing.Processor.class)
 public class Processor extends AbstractProcessor {
 
@@ -48,7 +48,7 @@ public class Processor extends AbstractProcessor {
 
     List<CursorHelper> cursorHelpers = new ArrayList<>();
 
-    Map<Integer,Element> migrators = new HashMap<>();
+    Map<Integer, Element> migrators = new HashMap<>();
     String dbFile = "database.db";
     int version = 1;
 
@@ -56,8 +56,7 @@ public class Processor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         writeStaticJavaFiles();
 
-        migrators = getMigrators(roundEnv);
-        version = getVersion(roundEnv);
+        getMigrators(roundEnv);
 
         for (Element element : roundEnv.getElementsAnnotatedWith(Model.class)) {
             models.add(element);
@@ -71,21 +70,16 @@ public class Processor extends AbstractProcessor {
         return true;
     }
 
-    private static int getVersion(RoundEnvironment roundEnv) {
-        for (Element element : roundEnv.getElementsAnnotatedWith(Version.class)) {
-            return element.getAnnotation(Version.class).value();
-        }
-        return 1;
-    }
-
-    private static Map<Integer,Element> getMigrators(RoundEnvironment roundEnv) {
-        Map<Integer,Element> migrators = new HashMap<>();
+    private void getMigrators(RoundEnvironment roundEnv) {
+        int max = 1;
         for (Element element : roundEnv.getElementsAnnotatedWith(Migration.class)) {
-            migrators.put(element.getAnnotation(Migration.class).value(),element);
+            int v = element.getAnnotation(Migration.class).value();
+            if (max < v)
+                max = v;
+            migrators.put(v, element);
         }
-        return migrators;
+        version = max;
     }
-
 
     private void generateEntityProxies(Element element) {
         ModelEntityProxyGenerator entityProxyGenerator = new ModelEntityProxyGenerator(element);
