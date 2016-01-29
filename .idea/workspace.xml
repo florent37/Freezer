@@ -89,8 +89,8 @@
           </provider>
           <provider selected="true" editor-type-id="split-provider[text-editor;MultiMarkdownPreviewEditor]">
             <state split_layout="FIRST">
-              <first_editor vertical-scroll-proportion="0.5265823">
-                <caret line="197" column="0" selection-start-line="197" selection-start-column="0" selection-end-line="197" selection-end-column="0" />
+              <first_editor vertical-scroll-proportion="0.6594937">
+                <caret line="186" column="24" selection-start-line="186" selection-start-column="24" selection-end-line="186" selection-end-column="24" />
                 <folding />
               </first_editor>
               <second_editor />
@@ -3416,8 +3416,8 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/github/florent37/orm/DatabaseMigration.java" />
         <option value="$PROJECT_DIR$/freezer/src/main/java/fr/xebia/android/freezer/migration/ColumnType.java" />
         <option value="$PROJECT_DIR$/freezer/src/main/java/fr/xebia/android/freezer/migration/Migrator.java" />
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/freezer/build.gradle" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -4386,8 +4386,8 @@
       </provider>
       <provider selected="true" editor-type-id="split-provider[text-editor;MultiMarkdownPreviewEditor]">
         <state split_layout="FIRST">
-          <first_editor vertical-scroll-proportion="0.5265823">
-            <caret line="197" column="0" selection-start-line="197" selection-start-column="0" selection-end-line="197" selection-end-column="0" />
+          <first_editor vertical-scroll-proportion="0.6594937">
+            <caret line="186" column="24" selection-start-line="186" selection-start-column="24" selection-end-line="186" selection-end-column="24" />
             <folding />
           </first_editor>
           <second_editor />

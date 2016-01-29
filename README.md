@@ -181,6 +181,11 @@ public class DatabaseMigration {
 }
 ```
 
+Migration don't allow yet to
+- change type of field
+- add/modify One To One
+- add/modify One To Many
+ 
 #TODO
 
 - Update an entry
@@ -194,7 +199,8 @@ public class DatabaseMigration {
 
 #Changelog
 
-- 1.0.1
+##1.0.1
+
 Introduced Migration Engine
 
 #A project initiated by Xebia
