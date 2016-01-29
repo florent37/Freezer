@@ -4,7 +4,7 @@
 
 [![logo freezer](https://raw.githubusercontent.com/florent37/Freezer/master/freezer-logo.png)](https://github.com/florent37/Freezer)
 
-Use Annotations to mark classes to be Persisted
+Use Annotations to mark classes to be persisted:
 
 ```java
 @Model
@@ -32,7 +32,7 @@ public class Cat {
 
 #Persist datas
 
-Persist your data easily
+Persist your data easily:
 
 ```java
 UserEntityManager userEntityManager = new UserEntityManager();
@@ -43,17 +43,17 @@ userEntityManager.add(user);
 
 #Querying
 
-Freezer query engine uses a Fluent interface to construct multi-clause queries.
+Freezer query engine uses a fluent interface to construct multi-clause queries.
 
 ##Simple
 
-To find all users you would write :
+To find all users:
 ```java  
 List<User> allUsers = userEntityManager.select()
                              .asList();
 ```
                                                   
-To find an user with 3 years you would write:             
+To find the first user who is 3 years old:             
 ```java                              
 User user3 = userEntityManager.select()
                     .age().equalsTo(3)
@@ -62,10 +62,15 @@ User user3 = userEntityManager.select()
 
 ##Complex
 
-To find a user named "florent", or having a cat short named "Java" or having a dog named "Sasha" you would write:             
+To find all users 
+- with `name` "Florent"
+- or who own a cat with `shortNamed` "Java" 
+- or who own a dog `named` "Sasha" 
+    
+you would write:             
 ```java  
 List<User> allUsers = userEntityManager.select()
-                                .name().equalsTo("florent")
+                                .name().equalsTo("Florent")
                              .or()
                                 .cat(CatEntityManager.where().shortName().equalsTo("Java"))
                              .or()
@@ -93,7 +98,7 @@ List<User> allUsers = userEntityManager.select()
 
 ##Aggregation
 
-The QueryBuilder offers various aggregation methods
+The `QueryBuilder` offers various aggregation methods:
 
 ```java
 float agesSum      = userEntityManager.select().sum(UserColumns.age);
@@ -105,32 +110,32 @@ int count          = userEntityManager.select().count();
 
 #Entities
 
-Freezer made it possible, yes you can design your entities as your wish
+Freezer makes it possible, yes you can design your entities as your wish:
 
 ```java
 @Model
 public class MyEntity {
 
-    //primitives
+    // primitives
     [ int / float / boolean / String ] field;
 
-    //arrays
+    // arrays
     [ int[] / float[] / boolean[] / String[] ] array; 
     
-    //collections
+    // collections
     [ List<Integer> / List<Float> / List<Boolean> / List<String> ] collection;
     
-    //One To One
+    // One To One
     MySecondEntity child;
     
-    //One To Many
+    // One To Many
     List<MySecondEntity> childs;
 }
 ```
 
 #Logging
 
-You can log all SQL queries from Entities Managers
+You can log all SQL queries from entities managers:
 
 ```java
 userEntityManager.logQueries((query, datas) -> Log.d(TAG, query) }
@@ -138,7 +143,7 @@ userEntityManager.logQueries((query, datas) -> Log.d(TAG, query) }
 
 #It's always better with a context
 
-Don't forget to attach Freezer to your application
+Don't forget to initialise Freezer in your application:
 
 ```java
 public class MyApplication extends Application {
@@ -153,8 +158,8 @@ public class MyApplication extends Application {
 
 #Migration
 
-To handle schema migration, just add @Migration(newVersion) in a static method,
-then describe the modifications added in this new version
+To handle schema migration, just add `@Migration(newVersion)` in a static method,
+then describe the modifications:
 
 ```java
 public class DatabaseMigration {
@@ -181,32 +186,31 @@ public class DatabaseMigration {
 }
 ```
 
-Migration don't allow yet to
-- change type of field
-- add/modify One To One
-- add/modify One To Many
-- handle collections/arrays
+Migration isn't yet capable of:
+- changing type of field
+- adding/modifying One To One
+- adding/modifying One To Many
+- handling collections/arrays
  
 #TODO
 
 - Update an entry
 - Improve migration
-- Adding some selectors operations (like, ...)
-- Adding Observable support
+- Add some selectors operations (like, ...)
+- Add Observable support
 - Provide an Asynchronous API
-- Support dates
-- Adding @Ignore annotation
-- Unit tests
+- Add `@Ignore` annotation
+- Add unit tests
 
 #Changelog
 
 ##1.0.1
 
-Introduced Migration Engine
+Introduced Migration Engine.
 
 #A project initiated by Xebia
 
-This project was first developed by Xebia and has been open-sourced since. We will continue working and investing on it.
+This project was first developed by Xebia and has been open-sourced since. We will continue working on it.
 We encourage the community to contribute to the project by opening tickets and/or pull requests.
 
 [![logo xebia](https://raw.githubusercontent.com/florent37/Freezer/master/logo_xebia.jpg)](http://www.xebia.fr/)
