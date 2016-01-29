@@ -8,6 +8,9 @@ public class ColumnType {
     public static ModelType ofModel(String objectName) {
         return new ModelType(objectName);
     }
+    public static ModelType collectionOfModel(String objectName) {
+        return new ModelType(objectName);
+    }
 
     public enum Collection {
         ListOfInts,

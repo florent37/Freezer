@@ -31,21 +31,15 @@ public class DatabaseMigration {
     @Migration(5)
     public static void migrateTo5(Migrator migrator) {
         migrator.addTable(migrator.createModel("Woman")
-                .field("name", ColumnType.Primitive.String)
-                .field("age", ColumnType.Primitive.Int)
-                .build()
-        );
+                        .field("name", ColumnType.Primitive.String)
+                        .build());
     }
 
-    //@Migration(4)
-    //public static void migrateTo4(FreezerMigrator freezerMigrator) {
-    //    freezerMigrator
-    //            .addTable(freezerMigrator.createObject("WOMAN")
-    //                    .field("name", ColumnType.String)
-    //                    .field("names", ColumnType.ListOfStrings))
-
-    //            .update("MAN")
-    //                .addField("lastName", ColumnType.ofTable("WOMAN"));
-    //}
+    @Migration(6)
+    public static void migrateTo6(Migrator migrator) {
+        migrator.update("Woman")
+                .addField("mans", ColumnType.collectionOfModel("Man"))
+                .addField("age", ColumnType.Primitive.Int);
+    }
 
 }

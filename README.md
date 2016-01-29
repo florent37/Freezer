@@ -151,6 +151,29 @@ public class MyApplication extends Application {
 }
 ```
 
+#Migration
+
+To handle schema migration, just add @Migration(newVersion) in a static method,
+then describe the modifications added in this new version
+
+```java
+public class DatabaseMigration {
+
+    @Migration(2)
+    public static void migrateTo2(Migrator migrator) {
+        migrator.update("User")
+                .removeField("age")
+                .renameTo("Man");
+    }
+
+    @Migration(3)
+    public static void migrateTo3(Migrator migrator) {
+        migrator.update("Man")
+                .addField("birth", ColumnType.Primitive.Int);
+    }
+}
+```
+
 #TODO
 
 - Update an entry
@@ -182,8 +205,8 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  provided 'com.xebia.android.freezer:freezer-annotations:1.0.0'
-  apt 'com.xebia.android.freezer:freezer-compiler:1.0.0'
+  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.0'
+  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.0'
 }
 ```
 
