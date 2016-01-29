@@ -192,6 +192,11 @@ public class DatabaseMigration {
 - Adding @Ignore annotation
 - Unit tests
 
+#Changelog
+
+- 1.0.1
+Introduced Migration Engine
+
 #A project initiated by Xebia
 
 This project was first developed by Xebia and has been open-sourced since. We will continue working and investing on it.
@@ -212,8 +217,9 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.0'
-  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.0'
+  compile 'fr.xebia.android.freezer:freezer-annotations:1.0.1'
+  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.1'
+  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.1'
 }
 ```
 
