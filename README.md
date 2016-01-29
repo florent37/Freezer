@@ -171,6 +171,13 @@ public class DatabaseMigration {
         migrator.update("Man")
                 .addField("birth", ColumnType.Primitive.Int);
     }
+    
+    @Migration(4)
+    public static void migrateTo5(Migrator migrator) {
+        migrator.addTable(migrator.createModel("Woman")
+                .field("name", ColumnType.Primitive.String)
+                .build());
+    }
 }
 ```
 

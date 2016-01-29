@@ -83,10 +83,6 @@ public class Migrator {
             return this;
         }
 
-        public void apply() {
-            //TODO
-        }
-
     }
 
     public static class ColumnTransformer {

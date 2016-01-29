@@ -5,24 +5,35 @@ package fr.xebia.android.freezer.migration;
  */
 public class ColumnType {
 
+    @Deprecated
     public static ModelType ofModel(String objectName) {
         return new ModelType(objectName);
     }
+
+    @Deprecated
     public static ModelType collectionOfModel(String objectName) {
         return new ModelType(objectName);
     }
 
     public enum Collection {
+        @Deprecated
         ListOfInts,
+        @Deprecated
         ListOfFloats,
+        @Deprecated
         ListOfBooleans,
+        @Deprecated
         ListOfStrings
     }
 
     public enum Array {
+        @Deprecated
         ArrayOfInts,
+        @Deprecated
         ArrayOfFloats,
+        @Deprecated
         ArrayOfBooleans,
+        @Deprecated
         ArrayOfStrings;
     }
 
@@ -43,6 +54,7 @@ public class ColumnType {
         }
     }
 
+    @Deprecated
     public static class ModelType {
         String objectName;
 
