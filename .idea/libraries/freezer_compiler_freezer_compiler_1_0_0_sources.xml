@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="freezer-compiler.freezer-compiler-1.0.0-sources">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/freezer-compiler/build/libs/freezer-compiler-1.0.0-sources.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

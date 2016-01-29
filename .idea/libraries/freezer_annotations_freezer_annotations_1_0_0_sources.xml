@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="freezer-annotations.freezer-annotations-1.0.0-sources">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/freezer-annotations/build/libs/freezer-annotations-1.0.0-sources.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

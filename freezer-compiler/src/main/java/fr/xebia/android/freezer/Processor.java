@@ -5,6 +5,24 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
+
+import fr.xebia.android.freezer.annotations.Migration;
 import fr.xebia.android.freezer.annotations.Model;
 import fr.xebia.android.freezer.generator.CursorHelperGenerator;
 import fr.xebia.android.freezer.generator.DAOGenerator;
@@ -16,25 +34,12 @@ import fr.xebia.android.freezer.generator.PrimitiveCursorHelperGenerator;
 import fr.xebia.android.freezer.generator.QueryBuilderGenerator;
 import fr.xebia.android.freezer.generator.QueryLoggerGenerator;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
-import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
-
 /**
  * Created by florentchampigny on 07/01/2016.
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
-@SupportedAnnotationTypes("fr.xebia.android.freezer.annotations.Model")
+@SupportedAnnotationTypes(
+        {"fr.xebia.android.freezer.annotations.Model", "fr.xebia.android.freezer.annotations.Migration"})
 @AutoService(javax.annotation.processing.Processor.class)
 public class Processor extends AbstractProcessor {
 
@@ -43,9 +48,16 @@ public class Processor extends AbstractProcessor {
 
     List<CursorHelper> cursorHelpers = new ArrayList<>();
 
+    Map<Integer, Element> migrators = new HashMap<>();
+    String dbFile = "database.db";
+    int version = 1;
+
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         writeStaticJavaFiles();
+
+        getMigrators(roundEnv);
+
         for (Element element : roundEnv.getElementsAnnotatedWith(Model.class)) {
             models.add(element);
             generateColumnEnums(element);
@@ -56,6 +68,17 @@ public class Processor extends AbstractProcessor {
         resolveDependencies();
         writeJavaFiles();
         return true;
+    }
+
+    private void getMigrators(RoundEnvironment roundEnv) {
+        int max = 1;
+        for (Element element : roundEnv.getElementsAnnotatedWith(Migration.class)) {
+            int v = element.getAnnotation(Migration.class).value();
+            if (max < v)
+                max = v;
+            migrators.put(v, element);
+        }
+        version = max;
     }
 
     private void generateEntityProxies(Element element) {
@@ -115,13 +138,10 @@ public class Processor extends AbstractProcessor {
     }
 
     protected void writeJavaFiles() {
-        String dbFile = "database.db"; //TODO
-        int version = 1; //TODO
-
         for (CursorHelper cursorHelper : cursorHelpers)
             writeFile(JavaFile.builder(cursorHelper.getPackage(), cursorHelper.getTypeSpec()).build());
 
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DatabaseHelperGenerator(dbFile, version, daosList).generate()).build());
+        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DatabaseHelperGenerator(dbFile, version, daosList, migrators).generate()).build());
     }
 
     protected void writeFile(JavaFile javaFile) {

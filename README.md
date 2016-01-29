@@ -151,16 +151,58 @@ public class MyApplication extends Application {
 }
 ```
 
+#Migration
+
+To handle schema migration, just add @Migration(newVersion) in a static method,
+then describe the modifications added in this new version
+
+```java
+public class DatabaseMigration {
+
+    @Migration(2)
+    public static void migrateTo2(Migrator migrator) {
+        migrator.update("User")
+                .removeField("age")
+                .renameTo("Man");
+    }
+
+    @Migration(3)
+    public static void migrateTo3(Migrator migrator) {
+        migrator.update("Man")
+                .addField("birth", ColumnType.Primitive.Int);
+    }
+    
+    @Migration(4)
+    public static void migrateTo4(Migrator migrator) {
+        migrator.addTable(migrator.createModel("Woman")
+                .field("name", ColumnType.Primitive.String)
+                .build());
+    }
+}
+```
+
+Migration don't allow yet to
+- change type of field
+- add/modify One To One
+- add/modify One To Many
+- handle collections/arrays
+ 
 #TODO
 
 - Update an entry
-- Adding SqlLiterHelper onUpgrade
+- Improve migration
 - Adding some selectors operations (like, ...)
 - Adding Observable support
 - Provide an Asynchronous API
 - Support dates
 - Adding @Ignore annotation
 - Unit tests
+
+#Changelog
+
+##1.0.1
+
+Introduced Migration Engine
 
 #A project initiated by Xebia
 
@@ -182,8 +224,14 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
+<<<<<<< HEAD
+  compile 'fr.xebia.android.freezer:freezer-annotations:1.0.1'
+  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.1'
+  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.1'
+=======
   provided 'fr.xebia.android.freezer:freezer-annotations:1.0.0'
   apt 'fr.xebia.android.freezer:freezer-compiler:1.0.0'
+>>>>>>> master
 }
 ```
 
