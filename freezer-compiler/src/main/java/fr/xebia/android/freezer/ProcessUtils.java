@@ -52,8 +52,10 @@ public class ProcessUtils {
 
     public static String getFieldType(VariableElement variableElement) {
         TypeName typeName = TypeName.get(variableElement.asType());
-        if (typeName == TypeName.INT || typeName == TypeName.BOOLEAN || typeName == TypeName.LONG || typeName == TypeName.BYTE)
+        if (typeName == TypeName.INT || typeName == TypeName.BOOLEAN || typeName == TypeName.BYTE)
             return "Int";
+        else if (typeName == TypeName.LONG)
+            return "Long";
         else if (typeName == TypeName.FLOAT)
             return "Float";
         else if (ClassName.get(String.class).equals(typeName))
