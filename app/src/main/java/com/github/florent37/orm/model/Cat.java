@@ -14,6 +14,9 @@ public class Cat {
     long[] ages;
     long nana;
 
+    double[] lesDoubles;
+    double monDouble;
+
     public Cat() {
     }
 

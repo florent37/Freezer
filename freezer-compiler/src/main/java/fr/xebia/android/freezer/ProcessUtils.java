@@ -289,7 +289,7 @@ public class ProcessUtils {
             else if (TypeName.FLOAT.equals(typeName))
                 return "getFloatsArray";
             else if (TypeName.DOUBLE.equals(typeName))
-                return "getFloatsArray";
+                return "getDoublesArray";
             else if (TypeName.BOOLEAN.equals(typeName))
                 return "getBooleansArray";
         } else {
@@ -320,7 +320,7 @@ public class ProcessUtils {
         else if (TypeName.FLOAT.equals(typeName))
             return "addFloats";
         else if (TypeName.DOUBLE.equals(typeName))
-            return "addFloats";
+            return "addDoubles";
         else if (TypeName.BOOLEAN.equals(typeName))
             return "addBooleans";
         return null;
