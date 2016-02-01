@@ -9,10 +9,8 @@ import java.util.List;
  */
 @Model
 public class Cat {
+
     String shortName;
-    String name;
-    long[] ages;
-    long nana;
 
     public Cat() {
     }

@@ -42,31 +42,23 @@ public class CursorHelperGenerator {
 
     public TypeSpec generate() {
 
-        MethodSpec.Builder fromCursorSimple = MethodSpec.methodBuilder("fromCursor")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(modelType)
-                .addParameter(Constants.cursorClassName, "cursor")
-                .addParameter(Constants.databaseClassName, "db")
-                .addStatement("return fromCursor(cursor,db,0)");
-
         MethodSpec.Builder fromCursorB = MethodSpec.methodBuilder("fromCursor")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(modelType)
                 .addParameter(Constants.cursorClassName, "cursor")
                 .addParameter(Constants.databaseClassName, "db")
-                .addParameter(TypeName.INT, "start")
                 .addStatement("$T object = new $T()", modelType, ProcessUtils.getModelProxy(element))
 
-                .addStatement("$L(cursor.getLong(start))", ProcessUtils.setModelId("object"));
+                .addStatement("$L(cursor.getLong(cursor.getColumnIndex($S)))", ProcessUtils.setModelId("object"), Constants.FIELD_ID);
 
         //for
         for (int i = 0; i < fields.size(); ++i) {
             VariableElement variableElement = fields.get(i);
             if (ProcessUtils.isPrimitive(variableElement)) {
-                String cursor = "cursor.get$L(start+"+(i+1)+")";
+                String cursor = "cursor.get$L(cursor.getColumnIndex($S))";
                 cursor = String.format(ProcessUtils.getFieldCast(variableElement), cursor);
 
-                fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement));
+                fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement), variableElement.getSimpleName());
             } else {
                 fromCursorB.addCode("\n");
                 String JOIN_NAME = ProcessUtils.getTableName(objectName) + "_" + ProcessUtils.getTableName(variableElement);
@@ -145,7 +137,6 @@ public class CursorHelperGenerator {
 
         return TypeSpec.classBuilder(ProcessUtils.getCursorHelperName(objectName))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addMethod(fromCursorSimple.build())
                 .addMethod(fromCursorB.build())
                 .addMethod(getValuesB.build())
                 .addMethod(get)

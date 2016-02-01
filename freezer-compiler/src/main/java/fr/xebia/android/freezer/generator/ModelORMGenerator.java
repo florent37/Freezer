@@ -6,8 +6,6 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import fr.xebia.android.freezer.Constants;
-import fr.xebia.android.freezer.ProcessUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,6 +15,9 @@ import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
+
+import fr.xebia.android.freezer.Constants;
+import fr.xebia.android.freezer.ProcessUtils;
 
 /**
  * Created by florentchampigny on 08/01/2016.
@@ -342,7 +343,12 @@ public class ModelORMGenerator {
         for (VariableElement variableElement : fields) {
             ClassName className = ProcessUtils.getSelectorName(variableElement);
             if (className != null) {
-                TypeName selector = ParameterizedTypeName.get(className, queryBuilderClassName);
+                TypeName selector = null;
+                if (className == Constants.queryBuilder_NumberSelectorClassName)
+                    selector = ParameterizedTypeName.get(className, queryBuilderClassName, ProcessUtils.getUnboxedClass(variableElement));
+                else
+                    selector = ParameterizedTypeName.get(className, queryBuilderClassName);
+
                 methodSpecs.add(MethodSpec.methodBuilder(variableElement.getSimpleName().toString())
                         .returns(selector)
                         .addModifiers(Modifier.PUBLIC)
@@ -356,7 +362,14 @@ public class ModelORMGenerator {
         for (VariableElement variableElement : collections) {
             ClassName className = ProcessUtils.getSelectorName(variableElement);
             if (className != null) {
-                TypeName selector = ParameterizedTypeName.get(className, queryBuilderClassName);
+                TypeName selector = null;
+
+                if (className == Constants.queryBuilder_ListNumberSelectorClassName)
+                    selector = ParameterizedTypeName.get(className, queryBuilderClassName, ProcessUtils.getUnboxedClass(variableElement));
+                else
+                    selector = ParameterizedTypeName.get(className, queryBuilderClassName);
+
+
                 methodSpecs.add(MethodSpec.methodBuilder(variableElement.getSimpleName().toString())
                         .returns(selector)
                         .addModifiers(Modifier.PUBLIC)
@@ -366,7 +379,6 @@ public class ModelORMGenerator {
                         .build());
             }
         }
-
 
         for (VariableElement variableElement : otherClassFields) {
 
