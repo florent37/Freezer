@@ -15,7 +15,7 @@ public final class CatCursorHelper {
   public static Cat fromCursor(Cursor cursor, SQLiteDatabase db, int start) {
     Cat object = new CatEntity();
     ((fr.xebia.android.freezer.DataBaseModel)object).setDatabaseModelId(cursor.getLong(start));
-    object.shortName = cursor.getString(start+1);
+    object.shortName = cursor.getString(cursor.getColumnIndex("shortName"));
     object.name = cursor.getString(start+2);
     object.nana = cursor.getLong(start+3);
     object.ages = PrimitiveCursorHelper.getLongsArray(db,((fr.xebia.android.freezer.DataBaseModel)object).getDatabaseModelId(),"ages");
