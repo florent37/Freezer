@@ -214,7 +214,7 @@ public class ProcessUtils {
     public static TypeName getFieldClass(Element element) {
         if (isArray(element)) {
             return getArrayEnclosedType(element);
-        }else {
+        } else {
             TypeName enclosed = unbox(getEnclosedTypeName(element));
             if (enclosed != null)
                 return enclosed;
@@ -279,7 +279,7 @@ public class ProcessUtils {
 
     public static String getPrimitiveCursorHelperFunction(Element element) {
         TypeName typeName = getFieldClass(element);
-        if(isArray(element)){
+        if (isArray(element)) {
             if (ClassName.get(String.class).equals(typeName))
                 return "getStringsArray";
             else if (TypeName.INT.equals(typeName))
@@ -292,7 +292,7 @@ public class ProcessUtils {
                 return "getFloatsArray";
             else if (TypeName.BOOLEAN.equals(typeName))
                 return "getBooleansArray";
-        }else {
+        } else {
             if (ClassName.get(String.class).equals(typeName))
                 return "getStrings";
             else if (TypeName.INT.equals(typeName))
@@ -343,6 +343,23 @@ public class ProcessUtils {
             if (TypeName.get(String.class).equals(typeName))
                 return Constants.queryBuilder_StringSelectorClassName;
         }
+        return null;
+    }
+
+    public static TypeName getUnboxedClass(Element element) {
+        TypeName typeName = getFieldClass(element);
+        if (TypeName.INT.equals(typeName))
+            return TypeName.get(Integer.class);
+        if (TypeName.LONG.equals(typeName))
+            return TypeName.get(Long.class);
+        if (TypeName.FLOAT.equals(typeName))
+            return TypeName.get(Float.class);
+        if (TypeName.DOUBLE.equals(typeName))
+            return TypeName.get(Double.class);
+        if (TypeName.BOOLEAN.equals(typeName))
+            return TypeName.get(Boolean.class);
+        if (TypeName.get(String.class).equals(typeName))
+            return typeName;
         return null;
     }
 }

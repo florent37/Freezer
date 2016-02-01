@@ -117,13 +117,13 @@ Freezer makes it possible, yes you can design your entities as your wish:
 public class MyEntity {
 
     // primitives
-    [ int / float / boolean / String ] field;
+    [ int / float / boolean / String / long / double ] field;
 
     // arrays
-    [ int[] / float[] / boolean[] / String[] ] array; 
+    [ int[] / float[] / boolean[] / String[] / long[] / double ] array; 
     
     // collections
-    [ List<Integer> / List<Float> / List<Boolean> / List<String> ] collection;
+    [ List<Integer> / List<Float> / List<Boolean> / List<String> / List<Long> / List<Double> ] collection;
     
     // One To One
     MySecondEntity child;
@@ -207,6 +207,10 @@ Migration isn't yet capable of:
 ##1.0.1
 
 Introduced Migration Engine.
+
+##1.0.2
+
+Support long & double
 
 #A project initiated by Xebia
 
