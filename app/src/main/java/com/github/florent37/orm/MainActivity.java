@@ -45,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
                 )
         );
 
-        catORM.select().nana().equalsTo(3l);
-
         Log.d("DAO", userORM.select()
                 .hacker().isTrue()
                 .or()

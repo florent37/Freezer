@@ -51,7 +51,7 @@ public class ProcessUtils {
     }
 
     public static String getFieldType(VariableElement variableElement) {
-        TypeName typeName = TypeName.get(variableElement.asType());
+        TypeName typeName = getFieldClass(variableElement);
         if (typeName == TypeName.INT || typeName == TypeName.BOOLEAN || typeName == TypeName.BYTE)
             return "Int";
         else if (typeName == TypeName.LONG)
@@ -66,21 +66,21 @@ public class ProcessUtils {
     }
 
     public static String getFieldCast(VariableElement variableElement) {
-        TypeName typeName = TypeName.get(variableElement.asType());
+        TypeName typeName = getFieldClass(variableElement);
         if (typeName == TypeName.BOOLEAN)
             return "(1 == %s)";
         return "%s";
     }
 
     public static String getFieldTableType(VariableElement variableElement) {
-        TypeName typeName = TypeName.get(variableElement.asType());
+        TypeName typeName = getFieldClass(variableElement);
         if (typeName == TypeName.INT || typeName == TypeName.BOOLEAN || typeName == TypeName.LONG || typeName == TypeName.BYTE)
             return "integer";
         if (typeName == TypeName.FLOAT)
             return "real";
         else if (ClassName.get(String.class).equals(typeName))
             return "text";
-        return "";
+        return null;
     }
 
     public static String getObjectName(Element element) {
@@ -164,10 +164,10 @@ public class ProcessUtils {
     }
 
     public static String getQueryCast(VariableElement variableElement) {
-        TypeName typeName = TypeName.get(variableElement.asType());
+        TypeName typeName = getFieldClass(variableElement);
         if (ClassName.get(String.class).equals(typeName))
             return "$L";
-        else if (typeName == TypeName.BOOLEAN)
+        else if (typeName == TypeName.BOOLEAN || typeName.equals(TypeName.get(Boolean.class)))
             return "String.valueOf($L ? 1 : 0)";
         else
             return "String.valueOf($L)";
@@ -213,12 +213,15 @@ public class ProcessUtils {
 
     public static TypeName getFieldClass(Element element) {
         if (isArray(element)) {
-            return getArrayEnclosedType(element);
+            TypeName typeName = getArrayEnclosedType(element);
+            return unbox(typeName);
         } else {
             TypeName enclosed = unbox(getEnclosedTypeName(element));
             if (enclosed != null)
                 return enclosed;
-            else return ClassName.get(element.asType());
+            else {
+                return unbox(TypeName.get(element.asType()));
+            }
         }
     }
 
@@ -280,18 +283,33 @@ public class ProcessUtils {
     public static String getPrimitiveCursorHelperFunction(Element element) {
         TypeName typeName = getFieldClass(element);
         if (isArray(element)) {
-            if (ClassName.get(String.class).equals(typeName))
-                return "getStringsArray";
-            else if (TypeName.INT.equals(typeName))
-                return "getIntegersArray";
-            else if (TypeName.LONG.equals(typeName))
-                return "getLongsArray";
-            else if (TypeName.FLOAT.equals(typeName))
-                return "getFloatsArray";
-            else if (TypeName.DOUBLE.equals(typeName))
-                return "getDoublesArray";
-            else if (TypeName.BOOLEAN.equals(typeName))
-                return "getBooleansArray";
+            if(getArrayEnclosedType(element).isPrimitive()){
+                if (ClassName.get(String.class).equals(typeName))
+                    return "getStringsPrimitiveArray";
+                else if (TypeName.INT.equals(typeName))
+                    return "getIntegersPrimitiveArray";
+                else if (TypeName.LONG.equals(typeName))
+                    return "getLongsPrimitiveArray";
+                else if (TypeName.FLOAT.equals(typeName))
+                    return "getFloatsPrimitiveArray";
+                else if (TypeName.DOUBLE.equals(typeName))
+                    return "getDoublesPrimitiveArray";
+                else if (TypeName.BOOLEAN.equals(typeName))
+                    return "getBooleansPrimitiveArray";
+            }else {
+                if (ClassName.get(String.class).equals(typeName))
+                    return "getStringsArray";
+                else if (TypeName.INT.equals(typeName))
+                    return "getIntegersArray";
+                else if (TypeName.LONG.equals(typeName))
+                    return "getLongsArray";
+                else if (TypeName.FLOAT.equals(typeName))
+                    return "getFloatsArray";
+                else if (TypeName.DOUBLE.equals(typeName))
+                    return "getDoublesArray";
+                else if (TypeName.BOOLEAN.equals(typeName))
+                    return "getBooleansArray";
+            }
         } else {
             if (ClassName.get(String.class).equals(typeName))
                 return "getStrings";
