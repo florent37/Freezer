@@ -211,6 +211,9 @@ Introduced Migration Engine.
 ##1.0.2
 
 Support long & double
+Support arrays
+Improved QueryBuilder
+Refactored cursors helpers
 
 #A project initiated by Xebia
 
@@ -232,9 +235,9 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  compile 'fr.xebia.android.freezer:freezer:1.0.1'
-  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.1'
-  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.1'
+  compile 'fr.xebia.android.freezer:freezer:1.0.2'
+  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.2'
+  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.2'
 }
 ```
 
