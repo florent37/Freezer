@@ -58,6 +58,8 @@ public class ProcessUtils {
             return "Long";
         else if (typeName == TypeName.FLOAT)
             return "Float";
+        else if (typeName == TypeName.DOUBLE)
+            return "Double";
         else if (ClassName.get(String.class).equals(typeName))
             return "String";
         return "";
@@ -282,7 +284,11 @@ public class ProcessUtils {
                 return "getStringsArray";
             else if (TypeName.INT.equals(typeName))
                 return "getIntegersArray";
+            else if (TypeName.LONG.equals(typeName))
+                return "getLongsArray";
             else if (TypeName.FLOAT.equals(typeName))
+                return "getFloatsArray";
+            else if (TypeName.DOUBLE.equals(typeName))
                 return "getFloatsArray";
             else if (TypeName.BOOLEAN.equals(typeName))
                 return "getBooleansArray";
@@ -291,8 +297,12 @@ public class ProcessUtils {
                 return "getStrings";
             else if (TypeName.INT.equals(typeName))
                 return "getIntegers";
+            else if (TypeName.LONG.equals(typeName))
+                return "getIntegers";
             else if (TypeName.FLOAT.equals(typeName))
                 return "getFloats";
+            else if (TypeName.DOUBLE.equals(typeName))
+                return "getDoubles";
             else if (TypeName.BOOLEAN.equals(typeName))
                 return "getBooleans";
         }
@@ -305,7 +315,11 @@ public class ProcessUtils {
             return "addStrings";
         else if (TypeName.INT.equals(typeName))
             return "addIntegers";
+        else if (TypeName.LONG.equals(typeName))
+            return "addLongs";
         else if (TypeName.FLOAT.equals(typeName))
+            return "addFloats";
+        else if (TypeName.DOUBLE.equals(typeName))
             return "addFloats";
         else if (TypeName.BOOLEAN.equals(typeName))
             return "addBooleans";

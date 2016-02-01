@@ -11,7 +11,8 @@ import java.util.List;
 public class Cat {
     String shortName;
     String name;
-    int[] ages;
+    long[] ages;
+    long nana;
 
     public Cat() {
     }
