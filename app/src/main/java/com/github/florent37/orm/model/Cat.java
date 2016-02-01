@@ -10,38 +10,12 @@ import java.util.List;
 @Model
 public class Cat {
 
-    int aInteger;
-    Integer bInteger;
-    int[] cInteger;
-    Integer[] dInteger;
-    List<Integer> eInteger;
-
-    boolean aBoolean;
-    Boolean bBoolean;
-    boolean[] cBoolean;
-    Boolean[] dBoolean;
-    List<Boolean> eBoolean;
-
-    float aFloat;
-    Float bFloat;
-    float[] cFloat;
-    Float[] dFloat;
-    List<Float> eFloat;
-
-    double aDouble;
-    Double bDouble;
-    double[] cDouble;
-    Double[] dDouble;
-    List<Double> eDouble;
-
-    String aString;
-    String[] bString;
-    List<String> cString;
+    String shortName;
 
     public Cat() {
     }
 
     public Cat(String shortName) {
-        this.aString = shortName;
+        this.shortName = shortName;
     }
 }
