@@ -1,8 +1,6 @@
-package com.github.florent37.orm.model;
+package cat;
 
 import fr.xebia.android.freezer.annotations.Model;
-
-import java.util.List;
 
 /**
  * Created by florentchampigny on 21/01/2016.

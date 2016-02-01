@@ -40,8 +40,10 @@ public class Constants {
     public static final String PRIMITIVE_CURSOR_HELPER = "PrimitiveCursorHelper";
     public static final TypeName primitiveCursorHelper = ClassName.get(Constants.DAO_PACKAGE, PRIMITIVE_CURSOR_HELPER);
     public static final String PRIMITIVE_TABLE_INT = "MODEL_INT";
+    public static final String PRIMITIVE_TABLE_LONG = "MODEL_INT";
     public static final String PRIMITIVE_TABLE_STRING = "MODEL_STRING";
     public static final String PRIMITIVE_TABLE_FLOAT = "MODEL_FLOAT";
+    public static final String PRIMITIVE_TABLE_DOUBLE = "MODEL_FLOAT";
     public static final String PRIMITIVE_TABLE_BOOLEAN = "MODEL_BOOLEAN";
 
     public static final String SELECTOR_NUMBER = "NumberSelector";
