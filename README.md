@@ -210,10 +210,10 @@ Introduced Migration Engine.
 
 ##1.0.2
 
-Support long & double
-Support arrays
-Improved QueryBuilder
-Refactored cursors helpers
+- Support long & double
+- Support arrays
+- Improved QueryBuilder
+- Refactored cursors helpers
 
 #A project initiated by Xebia
 
