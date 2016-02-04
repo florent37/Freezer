@@ -78,7 +78,7 @@ public class ProcessUtils {
             return "integer";
         if (typeName == TypeName.FLOAT)
             return "real";
-        else if (ClassName.get(String.class).equals(typeName))
+        else if (ClassName.get(String.class).equals(typeName) || isDate(typeName))
             return "text";
         return null;
     }
@@ -156,7 +156,7 @@ public class ProcessUtils {
     }
 
     public static boolean isPrimitive(TypeName typeName) {
-        return typeName.isPrimitive() || unbox(typeName).isPrimitive() || (ClassName.get(String.class).equals(typeName));
+        return typeName.isPrimitive() || unbox(typeName).isPrimitive() || (ClassName.get(String.class).equals(typeName)) || isDate(typeName);
     }
 
     public static boolean isCollectionOfPrimitive(Element element) {
@@ -379,5 +379,13 @@ public class ProcessUtils {
         if (TypeName.get(String.class).equals(typeName))
             return typeName;
         return null;
+    }
+
+    public static boolean isDate(Element element){
+        return isDate(getFieldClass(element));
+    }
+
+    public static boolean isDate(TypeName typeName){
+        return Constants.dateClassName.equals(typeName);
     }
 }

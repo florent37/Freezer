@@ -452,7 +452,7 @@ public class ModelORMGenerator {
                         .append(" ")
                         .append(ProcessUtils.getFieldTableType(variableElement));
                 if (i < fields.size() - 1)
-                    stringBuilder.append(",");
+                    stringBuilder.append(", ");
             }
         }
         return stringBuilder.toString();

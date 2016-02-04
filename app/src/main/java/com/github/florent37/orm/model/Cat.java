@@ -2,6 +2,7 @@ package com.github.florent37.orm.model;
 
 import fr.xebia.android.freezer.annotations.Model;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -11,6 +12,7 @@ import java.util.List;
 public class Cat {
 
     String shortName;
+    Date date;
 
     public Cat() {
     }

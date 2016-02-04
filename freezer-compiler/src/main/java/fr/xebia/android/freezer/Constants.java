@@ -3,6 +3,9 @@ package fr.xebia.android.freezer;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by florentchampigny on 18/01/2016.
  */
@@ -29,6 +32,8 @@ public class Constants {
     public static final TypeName contextClassName = ClassName.get("android.content", "Context");
     public static final TypeName cursorClassName = ClassName.get("android.database", "Cursor");
     public static final TypeName contentValuesClassName = ClassName.get("android.content", "ContentValues");
+    public static final TypeName dateClassName = ClassName.get(Date.class);
+    public static final TypeName simpleDateFormatClassName = ClassName.get(SimpleDateFormat.class);
 
     public static final String ENUM_COLUMN_ELEMENT_NAME = "column_name";
 
@@ -65,4 +70,6 @@ public class Constants {
     public static final String MODEL_ENTITY_PROXY_INTERFACE = "DataBaseModel";
     public static final String MODEL_ENTITY_PROXY_GET_ID_METHOD = "getDatabaseModelId";
     public static final String MODEL_ENTITY_PROXY_SET_ID_METHOD = "setDatabaseModelId";
+
+    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 }

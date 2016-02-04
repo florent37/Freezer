@@ -4,9 +4,6 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import fr.xebia.android.freezer.Constants;
-import fr.xebia.android.freezer.Dependency;
-import fr.xebia.android.freezer.ProcessUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +14,10 @@ import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
+
+import fr.xebia.android.freezer.Constants;
+import fr.xebia.android.freezer.Dependency;
+import fr.xebia.android.freezer.ProcessUtils;
 
 /**
  * Created by florentchampigny on 18/01/2016.
@@ -29,7 +30,7 @@ public class CursorHelperGenerator {
     List<VariableElement> fields;
     List<VariableElement> otherClassFields;
     List<VariableElement> collections;
-    List<Dependency> dependencies = new ArrayList();
+    List<Dependency> dependencies = new ArrayList<>();
 
     public CursorHelperGenerator(Element element) {
         this.element = element;
@@ -56,9 +57,17 @@ public class CursorHelperGenerator {
             VariableElement variableElement = fields.get(i);
             if (ProcessUtils.isPrimitive(variableElement)) {
                 String cursor = "cursor.get$L(cursor.getColumnIndex($S))";
-                cursor = String.format(ProcessUtils.getFieldCast(variableElement), cursor);
 
-                fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement), variableElement.getSimpleName());
+                if (ProcessUtils.isDate(variableElement)) {
+                    fromCursorB.addCode("try{ \n")
+                            .addStatement("object.$L = new $T($S).parse(cursor.getString(cursor.getColumnIndex($S)))",
+                                    variableElement.getSimpleName(), Constants.simpleDateFormatClassName, Constants.DATE_FORMAT, variableElement.getSimpleName())
+                            .addCode("} catch ($T e) { e.printStackTrace(); }", TypeName.get(Exception.class));
+                } else {
+                    cursor = String.format(ProcessUtils.getFieldCast(variableElement), cursor);
+
+                    fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement), variableElement.getSimpleName());
+                }
             } else {
                 fromCursorB.addCode("\n");
                 String JOIN_NAME = ProcessUtils.getTableName(objectName) + "_" + ProcessUtils.getTableName(variableElement);
@@ -91,10 +100,14 @@ public class CursorHelperGenerator {
         for (int i = 0; i < fields.size(); ++i) {
             VariableElement variableElement = fields.get(i);
             if (ProcessUtils.isPrimitive(variableElement)) {
-                String statement = "values.put($S,object.$L)";
-                if (ProcessUtils.isModelId(variableElement))
-                    statement = "if(" + ProcessUtils.getCursorHelperName("object") + " != 0) " + statement;
-                getValuesB.addStatement(statement, variableElement.getSimpleName(), variableElement.getSimpleName());
+                if (ProcessUtils.isDate(variableElement)) {
+                    getValuesB.addStatement("values.put($S, new $T($S).format(object.$L))", variableElement.getSimpleName(), Constants.simpleDateFormatClassName, Constants.DATE_FORMAT, variableElement.getSimpleName());
+                } else {
+                    String statement = "values.put($S,object.$L)";
+                    if (ProcessUtils.isModelId(variableElement))
+                        statement = "if(" + ProcessUtils.getCursorHelperName("object") + " != 0) " + statement;
+                    getValuesB.addStatement(statement, variableElement.getSimpleName(), variableElement.getSimpleName());
+                }
             }
         }
 

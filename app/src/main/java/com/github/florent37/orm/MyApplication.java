@@ -11,11 +11,11 @@ public class MyApplication extends Application {
 
     @Override public void onCreate() {
         super.onCreate();
-        Freezer.onCreate(this);
+        Freezer.getInstance().onCreate(this);
     }
 
     @Override public void onTerminate() {
         super.onTerminate();
-        Freezer.onDestroy();
+        Freezer.getInstance().onDestroy();
     }
 }
