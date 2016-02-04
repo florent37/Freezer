@@ -360,6 +360,8 @@ public class ProcessUtils {
                 return Constants.queryBuilder_BooleanSelectorClassName;
             if (TypeName.get(String.class).equals(typeName))
                 return Constants.queryBuilder_StringSelectorClassName;
+            if (isDate(typeName))
+                return Constants.queryBuilder_DateSelectorClassName;
         }
         return null;
     }
