@@ -73,8 +73,8 @@ public class QueryBuilderGenerator {
 
                 .addMethod(MethodSpec.methodBuilder("appendSortAsc")
                         .addModifiers(Modifier.PROTECTED)
-                        .addParameter(ClassName.get(String.class), "column")
                         .addParameter(ClassName.get(String.class), "tableName")
+                        .addParameter(ClassName.get(String.class), "column")
                         .addStatement("if(orderBuilder.length() != 0) queryBuilder.append(',')")
                         .addStatement("orderBuilder.append(tableName).append(column)")
                         .addStatement("orderBuilder.append($S)", " ASC ")
@@ -82,8 +82,8 @@ public class QueryBuilderGenerator {
 
                 .addMethod(MethodSpec.methodBuilder("appendSortDesc")
                         .addModifiers(Modifier.PROTECTED)
-                        .addParameter(ClassName.get(String.class), "column")
                         .addParameter(ClassName.get(String.class), "tableName")
+                        .addParameter(ClassName.get(String.class), "column")
                         .addStatement("if(orderBuilder.length() != 0) queryBuilder.append(',')")
                         .addStatement("orderBuilder.append(tableName).append(column)")
                         .addStatement("orderBuilder.append($S)", " DESC ")
