@@ -217,11 +217,8 @@ Migration isn't yet capable of:
 
 - Update an entry
 - Improve migration
-- Add some selectors operations (like, ...)
 - Add Observable support
 - Provide an Asynchronous API
-- Add `@Ignore` annotation
-- Add unit tests
 
 #Changelog
 

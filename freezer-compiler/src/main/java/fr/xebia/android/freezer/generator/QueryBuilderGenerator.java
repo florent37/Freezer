@@ -275,6 +275,14 @@ public class QueryBuilderGenerator {
                         .addStatement("return queryBuilder")
                         .build())
 
+                .addMethod(MethodSpec.methodBuilder("like")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(TypeVariableName.get("Q2"))
+                        .addParameter(TypeName.get(String.class), "value")
+                        .addStatement("queryBuilder.appendQuery(column+\" LIKE '\"+value+\"'\",null)")
+                        .addStatement("return queryBuilder")
+                        .build())
+
                 .build());
 
         typeSpecs.add(TypeSpec.classBuilder(Constants.SELECTOR_STRING_LIST)
@@ -402,6 +410,17 @@ public class QueryBuilderGenerator {
                             .returns(TypeVariableName.get("Q3"))
                             .addParameter(Constants.dateClassName, "date")
                             .addStatement("queryBuilder.appendQuery(column+\" > Datetime(?)\", new $T($S).format(date))", Constants.simpleDateFormatClassName, Constants.DATE_FORMAT)
+                            .addStatement("return queryBuilder")
+                            .build())
+
+                    .addMethod(MethodSpec.methodBuilder("between")
+                            .addModifiers(Modifier.PUBLIC)
+                            .returns(TypeVariableName.get("Q3"))
+                            .addParameter(Constants.dateClassName, "min")
+                            .addParameter(Constants.dateClassName, "max")
+                            .addStatement("queryBuilder.appendQuery(column+\" > Datetime(?)\", new $T($S).format(min))", Constants.simpleDateFormatClassName, Constants.DATE_FORMAT)
+                            .addStatement("queryBuilder.appendAnd()")
+                            .addStatement("queryBuilder.appendQuery(column+\" < Datetime(?)\", new $T($S).format(max))", Constants.simpleDateFormatClassName, Constants.DATE_FORMAT)
                             .addStatement("return queryBuilder")
                             .build())
 
