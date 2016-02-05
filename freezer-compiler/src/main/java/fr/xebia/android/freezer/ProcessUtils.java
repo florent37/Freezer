@@ -14,13 +14,24 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 
+import fr.xebia.android.freezer.annotations.Ignore;
+
 /**
  * Created by florentchampigny on 17/01/16.
  */
 public class ProcessUtils {
 
+    public static List<VariableElement> filterIgnore(List<VariableElement> elements) {
+        List<VariableElement> filtered = new ArrayList<>();
+        for (VariableElement variableElement : elements) {
+            if (variableElement.getAnnotation(Ignore.class) == null)
+                filtered.add(variableElement);
+        }
+        return filtered;
+    }
+
     public static List<VariableElement> getFields(Element element) {
-        return ElementFilter.fieldsIn(element.getEnclosedElements());
+        return filterIgnore(ElementFilter.fieldsIn(element.getEnclosedElements()));
     }
 
     public static List<VariableElement> getPrimitiveFields(Element element) {
@@ -29,7 +40,7 @@ public class ProcessUtils {
             if (isPrimitive(e) && !isCollectionOfPrimitive(e))
                 primitives.add(e);
         }
-        return primitives;
+        return filterIgnore(primitives);
     }
 
     public static List<VariableElement> getCollectionsOfPrimitiveFields(Element element) {
@@ -38,7 +49,7 @@ public class ProcessUtils {
             if (isCollectionOfPrimitive(e))
                 collectionsOfPrimitives.add(e);
         }
-        return collectionsOfPrimitives;
+        return filterIgnore(collectionsOfPrimitives);
     }
 
     public static List<VariableElement> getNonPrimitiveClassFields(Element element) {
@@ -47,7 +58,7 @@ public class ProcessUtils {
             if (!isPrimitive(e) && !isCollectionOfPrimitive(e))
                 nonPrimitive.add(e);
         }
-        return nonPrimitive;
+        return filterIgnore(nonPrimitive);
     }
 
     public static String getFieldType(VariableElement variableElement) {
@@ -283,7 +294,7 @@ public class ProcessUtils {
     public static String getPrimitiveCursorHelperFunction(Element element) {
         TypeName typeName = getFieldClass(element);
         if (isArray(element)) {
-            if(getArrayEnclosedType(element).isPrimitive()){
+            if (getArrayEnclosedType(element).isPrimitive()) {
                 if (ClassName.get(String.class).equals(typeName))
                     return "getStringsPrimitiveArray";
                 else if (TypeName.INT.equals(typeName))
@@ -296,7 +307,7 @@ public class ProcessUtils {
                     return "getDoublesPrimitiveArray";
                 else if (TypeName.BOOLEAN.equals(typeName))
                     return "getBooleansPrimitiveArray";
-            }else {
+            } else {
                 if (ClassName.get(String.class).equals(typeName))
                     return "getStringsArray";
                 else if (TypeName.INT.equals(typeName))
@@ -383,11 +394,11 @@ public class ProcessUtils {
         return null;
     }
 
-    public static boolean isDate(Element element){
+    public static boolean isDate(Element element) {
         return isDate(getFieldClass(element));
     }
 
-    public static boolean isDate(TypeName typeName){
+    public static boolean isDate(TypeName typeName) {
         return Constants.dateClassName.equals(typeName);
     }
 }
