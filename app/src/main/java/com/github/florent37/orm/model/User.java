@@ -25,9 +25,34 @@ public class User {
         this.hacker = hacker;
     }
 
+    public User(int age, String name) {
+        this.age = age;
+        this.name = name;
+    }
+
     @Override public String toString() {
         return "User{" +
                 " name='" + name + '\'' +
                 '}';
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Cat getCat() {
+        return cat;
+    }
+
+    public List<Dog> getDogs() {
+        return dogs;
+    }
+
+    public boolean isHacker() {
+        return hacker;
     }
 }

@@ -14,4 +14,8 @@ public class Dog {
     public Dog(String name) {
         this.name = name;
     }
+
+    public String getName() {
+        return name;
+    }
 }

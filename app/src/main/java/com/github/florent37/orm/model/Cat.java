@@ -20,4 +20,9 @@ public class Cat {
     public Cat(String shortName) {
         this.shortName = shortName;
     }
+
+    public String getShortName() {
+        return shortName;
+    }
+
 }

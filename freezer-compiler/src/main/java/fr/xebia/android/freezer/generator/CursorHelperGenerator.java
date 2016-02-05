@@ -60,25 +60,34 @@ public class CursorHelperGenerator {
 
                 if (ProcessUtils.isDate(variableElement)) {
                     fromCursorB.addCode("try{ \n")
-                            .addStatement("object.$L = new $T($S).parse(cursor.getString(cursor.getColumnIndex($S)))",
-                                    variableElement.getSimpleName(), Constants.simpleDateFormatClassName, Constants.DATE_FORMAT, variableElement.getSimpleName())
+                            .addStatement("String date$L = cursor.getString(cursor.getColumnIndex($S))", i, variableElement.getSimpleName())
+                            .addStatement("if(date$L != null) object.$L = new $T($S).parse(date$L)",
+                                    i, variableElement.getSimpleName(), Constants.simpleDateFormatClassName, Constants.DATE_FORMAT, i)
                             .addCode("} catch ($T e) { e.printStackTrace(); }", TypeName.get(Exception.class));
                 } else {
                     cursor = String.format(ProcessUtils.getFieldCast(variableElement), cursor);
 
                     fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement), variableElement.getSimpleName());
                 }
-            } else {
-                fromCursorB.addCode("\n");
-                String JOIN_NAME = ProcessUtils.getTableName(objectName) + "_" + ProcessUtils.getTableName(variableElement);
+            }
+        }
 
-                fromCursorB.addStatement("$T cursor$L = db.rawQuery($S,new String[]{String.valueOf($L), $S})", Constants.cursorClassName, i, "SELECT * FROM " + ProcessUtils.getTableName(variableElement) + ", " + JOIN_NAME + " WHERE " + JOIN_NAME + "." + ProcessUtils.getKeyName(objectName) + " = ? AND " + ProcessUtils.getTableName(variableElement) + "." + Constants.FIELD_ID + " = " + JOIN_NAME + "." + ProcessUtils.getKeyName(variableElement) + " AND " + JOIN_NAME + "." + Constants.FIELD_NAME + "= ?", ProcessUtils.getModelId("object"), ProcessUtils.getObjectName(variableElement));
+        for (int i = 0; i < otherClassFields.size(); ++i) {
+            VariableElement variableElement = otherClassFields.get(i);
 
-                fromCursorB.addStatement("$T objects$L = $T.get(cursor$L,db)", ProcessUtils.listOf(variableElement), i, ProcessUtils.getFieldCursorHelperClass(variableElement), i);
+            fromCursorB.addCode("\n");
+            String JOIN_NAME = ProcessUtils.getTableName(objectName) + "_" + ProcessUtils.getTableName(variableElement);
+
+            fromCursorB.addStatement("$T cursor$L = db.rawQuery($S,new String[]{String.valueOf($L), $S})", Constants.cursorClassName, i, "SELECT * FROM " + ProcessUtils.getTableName(variableElement) + ", " + JOIN_NAME + " WHERE " + JOIN_NAME + "." + ProcessUtils.getKeyName(objectName) + " = ? AND " + ProcessUtils.getTableName(variableElement) + "." + Constants.FIELD_ID + " = " + JOIN_NAME + "." + ProcessUtils.getKeyName(variableElement) + " AND " + JOIN_NAME + "." + Constants.FIELD_NAME + "= ?", ProcessUtils.getModelId("object"), ProcessUtils.getObjectName(variableElement));
+
+            fromCursorB.addStatement("$T objects$L = $T.get(cursor$L,db)", ProcessUtils.listOf(variableElement), i, ProcessUtils.getFieldCursorHelperClass(variableElement), i);
+
+            if (ProcessUtils.isCollection(variableElement))
+                fromCursorB.addStatement("if(!objects$L.isEmpty()) object.$L = objects$L", i, ProcessUtils.getObjectName(variableElement), i);
+            else
                 fromCursorB.addStatement("if(!objects$L.isEmpty()) object.$L = objects$L.get(0)", i, ProcessUtils.getObjectName(variableElement), i);
 
-                fromCursorB.addStatement("cursor$L.close()", i);
-            }
+            fromCursorB.addStatement("cursor$L.close()", i);
         }
 
         for (int i = 0; i < collections.size(); ++i) {
@@ -96,12 +105,11 @@ public class CursorHelperGenerator {
                 .addStatement("$T values = new $T()", Constants.contentValuesClassName, Constants.contentValuesClassName)
                 .addStatement("if(name != null) values.put($S,name)", Constants.FIELD_NAME);
 
-        //for
         for (int i = 0; i < fields.size(); ++i) {
             VariableElement variableElement = fields.get(i);
             if (ProcessUtils.isPrimitive(variableElement)) {
                 if (ProcessUtils.isDate(variableElement)) {
-                    getValuesB.addStatement("values.put($S, new $T($S).format(object.$L))", variableElement.getSimpleName(), Constants.simpleDateFormatClassName, Constants.DATE_FORMAT, variableElement.getSimpleName());
+                    getValuesB.addStatement("if(object.$L != null) values.put($S, new $T($S).format(object.$L))", variableElement.getSimpleName(), variableElement.getSimpleName(), Constants.simpleDateFormatClassName, Constants.DATE_FORMAT, variableElement.getSimpleName());
                 } else {
                     String statement = "values.put($S,object.$L)";
                     if (ProcessUtils.isModelId(variableElement))

@@ -124,7 +124,7 @@ public class ProcessUtils {
     }
 
     public static ParameterizedTypeName listOf(Element element) {
-        return ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(element.asType()));
+        return ParameterizedTypeName.get(ClassName.get(List.class), getFieldClass(element));
     }
 
     public static ParameterizedTypeName listOf(Class classe) {
