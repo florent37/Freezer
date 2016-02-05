@@ -1,5 +1,6 @@
 package com.github.florent37.orm.model;
 
+import fr.xebia.android.freezer.annotations.Ignore;
 import fr.xebia.android.freezer.annotations.Model;
 
 import java.util.Date;
@@ -13,6 +14,9 @@ public class Cat {
 
     String shortName;
     Date date;
+
+    String notIgnored;
+    @Ignore String ignoreThis;
 
     public Cat() {
     }
