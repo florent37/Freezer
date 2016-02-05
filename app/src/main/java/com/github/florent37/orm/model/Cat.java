@@ -21,8 +21,16 @@ public class Cat {
         this.shortName = shortName;
     }
 
+    public Cat(String shortName, Date date) {
+        this.shortName = shortName;
+        this.date = date;
+    }
+
     public String getShortName() {
         return shortName;
     }
 
+    public Date getDate() {
+        return date;
+    }
 }

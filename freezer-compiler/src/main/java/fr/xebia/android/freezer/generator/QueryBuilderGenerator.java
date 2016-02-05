@@ -401,7 +401,7 @@ public class QueryBuilderGenerator {
                             .addModifiers(Modifier.PUBLIC)
                             .returns(TypeVariableName.get("Q3"))
                             .addParameter(Constants.dateClassName, "date")
-                            .addStatement("queryBuilder.appendQuery(column+\" < Datetime(?)\", new $T($S).format(date))", Constants.simpleDateFormatClassName, Constants.DATE_FORMAT)
+                            .addStatement("queryBuilder.appendQuery(column+\" > Datetime(?)\", new $T($S).format(date))", Constants.simpleDateFormatClassName, Constants.DATE_FORMAT)
                             .addStatement("return queryBuilder")
                             .build())
 
