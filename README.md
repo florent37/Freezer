@@ -141,6 +141,19 @@ public class MyEntity {
 }
 ```
 
+#Ignore
+
+You can ignore a field:
+
+```java
+@Model
+public class MyEntity {
+    @Ignore
+    int field;    
+}
+```
+
+
 #Logging
 
 You can log all SQL queries from entities managers:
@@ -228,6 +241,10 @@ Introduced Migration Engine.
 - Support dates
 - Added unit tests
 - Fixed one to many
+
+##1.0.4
+
+- @Ignore
 
 #A project initiated by Xebia
 
