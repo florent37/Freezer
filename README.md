@@ -94,6 +94,11 @@ List<User> allUsers = userEntityManager.select()
      .hacker().equalsTo(true)
      .hacker().isTrue()
      .hacker().isFalse()
+//dates
+     .myDate().equalsTo(OTHER_DATE)
+     .myDate().notEqualsTo(OTHER_DATE)
+     .myDate().before(OTHER_DATE)
+     .myDate().after(OTHER_DATE)
 ```
 
 ##Aggregation
@@ -118,6 +123,9 @@ public class MyEntity {
 
     // primitives
     [ int / float / boolean / String / long / double ] field;
+    
+    //dates
+    Date myDate;
 
     // arrays
     [ int[] / float[] / boolean[] / String[] / long[] / double ] array; 
@@ -215,6 +223,12 @@ Introduced Migration Engine.
 - Improved QueryBuilder
 - Refactored cursors helpers
 
+##1.0.3
+
+- Support dates
+- Added unit tests
+- Fixed one to many
+
 #A project initiated by Xebia
 
 This project was first developed by Xebia and has been open-sourced since. We will continue working on it.
@@ -235,9 +249,9 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  compile 'fr.xebia.android.freezer:freezer:1.0.2'
-  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.2'
-  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.2'
+  compile 'fr.xebia.android.freezer:freezer:1.0.3'
+  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.3'
+  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.3'
 }
 ```
 
