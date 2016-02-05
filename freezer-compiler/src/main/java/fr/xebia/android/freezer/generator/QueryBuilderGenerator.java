@@ -73,8 +73,8 @@ public class QueryBuilderGenerator {
 
                 .addMethod(MethodSpec.methodBuilder("appendSortAsc")
                         .addModifiers(Modifier.PROTECTED)
-                        .addParameter(ClassName.get(String.class), "column")
                         .addParameter(ClassName.get(String.class), "tableName")
+                        .addParameter(ClassName.get(String.class), "column")
                         .addStatement("if(orderBuilder.length() != 0) queryBuilder.append(',')")
                         .addStatement("orderBuilder.append(tableName).append(column)")
                         .addStatement("orderBuilder.append($S)", " ASC ")
@@ -82,8 +82,8 @@ public class QueryBuilderGenerator {
 
                 .addMethod(MethodSpec.methodBuilder("appendSortDesc")
                         .addModifiers(Modifier.PROTECTED)
-                        .addParameter(ClassName.get(String.class), "column")
                         .addParameter(ClassName.get(String.class), "tableName")
+                        .addParameter(ClassName.get(String.class), "column")
                         .addStatement("if(orderBuilder.length() != 0) queryBuilder.append(',')")
                         .addStatement("orderBuilder.append(tableName).append(column)")
                         .addStatement("orderBuilder.append($S)", " DESC ")
@@ -241,7 +241,7 @@ public class QueryBuilderGenerator {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addTypeVariable(TypeVariableName.get("Q2", Constants.queryBuilderClassName))
                 .addField(TypeVariableName.get("Q2"), "queryBuilder", Modifier.PROTECTED)
-                .addField(TypeName.get(String.class), "column",  Modifier.PROTECTED)
+                .addField(TypeName.get(String.class), "column", Modifier.PROTECTED)
 
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
@@ -358,6 +358,54 @@ public class QueryBuilderGenerator {
                         .build())
 
                 .build());
+
+            typeSpecs.add(TypeSpec.classBuilder(Constants.SELECTOR_DATE)
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .addTypeVariable(TypeVariableName.get("Q3", Constants.queryBuilderClassName))
+                    .addField(TypeVariableName.get("Q3"), "queryBuilder", Modifier.PROTECTED)
+                    .addField(TypeName.get(String.class), "column", Modifier.PROTECTED)
+
+                    .addMethod(MethodSpec.constructorBuilder()
+                            .addModifiers(Modifier.PUBLIC)
+                            .addParameter(TypeVariableName.get("Q3"), "queryBuilder")
+                            .addParameter(TypeName.get(String.class), "column")
+                            .addStatement("this.queryBuilder = queryBuilder")
+                            .addStatement("this.column = column")
+                            .build())
+
+                    .addMethod(MethodSpec.methodBuilder("equalsTo")
+                            .addModifiers(Modifier.PUBLIC)
+                            .returns(TypeVariableName.get("Q3"))
+                            .addParameter(Constants.dateClassName, "date")
+                            .addStatement("queryBuilder.appendQuery(column+\" = Datetime(?)\", new $T($S).format(date))",Constants.simpleDateFormatClassName, Constants.DATE_FORMAT)
+                            .addStatement("return queryBuilder")
+                            .build())
+
+                    .addMethod(MethodSpec.methodBuilder("notEqualsTo")
+                            .addModifiers(Modifier.PUBLIC)
+                            .returns(TypeVariableName.get("Q3"))
+                            .addParameter(Constants.dateClassName, "date")
+                            .addStatement("queryBuilder.appendQuery(column+\" != Datetime(?)\", new $T($S).format(date))", Constants.simpleDateFormatClassName, Constants.DATE_FORMAT)
+                            .addStatement("return queryBuilder")
+                            .build())
+
+                    .addMethod(MethodSpec.methodBuilder("before")
+                            .addModifiers(Modifier.PUBLIC)
+                            .returns(TypeVariableName.get("Q3"))
+                            .addParameter(Constants.dateClassName, "date")
+                            .addStatement("queryBuilder.appendQuery(column+\" < Datetime(?)\", new $T($S).format(date))", Constants.simpleDateFormatClassName, Constants.DATE_FORMAT)
+                            .addStatement("return queryBuilder")
+                            .build())
+
+                    .addMethod(MethodSpec.methodBuilder("after")
+                            .addModifiers(Modifier.PUBLIC)
+                            .returns(TypeVariableName.get("Q3"))
+                            .addParameter(Constants.dateClassName, "date")
+                            .addStatement("queryBuilder.appendQuery(column+\" < Datetime(?)\", new $T($S).format(date))", Constants.simpleDateFormatClassName, Constants.DATE_FORMAT)
+                            .addStatement("return queryBuilder")
+                            .build())
+
+                    .build());
 
         return typeSpecs;
     }

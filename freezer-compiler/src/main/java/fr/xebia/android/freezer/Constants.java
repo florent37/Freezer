@@ -3,6 +3,9 @@ package fr.xebia.android.freezer;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by florentchampigny on 18/01/2016.
  */
@@ -29,6 +32,8 @@ public class Constants {
     public static final TypeName contextClassName = ClassName.get("android.content", "Context");
     public static final TypeName cursorClassName = ClassName.get("android.database", "Cursor");
     public static final TypeName contentValuesClassName = ClassName.get("android.content", "ContentValues");
+    public static final TypeName dateClassName = ClassName.get(Date.class);
+    public static final TypeName simpleDateFormatClassName = ClassName.get(SimpleDateFormat.class);
 
     public static final String ENUM_COLUMN_ELEMENT_NAME = "column_name";
 
@@ -52,6 +57,7 @@ public class Constants {
     public static final String SELECTOR_BOOLEAN_LIST = "ListBooleanSelector";
     public static final String SELECTOR_STRING = "StringSelector";
     public static final String SELECTOR_STRING_LIST = "ListStringSelector";
+    public static final String SELECTOR_DATE = "DateSelector";
 
     public static final ClassName queryBuilder_NumberSelectorClassName = ClassName.bestGuess(Constants.DAO_PACKAGE + "." + QUERY_BUILDER_SUFFIX + "." + SELECTOR_NUMBER);
     public static final ClassName queryBuilder_ListNumberSelectorClassName = ClassName.bestGuess(Constants.DAO_PACKAGE + "." + QUERY_BUILDER_SUFFIX + "." + SELECTOR_NUMBER_LIST);
@@ -59,10 +65,13 @@ public class Constants {
     public static final ClassName queryBuilder_ListBooleanSelectorClassName = ClassName.bestGuess(Constants.DAO_PACKAGE + "." + QUERY_BUILDER_SUFFIX + "." + SELECTOR_BOOLEAN_LIST);
     public static final ClassName queryBuilder_StringSelectorClassName = ClassName.bestGuess(Constants.DAO_PACKAGE + "." + QUERY_BUILDER_SUFFIX + "." + SELECTOR_STRING);
     public static final ClassName queryBuilder_ListStringSelectorClassName = ClassName.bestGuess(Constants.DAO_PACKAGE + "." + QUERY_BUILDER_SUFFIX + "." + SELECTOR_STRING_LIST);
+    public static final ClassName queryBuilder_DateSelectorClassName = ClassName.bestGuess(Constants.DAO_PACKAGE + "." + QUERY_BUILDER_SUFFIX + "." + SELECTOR_DATE);
 
     public static final String QUERY_LOGGER = "QueryLogger";
     public static final String MODEL_ENTITY_PROXY = "Entity";
     public static final String MODEL_ENTITY_PROXY_INTERFACE = "DataBaseModel";
     public static final String MODEL_ENTITY_PROXY_GET_ID_METHOD = "getDatabaseModelId";
     public static final String MODEL_ENTITY_PROXY_SET_ID_METHOD = "setDatabaseModelId";
+
+    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 }
