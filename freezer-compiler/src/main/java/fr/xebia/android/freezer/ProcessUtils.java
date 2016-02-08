@@ -95,7 +95,7 @@ public class ProcessUtils {
         return "%s";
     }
 
-    public static String getFieldTableType(VariableElement variableElement) {
+    public static String getFieldTableType(Element variableElement) {
         TypeName typeName = getFieldClass(variableElement);
         if (typeName == TypeName.INT || typeName == TypeName.BOOLEAN || typeName == TypeName.LONG || typeName == TypeName.BYTE)
             return "integer";
@@ -417,4 +417,5 @@ public class ProcessUtils {
     public static boolean isDate(TypeName typeName) {
         return Constants.dateClassName.equals(typeName);
     }
+
 }
