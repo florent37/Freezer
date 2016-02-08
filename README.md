@@ -26,6 +26,7 @@ public class Dog {
 ```java
 @Model
 public class Cat {
+    @Id long id;
     String shortName;
 }
 ```
@@ -141,6 +142,18 @@ public class MyEntity {
 }
 ```
 
+#Id
+
+You can optionnaly set a field as an identifier:
+
+```java
+@Model
+public class MyEntity {
+    @Id long id;
+}
+```
+The identifier must be a `long
+
 #Ignore
 
 You can ignore a field:
@@ -241,7 +254,7 @@ Introduced Migration Engine.
 
 ##1.0.4
 
-- @Ignore
+- Added @Id & @Ignore
 
 #A project initiated by Xebia
 
@@ -263,9 +276,9 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  compile 'fr.xebia.android.freezer:freezer:1.0.3'
-  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.3'
-  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.3'
+  compile 'fr.xebia.android.freezer:freezer:1.0.4'
+  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.4'
+  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.4'
 }
 ```
 
