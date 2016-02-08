@@ -173,7 +173,7 @@ public class MyEntity {
     @Id long id;
 }
 ```
-The identifier must be a `long
+The identifier must be a `long`
 
 #Ignore
 
