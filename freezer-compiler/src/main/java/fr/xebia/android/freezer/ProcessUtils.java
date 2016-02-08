@@ -14,6 +14,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 
+import fr.xebia.android.freezer.annotations.Id;
 import fr.xebia.android.freezer.annotations.Ignore;
 
 /**
@@ -61,6 +62,17 @@ public class ProcessUtils {
         return filterIgnore(nonPrimitive);
     }
 
+    public static boolean hasIdField(Element element){
+        return getIdField(element) != null;
+    }
+
+    public static Element getIdField(Element element){
+        for (VariableElement e : getFields(element)) {
+            if (isIdField(e)) return e;
+        }
+        return null;
+    }
+
     public static String getFieldType(VariableElement variableElement) {
         TypeName typeName = getFieldClass(variableElement);
         if (typeName == TypeName.INT || typeName == TypeName.BOOLEAN || typeName == TypeName.BYTE)
@@ -96,6 +108,10 @@ public class ProcessUtils {
 
     public static String getObjectName(Element element) {
         return element.getSimpleName().toString();
+    }
+
+    public static boolean isIdField(Element element) {
+        return element.getAnnotation(Id.class) != null && TypeName.LONG.equals(TypeName.get(element.asType()));
     }
 
     public static String getObjectPackage(Element element) {

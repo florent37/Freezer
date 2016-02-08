@@ -1,5 +1,6 @@
 package com.github.florent37.orm.model;
 
+import fr.xebia.android.freezer.annotations.Id;
 import fr.xebia.android.freezer.annotations.Ignore;
 import fr.xebia.android.freezer.annotations.Model;
 
@@ -12,11 +13,15 @@ import java.util.List;
 @Model
 public class Cat {
 
+    @Id
+    long id;
+
     String shortName;
     Date date;
 
     String notIgnored;
-    @Ignore String ignoreThis;
+    @Ignore
+    String ignoreThis;
 
     public Cat() {
     }
@@ -36,5 +41,9 @@ public class Cat {
 
     public Date getDate() {
         return date;
+    }
+
+    public long getId() {
+        return id;
     }
 }
