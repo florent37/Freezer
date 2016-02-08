@@ -17,9 +17,9 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  compile 'fr.xebia.android.freezer:freezer:1.0.3'
-  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.3'
-  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.3'
+  compile 'fr.xebia.android.freezer:freezer:1.0.4'
+  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.4'
+  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.4'
 }
 ```
 
@@ -47,6 +47,7 @@ public class Dog {
 ```java
 @Model
 public class Cat {
+    @Id long id;
     String shortName;
 }
 ```
@@ -162,6 +163,31 @@ public class MyEntity {
 }
 ```
 
+#Id
+
+You can optionnaly set a field as an identifier:
+
+```java
+@Model
+public class MyEntity {
+    @Id long id;
+}
+```
+The identifier must be a `long
+
+#Ignore
+
+You can ignore a field:
+
+```java
+@Model
+public class MyEntity {
+    @Ignore
+    int field;    
+}
+```
+
+
 #Logging
 
 You can log all SQL queries from entities managers:
@@ -225,11 +251,8 @@ Migration isn't yet capable of:
 
 - Update an entry
 - Improve migration
-- Add some selectors operations (like, ...)
 - Add Observable support
 - Provide an Asynchronous API
-- Add `@Ignore` annotation
-- Add unit tests
 
 #Changelog
 
@@ -249,6 +272,10 @@ Introduced Migration Engine.
 - Support dates
 - Added unit tests
 - Fixed one to many
+
+##1.0.4
+
+- Added @Id & @Ignore
 
 #A project initiated by Xebia
 

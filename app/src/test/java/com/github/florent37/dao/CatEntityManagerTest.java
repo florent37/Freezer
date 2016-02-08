@@ -43,6 +43,7 @@ public class CatEntityManagerTest {
 
         //then
         assertThat(catEntityManager.count()).isEqualTo(1);
+        assertThat(cat.getId()).isNotEqualTo(0);
     }
 
     @Test

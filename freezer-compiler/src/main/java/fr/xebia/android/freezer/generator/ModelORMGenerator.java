@@ -39,6 +39,7 @@ public class ModelORMGenerator {
     TypeSpec queryBuilder;
     TypeSpec dao;
 
+    Element fieldId;
     List<VariableElement> fields;
     List<VariableElement> otherClassFields;
     List<VariableElement> collections;
@@ -58,6 +59,8 @@ public class ModelORMGenerator {
         this.fields = ProcessUtils.getPrimitiveFields(element);
         this.otherClassFields = ProcessUtils.getNonPrimitiveClassFields(element);
         this.collections = ProcessUtils.getCollectionsOfPrimitiveFields(element);
+
+        this.fieldId = ProcessUtils.getIdField(element);
     }
 
     public TypeSpec getDao() {
@@ -369,7 +372,6 @@ public class ModelORMGenerator {
                 else
                     selector = ParameterizedTypeName.get(className, queryBuilderClassName);
 
-
                 methodSpecs.add(MethodSpec.methodBuilder(variableElement.getSimpleName().toString())
                         .returns(selector)
                         .addModifiers(Modifier.PUBLIC)
@@ -444,14 +446,21 @@ public class ModelORMGenerator {
 
     protected String generateTableCreate() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < fields.size(); ++i) {
-            VariableElement variableElement = fields.get(i);
+
+        //filter / remove fieldId
+        List<Element> elements = new ArrayList<>();
+        for (VariableElement variableElement : fields)
+            if (variableElement != fieldId)
+                elements.add(variableElement);
+
+        for (int i = 0; i < elements.size(); ++i) {
+            Element variableElement = elements.get(i);
             if (!Constants.FIELD_ID.equals(variableElement.getSimpleName().toString())) {
                 stringBuilder
                         .append(variableElement.getSimpleName())
                         .append(" ")
                         .append(ProcessUtils.getFieldTableType(variableElement));
-                if (i < fields.size() - 1)
+                if (i < elements.size() - 1)
                     stringBuilder.append(", ");
             }
         }

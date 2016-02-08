@@ -39,7 +39,11 @@ import fr.xebia.android.freezer.generator.QueryLoggerGenerator;
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes(
-        {"fr.xebia.android.freezer.annotations.Model", "fr.xebia.android.freezer.annotations.Migration"})
+        {
+                "fr.xebia.android.freezer.annotations.Model",
+                "fr.xebia.android.freezer.annotations.Migration",
+                "fr.xebia.android.freezer.annotations.Ignore"
+        })
 @AutoService(javax.annotation.processing.Processor.class)
 public class Processor extends AbstractProcessor {
 

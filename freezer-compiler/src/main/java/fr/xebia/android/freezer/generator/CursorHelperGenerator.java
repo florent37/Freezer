@@ -64,7 +64,7 @@ public class CursorHelperGenerator {
                             .addStatement("if(date$L != null) object.$L = new $T($S).parse(date$L)",
                                     i, variableElement.getSimpleName(), Constants.simpleDateFormatClassName, Constants.DATE_FORMAT, i)
                             .addCode("} catch ($T e) { e.printStackTrace(); }", TypeName.get(Exception.class));
-                } else {
+                } else if (!ProcessUtils.isIdField(variableElement)){
                     cursor = String.format(ProcessUtils.getFieldCast(variableElement), cursor);
 
                     fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement), variableElement.getSimpleName());
@@ -110,7 +110,7 @@ public class CursorHelperGenerator {
             if (ProcessUtils.isPrimitive(variableElement)) {
                 if (ProcessUtils.isDate(variableElement)) {
                     getValuesB.addStatement("if(object.$L != null) values.put($S, new $T($S).format(object.$L))", variableElement.getSimpleName(), variableElement.getSimpleName(), Constants.simpleDateFormatClassName, Constants.DATE_FORMAT, variableElement.getSimpleName());
-                } else {
+                } else if(!ProcessUtils.isIdField(variableElement)) {
                     String statement = "values.put($S,object.$L)";
                     if (ProcessUtils.isModelId(variableElement))
                         statement = "if(" + ProcessUtils.getCursorHelperName("object") + " != 0) " + statement;
@@ -176,6 +176,10 @@ public class CursorHelperGenerator {
                 .addParameter(Constants.databaseClassName, "database")
                 .addParameter(modelType, "object")
                 .addStatement("long objectId = database.insert($S, null, getValues(object,null))", ProcessUtils.getTableName(objectName));
+
+        Element idField = ProcessUtils.getIdField(element);
+        if(idField != null)
+            insertB.addStatement("object.$L = objectId",ProcessUtils.getObjectName(idField));
 
         for (VariableElement variableElement : otherClassFields) {
             insertB.addStatement("$T.insertFor$L(database,object.$L, objectId , $S)", ProcessUtils.getFieldCursorHelperClass(variableElement), objectName, ProcessUtils.getObjectName(variableElement), ProcessUtils.getObjectName(variableElement));
