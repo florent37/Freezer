@@ -4,6 +4,27 @@
 
 [![logo freezer](https://raw.githubusercontent.com/florent37/Freezer/master/freezer-logo.png)](https://github.com/florent37/Freezer)
 
+#Download
+
+[ ![Download](https://api.bintray.com/packages/florent37/maven/freezer-compiler/images/download.svg) ](https://bintray.com/florent37/maven/freezer-compiler/_latestVersion)
+```java
+buildscript {
+  dependencies {
+    classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+  }
+}
+
+apply plugin: 'com.neenbedankt.android-apt'
+
+dependencies {
+  compile 'fr.xebia.android.freezer:freezer:1.0.4'
+  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.4'
+  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.4'
+}
+```
+
+#Usage
+
 Use Annotations to mark classes to be persisted:
 
 ```java
@@ -262,25 +283,6 @@ This project was first developed by Xebia and has been open-sourced since. We wi
 We encourage the community to contribute to the project by opening tickets and/or pull requests.
 
 [![logo xebia](https://raw.githubusercontent.com/florent37/Freezer/master/logo_xebia.jpg)](http://www.xebia.fr/)
-
-#Download
-
-[ ![Download](https://api.bintray.com/packages/florent37/maven/freezer-compiler/images/download.svg) ](https://bintray.com/florent37/maven/freezer-compiler/_latestVersion)
-```java
-buildscript {
-  dependencies {
-    classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-  }
-}
-
-apply plugin: 'com.neenbedankt.android-apt'
-
-dependencies {
-  compile 'fr.xebia.android.freezer:freezer:1.0.4'
-  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.4'
-  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.4'
-}
-```
 
 License
 --------
