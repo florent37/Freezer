@@ -54,7 +54,9 @@ public class ColumnType {
         Int("number"),
         Float("real"),
         Boolean("number"),
-        String("text");
+        String("text"),
+        Date("text"),
+        ;
 
         private String sqlName;
 
