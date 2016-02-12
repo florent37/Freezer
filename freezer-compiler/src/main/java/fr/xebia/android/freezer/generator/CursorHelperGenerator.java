@@ -64,7 +64,7 @@ public class CursorHelperGenerator {
                             .addStatement("if(date$L != null) object.$L = new $T($S).parse(date$L)",
                                     i, variableElement.getSimpleName(), Constants.simpleDateFormatClassName, Constants.DATE_FORMAT, i)
                             .addCode("} catch ($T e) { e.printStackTrace(); }", TypeName.get(Exception.class));
-                } else if (!ProcessUtils.isIdField(variableElement)){
+                } else if (!ProcessUtils.isIdField(variableElement)) {
                     cursor = String.format(ProcessUtils.getFieldCast(variableElement), cursor);
 
                     fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement), variableElement.getSimpleName());
@@ -110,7 +110,7 @@ public class CursorHelperGenerator {
             if (ProcessUtils.isPrimitive(variableElement)) {
                 if (ProcessUtils.isDate(variableElement)) {
                     getValuesB.addStatement("if(object.$L != null) values.put($S, new $T($S).format(object.$L))", variableElement.getSimpleName(), variableElement.getSimpleName(), Constants.simpleDateFormatClassName, Constants.DATE_FORMAT, variableElement.getSimpleName());
-                } else if(!ProcessUtils.isIdField(variableElement)) {
+                } else if (!ProcessUtils.isIdField(variableElement)) {
                     String statement = "values.put($S,object.$L)";
                     if (ProcessUtils.isModelId(variableElement))
                         statement = "if(" + ProcessUtils.getCursorHelperName("object") + " != 0) " + statement;
@@ -168,7 +168,7 @@ public class CursorHelperGenerator {
 
     }
 
-    protected List<MethodSpec> generateUpdateMethod(){
+    protected List<MethodSpec> generateUpdateMethod() {
         List<MethodSpec> methodSpecs = new ArrayList<>();
 
         MethodSpec.Builder updateB = MethodSpec.methodBuilder("update")
@@ -177,27 +177,103 @@ public class CursorHelperGenerator {
                 .addParameter(Constants.databaseClassName, "database")
                 .addParameter(modelType, "object");
 
-        updateB.addStatement("Long id = null");
-
         Element idField = ProcessUtils.getIdField(element);
-        if(idField != null) {
-            updateB.addStatement("id = object.$L", ProcessUtils.getObjectName(idField));
-        }else{
-            updateB.addStatement("if(object instanceof $T) id = $L", Constants.entityProxyClass, ProcessUtils.getModelId("object"));
+        if (idField != null) {
+            updateB.addStatement("Long objectId = object.$L", ProcessUtils.getObjectName(idField));
+        } else {
+            updateB.addStatement("Long objectId = null");
+            updateB.addStatement("if(object instanceof $T) objectId = $L", Constants.entityProxyClass, ProcessUtils.getModelId("object"));
         }
 
-        updateB.beginControlFlow("if(id != null)");
-        updateB.addStatement("database.update($S, getValues(object,null), $S, new String[]{String.valueOf(id)})", ProcessUtils.getTableName(objectName), Constants.FIELD_ID + " = ?");
+        updateB.beginControlFlow("if(objectId != null)");
+        updateB.addStatement("database.update($S, getValues(object,null), $S, new String[]{String.valueOf(objectId)})", ProcessUtils.getTableName(objectName), Constants.FIELD_ID + " = ?");
 
-        for (int i = 0; i < collections.size(); ++i) {
-            VariableElement variableElement = collections.get(i);
-            updateB.addStatement("if(object.$L != null) $T.$L(database,objectId,$S,object.$L)", ProcessUtils.getObjectName(variableElement), Constants.primitiveCursorHelper, ProcessUtils.addPrimitiveCursorHelperFunction(variableElement), ProcessUtils.getObjectName(variableElement), ProcessUtils.getObjectName(variableElement));
-        }
+        //for (int i = 0; i < collections.size(); ++i) {
+        //    VariableElement variableElement = collections.get(i);
+        //    updateB.addStatement("if(object.$L != null) $T.$L(database,objectId,$S,object.$L)", ProcessUtils.getObjectName(variableElement), Constants.primitiveCursorHelper, ProcessUtils.addPrimitiveCursorHelperFunction(variableElement), ProcessUtils.getObjectName(variableElement), ProcessUtils.getObjectName(variableElement));
+        //}
 
         updateB.endControlFlow();
-        updateB.addStatement("return id");
 
-        methodSpecs.add(updateB.build());
+        for (VariableElement variableElement : otherClassFields) {
+            updateB.addStatement("$T.updateFor$L(database,object.$L, objectId , $S)", ProcessUtils.getFieldCursorHelperClass(variableElement), objectName, ProcessUtils.getObjectName(variableElement), ProcessUtils.getObjectName(variableElement));
+
+            String JOINTABLE = ProcessUtils.getTableName(objectName) + "_" + ProcessUtils.getTableName(variableElement);
+
+            MethodSpec.Builder updateForB = MethodSpec.methodBuilder("updateFor" + objectName)
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .addParameter(Constants.databaseClassName, "database")
+                    .addParameter(ProcessUtils.getFieldClass(variableElement), "child")
+                    .addParameter(TypeName.LONG, "parentId")
+                    .addParameter(ClassName.get(String.class), "variable")
+
+                    .beginControlFlow("if(child == null)")
+                    .addStatement("database.delete($S, \"$L = ? AND $L = ?\", new String[]{String.valueOf(parentId), variable})", JOINTABLE, ProcessUtils.getKeyName(objectName), Constants.FIELD_NAME)
+                    .endControlFlow()
+
+                    .beginControlFlow("else");
+
+            Element idFieldChild = ProcessUtils.getIdField(variableElement);
+            if (idFieldChild != null) {
+                updateForB.addStatement("Long = objectId = child.$L", ProcessUtils.getObjectName(idFieldChild));
+            } else {
+                updateForB.addStatement("Long objectId = null");
+                updateForB.addStatement("if(child instanceof $T) objectId = $L", Constants.entityProxyClass, ProcessUtils.getModelId("child"));
+            }
+
+            updateForB
+                    .beginControlFlow("if(objectId != null)")
+                    .addStatement("update(database,child)")
+                    .endControlFlow()
+
+                    .beginControlFlow("else")
+                    .addStatement("insertFor$L(database,child,parentId,variable)", objectName)
+                    .endControlFlow()
+
+                    .endControlFlow();
+
+            MethodSpec update = updateForB.build();
+
+            MethodSpec.Builder updateAllB = MethodSpec.methodBuilder("updateFor" + objectName)
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .addParameter(Constants.databaseClassName, "database")
+                    .addParameter(ProcessUtils.listOf(ProcessUtils.getFieldClass(variableElement)), "objects")
+                    .addParameter(TypeName.LONG, "parentId")
+                    .addParameter(ClassName.get(String.class), "variable")
+
+                    .beginControlFlow("if(objects == null)") //user.cats became null
+                    .addStatement("database.delete($S, \"$L = ? AND $L = ?\", new String[]{String.valueOf(parentId), variable})", JOINTABLE, ProcessUtils.getKeyName(objectName), Constants.FIELD_NAME)
+                    .endControlFlow()
+
+                    .beginControlFlow("else")
+
+                    .addStatement("$T cursor = database.rawQuery(\"SELECT count(*) $L WHERE $L = ? AND $L= ?\", new String[]{String.valueOf(parentId), variable})", Constants.cursorClassName, JOINTABLE, ProcessUtils.getIdField(element), Constants.FIELD_NAME)
+                    .addStatement("cursor.moveToNext()")
+
+                    .beginControlFlow("if (cursor.getInt(0) == 0) ") //user.cats was null
+                    .addStatement("insertFor$L(database, objects, parentId, variable)", objectName)
+
+                    .endControlFlow()
+                    .beginControlFlow("else")
+
+                            //added a child
+
+                            //or
+
+                            //modified childs
+
+                            //or
+
+                            //removed a child
+
+                    .endControlFlow()
+
+                    .endControlFlow();
+
+            dependencies.add(new Dependency(ProcessUtils.getFieldClass(variableElement), Arrays.asList(update, updateAllB.build())));
+        }
+
+        methodSpecs.add(updateB.addStatement("return objectId").build());
 
         methodSpecs.add(MethodSpec.methodBuilder("update")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -220,8 +296,8 @@ public class CursorHelperGenerator {
                 .addStatement("long objectId = database.insert($S, null, getValues(object,null))", ProcessUtils.getTableName(objectName));
 
         Element idField = ProcessUtils.getIdField(element);
-        if(idField != null)
-            insertB.addStatement("object.$L = objectId",ProcessUtils.getObjectName(idField));
+        if (idField != null)
+            insertB.addStatement("object.$L = objectId", ProcessUtils.getObjectName(idField));
 
         for (VariableElement variableElement : otherClassFields) {
             insertB.addStatement("$T.insertFor$L(database,object.$L, objectId , $S)", ProcessUtils.getFieldCursorHelperClass(variableElement), objectName, ProcessUtils.getObjectName(variableElement), ProcessUtils.getObjectName(variableElement));
