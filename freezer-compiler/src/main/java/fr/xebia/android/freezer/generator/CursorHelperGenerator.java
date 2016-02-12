@@ -163,8 +163,50 @@ public class CursorHelperGenerator {
                 .addMethod(get)
                 .addMethods(joinMethods)
                 .addMethods(generateInsertMethods())
+                .addMethods(generateUpdateMethod())
                 .build();
 
+    }
+
+    protected List<MethodSpec> generateUpdateMethod(){
+        List<MethodSpec> methodSpecs = new ArrayList<>();
+
+        MethodSpec.Builder updateB = MethodSpec.methodBuilder("update")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(TypeName.LONG)
+                .addParameter(Constants.databaseClassName, "database")
+                .addParameter(modelType, "object");
+
+        updateB.addStatement("Long id = null");
+
+        Element idField = ProcessUtils.getIdField(element);
+        if(idField != null) {
+            updateB.addStatement("id = object.$L", ProcessUtils.getObjectName(idField));
+        }else{
+            updateB.addStatement("if(object instanceof $T) id = $L", Constants.entityProxyClass, ProcessUtils.getModelId("object"));
+        }
+
+        updateB.beginControlFlow("if(id != null)");
+        updateB.addStatement("database.update($S, getValues(object,null), $S, new String[]{String.valueOf(id)})", ProcessUtils.getTableName(objectName), Constants.FIELD_ID + " = ?");
+
+        for (int i = 0; i < collections.size(); ++i) {
+            VariableElement variableElement = collections.get(i);
+            updateB.addStatement("if(object.$L != null) $T.$L(database,objectId,$S,object.$L)", ProcessUtils.getObjectName(variableElement), Constants.primitiveCursorHelper, ProcessUtils.addPrimitiveCursorHelperFunction(variableElement), ProcessUtils.getObjectName(variableElement), ProcessUtils.getObjectName(variableElement));
+        }
+
+        updateB.endControlFlow();
+        updateB.addStatement("return id");
+
+        methodSpecs.add(updateB.build());
+
+        methodSpecs.add(MethodSpec.methodBuilder("update")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(Constants.databaseClassName, "database")
+                .addParameter(ProcessUtils.listOf(modelType), "objects")
+                .addStatement("for($T object : objects) update(database,object)", modelType)
+                .build());
+
+        return methodSpecs;
     }
 
     protected List<MethodSpec> generateInsertMethods() {
@@ -228,18 +270,6 @@ public class CursorHelperGenerator {
                     .addStatement("return values").build();
 
             dependencies.add(new Dependency(ProcessUtils.getFieldClass(variableElement), Arrays.asList(insert, insertAll, getTABLE_NAMEvalues)));
-
-            //String JOINTABLE = TABLE_NAME + "_" + ProcessUtils.getTableName(variableElement);
-            //if (!ProcessUtils.isCollection(variableElement)) {
-            //    addB.addStatement("if(object.$L != null) object.$L._id = database.insert($S, null, $T.getValues(object.$L,$S))", ProcessUtils.getObjectName(variableElement), ProcessUtils.getObjectName(variableElement), ProcessUtils.getTableName(variableElement), ProcessUtils.getFieldCursorHelperClass(variableElement), ProcessUtils.getObjectName(variableElement), ProcessUtils.getObjectName(variableElement));
-            //} else {
-            //    addB.beginControlFlow("if(object.$L != null)", ProcessUtils.getObjectName(variableElement))
-            //            .beginControlFlow("for($T child : object.$L)", ProcessUtils.getFieldClass(variableElement), ProcessUtils.getObjectName(variableElement))
-            //            .addStatement("child._id = database.insert($S, null, $T.getValues(child,null))", ProcessUtils.getTableName(variableElement), ProcessUtils.getFieldCursorHelperClass(variableElement))
-            //            .addStatement("database.insert($S, null, $T.get$LValues(object._id,child._id, $S))", JOINTABLE, modelCursorHelperClassName, JOINTABLE, ProcessUtils.getObjectName(variableElement))
-            //            .endControlFlow()
-            //            .endControlFlow();
-            //}
         }
 
         for (int i = 0; i < collections.size(); ++i) {
