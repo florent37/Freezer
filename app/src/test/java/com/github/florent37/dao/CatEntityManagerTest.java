@@ -82,6 +82,25 @@ public class CatEntityManagerTest {
     }
 
     @Test
+    public void shouldGetCatWithCustomDate_notEquals(){
+        //given
+        Date date = new Date(System.currentTimeMillis() - 60 * 1000);
+
+        Cat cat1 = new Cat("Java",date);
+        Cat cat2 = new Cat("Blob",new Date(System.currentTimeMillis() + 60 * 1000));
+
+        //when
+        catEntityManager.add(cat1);
+        catEntityManager.add(cat2);
+
+        List<Cat> cats = catEntityManager.select().date().notEqualsTo(date).asList();
+
+        //then
+        assertThat(cats).hasSize(1);
+        assertThat(cats.get(0).getShortName()).isEqualTo("Blob");
+    }
+
+    @Test
     public void shouldGetCatWithCustomDate_before(){
         //given
         Date now = new Date(System.currentTimeMillis());
@@ -117,6 +136,30 @@ public class CatEntityManagerTest {
         //then
         assertThat(cats).hasSize(1);
         assertThat(cats.get(0).getShortName()).isEqualTo("Blob");
+    }
+
+    @Test
+    public void shouldGetCatWithCustomDate_between(){
+        //given
+        Date now = new Date(System.currentTimeMillis());
+
+        Cat cat1 = new Cat("Java",new Date(now.getTime()));
+        Cat cat2 = new Cat("Blob",new Date(now.getTime()));
+        Cat cat3 = new Cat("Baba",new Date(now.getTime() - 120 * 1000 * 1000));
+        Cat cat4 = new Cat("Cece",new Date(now.getTime() + 120 * 1000 * 1000));
+
+        //when
+        catEntityManager.add(cat1);
+        catEntityManager.add(cat2);
+        catEntityManager.add(cat3);
+        catEntityManager.add(cat4);
+
+        List<Cat> cats = catEntityManager.select().date().between(new Date(now.getTime() - 60 * 1000 * 1000), new Date(now.getTime() + 60 * 1000 * 1000)).asList();
+
+        //then
+        assertThat(cats).hasSize(2);
+        assertThat(cats.get(0).getShortName()).isEqualTo("Java");
+        assertThat(cats.get(1).getShortName()).isEqualTo("Blob");
     }
 
     @Test

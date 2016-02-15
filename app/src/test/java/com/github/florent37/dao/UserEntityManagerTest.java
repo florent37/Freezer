@@ -129,6 +129,78 @@ public class UserEntityManagerTest {
     }
 
     @Test
+    public void testSelectUserFromBoolean_equalsTrue() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
+                new User(30, "kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty")), true),
+                new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")), false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        User userFromBase = userEntityManager.select().hacker().equalsTo(true).first();
+
+        //then
+        assertThat(userFromBase).isNotNull();
+        assertThat(userFromBase.getName()).isEqualTo("florent");
+    }
+
+    @Test
+    public void testSelectUserFromBoolean_isTrue() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
+                new User(30, "kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty")), true),
+                new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")), false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        User userFromBase = userEntityManager.select().hacker().isTrue().first();
+
+        //then
+        assertThat(userFromBase).isNotNull();
+        assertThat(userFromBase.getName()).isEqualTo("florent");
+    }
+
+    @Test
+    public void testSelectUserFromBoolean_equalsFalse() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
+                new User(30, "kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty")), true),
+                new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")), false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        User userFromBase = userEntityManager.select().hacker().equalsTo(false).first();
+
+        //then
+        assertThat(userFromBase).isNotNull();
+        assertThat(userFromBase.getName()).isEqualTo("alex");
+    }
+
+    @Test
+    public void testSelectUserFromBoolean_isFalse() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
+                new User(30, "kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty")), true),
+                new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")), false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        User userFromBase = userEntityManager.select().hacker().isFalse().first();
+
+        //then
+        assertThat(userFromBase).isNotNull();
+        assertThat(userFromBase.getName()).isEqualTo("alex");
+    }
+
+    @Test
     public void testUpdateUser_onlyFields() throws Exception{
         //given
         userEntityManager.add(new User(30, "blob", null, null, true));
