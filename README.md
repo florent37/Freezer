@@ -17,9 +17,9 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  compile 'fr.xebia.android.freezer:freezer:1.0.4'
-  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.4'
-  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.4'
+  compile 'fr.xebia.android.freezer:freezer:1.0.5'
+  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.5'
+  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.5'
 }
 ```
 
@@ -182,7 +182,7 @@ public class MyEntity {
     @Id long id;
 }
 ```
-The identifier must be a `long
+The identifier must be a `long`
 
 #Ignore
 
