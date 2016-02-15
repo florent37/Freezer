@@ -119,4 +119,21 @@ public class CatEntityManagerTest {
         assertThat(cats.get(0).getShortName()).isEqualTo("Blob");
     }
 
+    @Test
+    public void testUpdateCat_onlyFields() throws Exception{
+        //given
+        Cat cat = new Cat("toto");
+        catEntityManager.add(cat);
+        assertThat(catEntityManager.count()).isEqualTo(1);
+
+        //when
+        cat.setShortName("mimi");
+        catEntityManager.update(cat);
+
+        //then
+        assertThat(catEntityManager.count()).isEqualTo(1);
+        Cat catFromBase = catEntityManager.select().first();
+        assertThat(catFromBase.getShortName()).isEqualTo("mimi");
+    }
+
 }

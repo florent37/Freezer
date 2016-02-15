@@ -212,13 +212,14 @@ public class CursorHelperGenerator {
                     .endControlFlow()
 
                     .beginControlFlow("else");
-
-            Element idFieldChild = ProcessUtils.getIdField(variableElement);
-            if (idFieldChild != null) {
-                updateForB.addStatement("Long = objectId = child.$L", ProcessUtils.getObjectName(idFieldChild));
-            } else {
-                updateForB.addStatement("Long objectId = null");
-                updateForB.addStatement("if(child instanceof $T) objectId = $L", Constants.entityProxyClass, ProcessUtils.getModelId("child"));
+            {
+                Element idFieldChild = ProcessUtils.getIdField(variableElement);
+                if (idFieldChild != null) {
+                    updateForB.addStatement("Long = objectId = child.$L", ProcessUtils.getObjectName(idFieldChild));
+                } else {
+                    updateForB.addStatement("Long objectId = null");
+                    updateForB.addStatement("if(child instanceof $T) objectId = $L", Constants.entityProxyClass, ProcessUtils.getModelId("child"));
+                }
             }
 
             updateForB
@@ -241,33 +242,32 @@ public class CursorHelperGenerator {
                     .addParameter(TypeName.LONG, "parentId")
                     .addParameter(ClassName.get(String.class), "variable")
 
-                    .beginControlFlow("if(objects == null)") //user.cats became null
                     .addStatement("database.delete($S, \"$L = ? AND $L = ?\", new String[]{String.valueOf(parentId), variable})", JOINTABLE, ProcessUtils.getKeyName(objectName), Constants.FIELD_NAME)
+                    .beginControlFlow("if(objects != null)")
+                    .beginControlFlow("for($T child : objects)", ProcessUtils.getFieldClass(variableElement));
+
+            {
+                Element idFieldChild = ProcessUtils.getIdField(variableElement);
+                if (idFieldChild != null) {
+                    updateAllB.addStatement("Long = objectId = child.$L", ProcessUtils.getObjectName(idFieldChild));
+                } else {
+                    updateAllB.addStatement("Long objectId = null");
+                    updateAllB.addStatement("if(child instanceof $T) objectId = $L", Constants.entityProxyClass, ProcessUtils.getModelId("child"));
+                }
+
+                updateAllB
+                        .beginControlFlow("if(objectId != null)")
+                        .addStatement("update(database,child)")
+                        .addStatement("database.insert($S, null, get$LValues(parentId, objectId, variable))", JOINTABLE, JOINTABLE)
+                        .endControlFlow()
+
+                        .beginControlFlow("else")
+                        .addStatement("insertFor$L(database,child,parentId,variable)", objectName)
+                        .endControlFlow();
+            }
+
+            updateAllB
                     .endControlFlow()
-
-                    .beginControlFlow("else")
-
-                    .addStatement("$T cursor = database.rawQuery(\"SELECT count(*) $L WHERE $L = ? AND $L= ?\", new String[]{String.valueOf(parentId), variable})", Constants.cursorClassName, JOINTABLE, ProcessUtils.getIdField(element), Constants.FIELD_NAME)
-                    .addStatement("cursor.moveToNext()")
-
-                    .beginControlFlow("if (cursor.getInt(0) == 0) ") //user.cats was null
-                    .addStatement("insertFor$L(database, objects, parentId, variable)", objectName)
-
-                    .endControlFlow()
-                    .beginControlFlow("else")
-
-                            //added a child
-
-                            //or
-
-                            //modified childs
-
-                            //or
-
-                            //removed a child
-
-                    .endControlFlow()
-
                     .endControlFlow();
 
             dependencies.add(new Dependency(ProcessUtils.getFieldClass(variableElement), Arrays.asList(update, updateAllB.build())));

@@ -40,7 +40,7 @@ public class UserEntityManagerTest {
     }
 
     @Test
-    public void shouldAddUser(){
+    public void shouldAddUser() {
         //given
         User user = new User(21, "florent");
 
@@ -53,7 +53,7 @@ public class UserEntityManagerTest {
     }
 
     @Test
-    public void shouldAddUsers(){
+    public void shouldAddUsers() {
         //given
         List<User> users = Arrays.asList(
                 new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
@@ -71,9 +71,8 @@ public class UserEntityManagerTest {
 
     }
 
-
     @Test
-    public void shouldAddUsers_withCatDogs(){
+    public void shouldAddUsers_withCatDogs() {
         //given
         User user = new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true);
 
@@ -94,7 +93,7 @@ public class UserEntityManagerTest {
     }
 
     @Test
-    public void testSelectUserFromAge(){
+    public void testSelectUserFromAge() {
         //given
         List<User> users = Arrays.asList(
                 new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
@@ -112,7 +111,7 @@ public class UserEntityManagerTest {
     }
 
     @Test
-    public void testSelectUsersFromAge(){
+    public void testSelectUsersFromAge() {
         //given
         List<User> users = Arrays.asList(
                 new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
@@ -128,5 +127,168 @@ public class UserEntityManagerTest {
         assertThat(usersFromBase).isNotNull();
         assertThat(usersFromBase).hasSize(2);
     }
+
+    @Test
+    public void testUpdateUser_onlyFields() throws Exception{
+        //given
+        userEntityManager.add(new User(30, "blob", null, null, true));
+
+        //when
+        User userFromBase = userEntityManager.select().name().equalsTo("blob").first();
+        userFromBase.setAge(10);
+        userEntityManager.update(userFromBase);
+
+        //then
+        assertThat(userEntityManager.count()).isEqualTo(1);
+        User userFromBase2 = userEntityManager.select().name().equalsTo("blob").first();
+        assertThat(userFromBase2.getAge()).isEqualTo(10);
+    }
+
+    @Test
+    public void testUpdateUser_oneToOne_nullToValue() throws Exception{
+        //given
+        userEntityManager.add(new User(30, "blob", null, null, true));
+
+        //when
+        User userFromBase = userEntityManager.select().name().equalsTo("blob").first();
+        userFromBase.setCat(new Cat("java"));
+        userEntityManager.update(userFromBase);
+
+        //then
+        assertThat(userEntityManager.count()).isEqualTo(1);
+        assertThat(catEntityManager.count()).isEqualTo(1);
+        User userFromBase2 = userEntityManager.select().name().equalsTo("blob").first();
+        assertThat(userFromBase2.getCat()).isNotNull();
+        assertThat(userFromBase2.getCat().getShortName()).isEqualTo("java");
+    }
+
+    @Test
+    public void testUpdateUser_oneToOne_valueToNull() throws Exception{
+        //given
+        userEntityManager.add(new User(30, "blob", new Cat("java"), null, true));
+
+        //when
+        User userFromBase = userEntityManager.select().name().equalsTo("blob").first();
+        userFromBase.setCat(null);
+        userEntityManager.update(userFromBase);
+
+        //then
+        assertThat(userEntityManager.count()).isEqualTo(1);
+        assertThat(catEntityManager.count()).isEqualTo(1);
+        User userFromBase2 = userEntityManager.select().name().equalsTo("blob").first();
+        assertThat(userFromBase2.getCat()).isNull();
+    }
+
+    @Test
+    public void testUpdateUser_oneToOne_updateValue() throws Exception{
+        //given
+        userEntityManager.add(new User(30, "blob", new Cat("java"), null, true));
+
+        //when
+        User userFromBase = userEntityManager.select().name().equalsTo("blob").first();
+        userFromBase.getCat().setShortName("lili");
+        userEntityManager.update(userFromBase);
+
+        //then
+        assertThat(userEntityManager.count()).isEqualTo(1);
+        assertThat(catEntityManager.count()).isEqualTo(1);
+        User userFromBase2 = userEntityManager.select().name().equalsTo("blob").first();
+        assertThat(userFromBase2.getCat()).isNotNull();
+        assertThat(userFromBase2.getCat().getShortName()).isEqualTo("lili");
+    }
+
+    @Test
+    public void testUpdateUser_oneToMany_nullToValue() throws Exception{
+        //given
+        userEntityManager.add(new User(30, "blob", null, null, true));
+
+        //when
+        User userFromBase = userEntityManager.select().name().equalsTo("blob").first();
+        userFromBase.setDogs(Arrays.asList(new Dog("a"), new Dog("b")));
+        userEntityManager.update(userFromBase);
+
+        //then
+        assertThat(userEntityManager.count()).isEqualTo(1);
+        assertThat(dogEntityManager.count()).isEqualTo(2);
+        User userFromBase2 = userEntityManager.select().name().equalsTo("blob").first();
+        assertThat(userFromBase2.getDogs()).hasSize(2);
+        assertThat(userFromBase2.getDogs().get(0).getName()).isEqualTo("a");
+        assertThat(userFromBase2.getDogs().get(1).getName()).isEqualTo("b");
+    }
+
+    @Test
+    public void testUpdateUser_oneToMany_valueToNull() throws Exception{
+        //given
+        userEntityManager.add(new User(30, "blob", null, Arrays.asList(new Dog("a"), new Dog("b")), true));
+
+        //when
+        User userFromBase = userEntityManager.select().name().equalsTo("blob").first();
+        assertThat(userFromBase.getDogs()).hasSize(2);
+        userFromBase.setDogs(null);
+        userEntityManager.update(userFromBase);
+
+        //then
+        assertThat(userEntityManager.count()).isEqualTo(1);
+        assertThat(dogEntityManager.count()).isEqualTo(2); //TODO
+        User userFromBase2 = userEntityManager.select().name().equalsTo("blob").first();
+        assertThat(userFromBase2.getDogs()).isNull();
+    }
+
+    @Test
+    public void testUpdateUser_oneToMany_valueAdded() throws Exception{
+        //given
+        userEntityManager.add(new User(30, "blob", null, Arrays.asList(new Dog("a"), new Dog("b")), true));
+
+        //when
+        User userFromBase = userEntityManager.select().name().equalsTo("blob").first();
+        assertThat(userFromBase.getDogs()).hasSize(2);
+        userFromBase.getDogs().add(new Dog("c"));
+        userEntityManager.update(userFromBase);
+
+        //then
+        assertThat(userEntityManager.count()).isEqualTo(1);
+        //TODO assertThat(dogEntityManager.count()).isEqualTo(2);
+        User userFromBase2 = userEntityManager.select().name().equalsTo("blob").first();
+        assertThat(userFromBase2.getDogs()).hasSize(3);
+    }
+
+    @Test
+    public void testUpdateUser_oneToMany_valueRemoved() throws Exception{
+        //given
+        userEntityManager.add(new User(30, "blob", null, Arrays.asList(new Dog("a"), new Dog("b")), true));
+
+        //when
+        User userFromBase = userEntityManager.select().name().equalsTo("blob").first();
+        assertThat(userFromBase.getDogs()).hasSize(2);
+        userFromBase.getDogs().remove(0);
+        userEntityManager.update(userFromBase);
+
+        //then
+        assertThat(userEntityManager.count()).isEqualTo(1);
+        assertThat(dogEntityManager.count()).isEqualTo(2); //TODO
+        User userFromBase2 = userEntityManager.select().name().equalsTo("blob").first();
+        assertThat(userFromBase2.getDogs()).hasSize(1);
+    }
+
+    @Test
+    public void testUpdateUser_oneToMany_valueUpdated() throws Exception{
+        //given
+        userEntityManager.add(new User(30, "blob", null, Arrays.asList(new Dog("a"), new Dog("b")), true));
+
+        //when
+        User userFromBase = userEntityManager.select().name().equalsTo("blob").first();
+        assertThat(userFromBase.getDogs()).hasSize(2);
+        userFromBase.getDogs().get(0).setName("ddd");
+        userEntityManager.update(userFromBase);
+
+        //then
+        assertThat(userEntityManager.count()).isEqualTo(1);
+        assertThat(dogEntityManager.count()).isEqualTo(2);
+        User userFromBase2 = userEntityManager.select().name().equalsTo("blob").first();
+        assertThat(userFromBase2.getDogs()).hasSize(2);
+        assertThat(userFromBase2.getDogs().get(0).getName()).isEqualTo("ddd");
+        assertThat(userFromBase2.getDogs().get(1).getName()).isEqualTo("b");
+    }
+
 
 }

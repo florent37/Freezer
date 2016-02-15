@@ -302,6 +302,22 @@ public class ModelORMGenerator {
                         .addStatement("for($T object : objects) add(object)", modelClassName)
                         .build())
 
+                .addMethod(MethodSpec.methodBuilder("update")
+                        .addParameter(modelClassName, "object")
+                        .returns(TypeName.LONG)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("$T database = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
+                        .addStatement("long objectId = $T.update(database,object)", modelCursorHelperClassName)
+                        .addStatement("$T.getInstance().close()", Constants.daoClassName)
+                        .addStatement("return objectId")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("update")
+                        .addParameter(ProcessUtils.listOf(modelClassName), "objects")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("for($T object : objects) update(object)", modelClassName)
+                        .build())
+
                 .addMethod(MethodSpec.methodBuilder("delete")
                         .addParameter(modelClassName, "object")
                         .addModifiers(Modifier.PUBLIC)

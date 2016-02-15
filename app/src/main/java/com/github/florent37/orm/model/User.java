@@ -36,6 +36,26 @@ public class User {
                 '}';
     }
 
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCat(Cat cat) {
+        this.cat = cat;
+    }
+
+    public void setDogs(List<Dog> dogs) {
+        this.dogs = dogs;
+    }
+
+    public void setHacker(boolean hacker) {
+        this.hacker = hacker;
+    }
+
     public int getAge() {
         return age;
     }
