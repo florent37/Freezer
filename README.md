@@ -163,6 +163,15 @@ public class MyEntity {
 }
 ```
 
+#Update
+
+You can update a model:
+
+```java
+user.setName("laurent");
+userEntityManager.update(user);
+```
+
 #Id
 
 You can optionnaly set a field as an identifier:
@@ -249,7 +258,6 @@ Migration isn't yet capable of:
  
 #TODO
 
-- Update an entry
 - Improve migration
 - Add Observable support
 - Provide an Asynchronous API
@@ -276,6 +284,10 @@ Introduced Migration Engine.
 ##1.0.4
 
 - Added @Id & @Ignore
+
+##1.0.5
+
+- Model update
 
 #A project initiated by Xebia
 
