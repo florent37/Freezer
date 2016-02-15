@@ -2,9 +2,11 @@ package com.github.florent37.dao;
 
 import com.github.florent37.orm.model.Cat;
 import com.github.florent37.orm.model.CatEntityManager;
+import com.github.florent37.orm.model.CatQueryBuilder;
 import com.github.florent37.orm.model.Dog;
 import com.github.florent37.orm.model.DogEntityManager;
 import com.github.florent37.orm.model.User;
+import com.github.florent37.orm.model.UserColumns;
 import com.github.florent37.orm.model.UserEntityManager;
 
 import org.junit.Before;
@@ -111,7 +113,7 @@ public class UserEntityManagerTest {
     }
 
     @Test
-    public void testSelectUsersFromAge() {
+    public void testSelectUsersFromAge_equals() {
         //given
         List<User> users = Arrays.asList(
                 new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
@@ -126,6 +128,79 @@ public class UserEntityManagerTest {
         //then
         assertThat(usersFromBase).isNotNull();
         assertThat(usersFromBase).hasSize(2);
+    }
+
+    @Test
+    public void testSelectUsersFromAge_notEquals() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
+                new User(21, "kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty")), true),
+                new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")), false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        List<User> usersFromBase = userEntityManager.select().age().notEqualsTo(21).asList();
+
+        //then
+        assertThat(usersFromBase).isNotNull();
+        assertThat(usersFromBase).hasSize(1);
+        assertThat(usersFromBase.get(0).getName()).isEqualTo("alex");
+    }
+
+    @Test
+    public void testSelectUsersFromAge_greather() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
+                new User(21, "kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty")), true),
+                new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")), false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        List<User> usersFromBase = userEntityManager.select().age().greatherThan(10).asList();
+
+        //then
+        assertThat(usersFromBase).isNotNull();
+        assertThat(usersFromBase).hasSize(2);
+    }
+
+    @Test
+    public void testSelectUsersFromAge_less() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
+                new User(21, "kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty")), true),
+                new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")), false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        List<User> usersFromBase = userEntityManager.select().age().lessThan(20).asList();
+
+        //then
+        assertThat(usersFromBase).isNotNull();
+        assertThat(usersFromBase).hasSize(1);
+    }
+
+    @Test
+    public void testSelectUsersFromAge_between() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
+                new User(21, "kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty")), true),
+                new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")), false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        List<User> usersFromBase = userEntityManager.select().age().between(9, 20).asList();
+
+        //then
+        assertThat(usersFromBase).isNotNull();
+        assertThat(usersFromBase).hasSize(1);
     }
 
     @Test
@@ -144,6 +219,100 @@ public class UserEntityManagerTest {
         //then
         assertThat(userFromBase).isNotNull();
         assertThat(userFromBase.getName()).isEqualTo("florent");
+    }
+
+    @Test
+    public void testSelectUser_or() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", null, null, false),
+                new User(30, "kevin", null, null, true),
+                new User(10, "alex", null, null, false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        List<User> userFromBase = userEntityManager.select()
+                .name().equalsTo("florent")
+                .or()
+                .hacker().isTrue()
+                .asList();
+
+        //then
+        assertThat(userFromBase).isNotNull();
+        assertThat(userFromBase).hasSize(2);
+    }
+
+    @Test
+    public void testSelectUser_group() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(10, "florent", null, null, false),
+                new User(30, "kevin", null, null, true),
+                new User(20, "mimi", null, null, true),
+                new User(10, "alex", null, null, false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        List<User> userFromBase = userEntityManager.select()
+                .beginGroup()
+                .name().equalsTo("florent")
+                .or()
+                .hacker().isTrue()
+                .endGroup()
+                .and()
+                .age().equalsTo(20)
+                .asList();
+
+        //then
+        assertThat(userFromBase).isNotNull();
+        assertThat(userFromBase).hasSize(1);
+        assertThat(userFromBase.get(0).getName()).isEqualTo("mimi");
+    }
+
+    @Test
+    public void testSelectUser_orderAgeASC() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", null, null, false),
+                new User(30, "kevin", null, null, true),
+                new User(10, "alex", null, null, false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        List<User> userFromBase = userEntityManager.select()
+                .sortAsc(UserColumns.age)
+                .asList();
+
+        //then
+        assertThat(userFromBase).isNotNull();
+        assertThat(userFromBase.get(0).getName()).isEqualTo("alex");
+        assertThat(userFromBase.get(1).getName()).isEqualTo("florent");
+        assertThat(userFromBase.get(2).getName()).isEqualTo("kevin");
+    }
+
+    @Test
+    public void testSelectUser_orderAgeDESC() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", null, null, false),
+                new User(30, "kevin", null, null, true),
+                new User(10, "alex", null, null, false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        List<User> userFromBase = userEntityManager.select()
+                .sortDesc(UserColumns.age)
+                .asList();
+
+        //then
+        assertThat(userFromBase).isNotNull();
+        assertThat(userFromBase.get(0).getName()).isEqualTo("kevin");
+        assertThat(userFromBase.get(1).getName()).isEqualTo("florent");
+        assertThat(userFromBase.get(2).getName()).isEqualTo("alex");
     }
 
     @Test
@@ -362,5 +531,81 @@ public class UserEntityManagerTest {
         assertThat(userFromBase2.getDogs().get(1).getName()).isEqualTo("b");
     }
 
+    @Test
+    public void testSelectUsersFromCat_stringEquals() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
+                new User(21, "kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty")), true),
+                new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")), false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        List<User> usersFromBase = userEntityManager.select().cat(CatEntityManager.where().shortName().equalsTo("Java")).asList();
+
+        //then
+        assertThat(usersFromBase).isNotNull();
+        assertThat(usersFromBase).hasSize(1);
+        assertThat(usersFromBase.get(0).getName()).isEqualTo("florent");
+    }
+
+    @Test
+    public void testSelectUsersFromCat_stringNotEquals() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
+                new User(21, "kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty")), true),
+                new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")), false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        List<User> usersFromBase = userEntityManager.select().cat(CatEntityManager.where().shortName().notEqualsTo("Java")).asList();
+
+        //then
+        assertThat(usersFromBase).isNotNull();
+        assertThat(usersFromBase).hasSize(2);
+    }
+
+    @Test
+    public void testSelectUsersFromCat_stringContains() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
+                new User(21, "kevin", new Cat("Jorris"), Arrays.asList(new Dog("Darty")), true),
+                new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")), false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        List<User> usersFromBase = userEntityManager.select().cat(CatEntityManager.where().shortName().contains("J")).asList();
+
+        //then
+        assertThat(usersFromBase).isNotNull();
+        assertThat(usersFromBase).hasSize(2);
+        assertThat(usersFromBase.get(0).getName()).isEqualTo("florent");
+        assertThat(usersFromBase.get(1).getName()).isEqualTo("kevin");
+    }
+
+    @Test
+    public void testSelectUsersFromCat_stringLike() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
+                new User(21, "kevin", new Cat("Lava"), Arrays.asList(new Dog("Darty")), true),
+                new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")), false)
+        );
+
+        //when
+        userEntityManager.add(users);
+        List<User> usersFromBase = userEntityManager.select().cat(CatEntityManager.where().shortName().contains("%av%")).asList();
+
+        //then
+        assertThat(usersFromBase).isNotNull();
+        assertThat(usersFromBase).hasSize(2);
+        assertThat(usersFromBase.get(0).getName()).isEqualTo("florent");
+        assertThat(usersFromBase.get(1).getName()).isEqualTo("kevin");
+    }
 
 }
