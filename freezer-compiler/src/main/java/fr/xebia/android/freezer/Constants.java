@@ -34,8 +34,10 @@ public class Constants {
     public static final TypeName contentValuesClassName = ClassName.get("android.content", "ContentValues");
     public static final TypeName dateClassName = ClassName.get(Date.class);
     public static final TypeName simpleDateFormatClassName = ClassName.get(SimpleDateFormat.class);
+    public static final TypeName stringBuilderClassName = ClassName.get(StringBuilder.class);
 
     public static final String ENUM_COLUMN_ELEMENT_NAME = "column_name";
+    public static final String ENUM_COLUMN_IS_PRIMITIVE = "column_is_primitive";
 
     public static final String FIELD_ID = "_id";
     public static final String FIELD_NAME = "_field_name";

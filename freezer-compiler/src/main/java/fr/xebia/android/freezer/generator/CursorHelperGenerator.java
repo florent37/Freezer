@@ -56,7 +56,9 @@ public class CursorHelperGenerator {
         for (int i = 0; i < fields.size(); ++i) {
             VariableElement variableElement = fields.get(i);
             if (ProcessUtils.isPrimitive(variableElement)) {
-                String cursor = "cursor.get$L(cursor.getColumnIndex($S))";
+                fromCursorB.addStatement("int index$L = cursor.getColumnIndex($S)", i, variableElement.getSimpleName());
+                fromCursorB.beginControlFlow("if(index$L != -1)", i);
+                String cursor = "cursor.get$L(index$L)";
 
                 if (ProcessUtils.isDate(variableElement)) {
                     fromCursorB.addCode("try{ \n")
@@ -67,8 +69,9 @@ public class CursorHelperGenerator {
                 } else if (!ProcessUtils.isIdField(variableElement)) {
                     cursor = String.format(ProcessUtils.getFieldCast(variableElement), cursor);
 
-                    fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement), variableElement.getSimpleName());
+                    fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement), i);
                 }
+                fromCursorB.endControlFlow();
             }
         }
 

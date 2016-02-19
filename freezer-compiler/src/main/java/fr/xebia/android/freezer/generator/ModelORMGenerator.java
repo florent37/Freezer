@@ -8,6 +8,7 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -79,6 +80,8 @@ public class ModelORMGenerator {
                 .addModifiers(Modifier.PUBLIC)
 
                 .superclass(Constants.queryBuilderClassName)
+
+                .addField(ProcessUtils.listOf(enumColums), "fields")
 
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
@@ -228,11 +231,57 @@ public class ModelORMGenerator {
 
                         .build())
 
+                .addMethod(MethodSpec.methodBuilder("fields")
+                        .returns(queryBuilderClassName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(ArrayTypeName.of(enumColums), "fields")
+                        .varargs()
+                        .addStatement("this.fields = new $T<>()", TypeName.get(ArrayList.class))
+                        .addStatement("this.fields.addAll($T.asList(fields))", TypeName.get(Arrays.class))
+                        .addStatement("return this")
+
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("fieldsWithout")
+                        .returns(queryBuilderClassName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(ArrayTypeName.of(enumColums), "fields")
+                        .varargs()
+                        .addStatement("this.fields = new $T<>($T.asList($L.values()))", TypeName.get(ArrayList.class), TypeName.get(Arrays.class), enumColums)
+                        .addStatement("this.fields.removeAll($T.asList(fields))", TypeName.get(Arrays.class))
+                        .addStatement("return this")
+
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("field")
+                        .returns(queryBuilderClassName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(enumColums, "field")
+                        .addStatement("return this")
+
+                        .build())
+
                 .addMethod(MethodSpec.methodBuilder("execute")
                         .returns(listObjectsClassName)
                         .addModifiers(Modifier.PRIVATE)
                         .addStatement("$T db = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
-                        .addStatement("$T query = $S + constructQuery()", ClassName.get(String.class), String.format("select distinct %s.* from %s ", TABLE_NAME, TABLE_NAME))
+                        .addStatement("$T stringBuilder =  new $T()", Constants.stringBuilderClassName, Constants.stringBuilderClassName)
+                        .addStatement("stringBuilder.append($S)", "select distinct ")
+                        .addStatement("if(fields == null) stringBuilder.append(\"$L.* \")", TABLE_NAME)
+                        .beginControlFlow("else")
+                        .addStatement("stringBuilder.append($S)", TABLE_NAME + "." + Constants.FIELD_ID)
+                        .addStatement("final int fieldsSize = fields.size()")
+                        .beginControlFlow("for(int i=0;i<fieldsSize;++i)")
+                        .addStatement("$T c = fields.get(i)", enumColums)
+                        .beginControlFlow("if(c.isPrimitive())")
+                        .addStatement("stringBuilder.append($S)", ", ")
+                        .addStatement("stringBuilder.append($S+fields.get(i))", TABLE_NAME + ".")
+                        .endControlFlow()
+                        .endControlFlow()
+                        .endControlFlow()
+                        .addStatement("stringBuilder.append($S)", String.format(" from %s ", TABLE_NAME))
+                        .addStatement("stringBuilder.append(constructQuery())")
+                        .addStatement("$T query = stringBuilder.toString()", ClassName.get(String.class))
                         .addStatement("String[] args = constructArgs()")
                         .addStatement("if(logger != null) logger.onQuery(query,args)")
                         .addStatement("$T cursor = db.rawQuery(query, args)", Constants.cursorClassName)

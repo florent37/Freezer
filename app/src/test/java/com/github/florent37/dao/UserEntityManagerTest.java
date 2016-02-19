@@ -2,7 +2,6 @@ package com.github.florent37.dao;
 
 import com.github.florent37.orm.model.Cat;
 import com.github.florent37.orm.model.CatEntityManager;
-import com.github.florent37.orm.model.CatQueryBuilder;
 import com.github.florent37.orm.model.Dog;
 import com.github.florent37.orm.model.DogEntityManager;
 import com.github.florent37.orm.model.User;
@@ -370,7 +369,7 @@ public class UserEntityManagerTest {
     }
 
     @Test
-    public void testUpdateUser_onlyFields() throws Exception{
+    public void testUpdateUser_onlyFields() throws Exception {
         //given
         userEntityManager.add(new User(30, "blob", null, null, true));
 
@@ -386,7 +385,7 @@ public class UserEntityManagerTest {
     }
 
     @Test
-    public void testUpdateUser_oneToOne_nullToValue() throws Exception{
+    public void testUpdateUser_oneToOne_nullToValue() throws Exception {
         //given
         userEntityManager.add(new User(30, "blob", null, null, true));
 
@@ -404,7 +403,7 @@ public class UserEntityManagerTest {
     }
 
     @Test
-    public void testUpdateUser_oneToOne_valueToNull() throws Exception{
+    public void testUpdateUser_oneToOne_valueToNull() throws Exception {
         //given
         userEntityManager.add(new User(30, "blob", new Cat("java"), null, true));
 
@@ -421,7 +420,7 @@ public class UserEntityManagerTest {
     }
 
     @Test
-    public void testUpdateUser_oneToOne_updateValue() throws Exception{
+    public void testUpdateUser_oneToOne_updateValue() throws Exception {
         //given
         userEntityManager.add(new User(30, "blob", new Cat("java"), null, true));
 
@@ -439,7 +438,7 @@ public class UserEntityManagerTest {
     }
 
     @Test
-    public void testUpdateUser_oneToMany_nullToValue() throws Exception{
+    public void testUpdateUser_oneToMany_nullToValue() throws Exception {
         //given
         userEntityManager.add(new User(30, "blob", null, null, true));
 
@@ -458,7 +457,7 @@ public class UserEntityManagerTest {
     }
 
     @Test
-    public void testUpdateUser_oneToMany_valueToNull() throws Exception{
+    public void testUpdateUser_oneToMany_valueToNull() throws Exception {
         //given
         userEntityManager.add(new User(30, "blob", null, Arrays.asList(new Dog("a"), new Dog("b")), true));
 
@@ -476,7 +475,7 @@ public class UserEntityManagerTest {
     }
 
     @Test
-    public void testUpdateUser_oneToMany_valueAdded() throws Exception{
+    public void testUpdateUser_oneToMany_valueAdded() throws Exception {
         //given
         userEntityManager.add(new User(30, "blob", null, Arrays.asList(new Dog("a"), new Dog("b")), true));
 
@@ -494,7 +493,7 @@ public class UserEntityManagerTest {
     }
 
     @Test
-    public void testUpdateUser_oneToMany_valueRemoved() throws Exception{
+    public void testUpdateUser_oneToMany_valueRemoved() throws Exception {
         //given
         userEntityManager.add(new User(30, "blob", null, Arrays.asList(new Dog("a"), new Dog("b")), true));
 
@@ -512,7 +511,7 @@ public class UserEntityManagerTest {
     }
 
     @Test
-    public void testUpdateUser_oneToMany_valueUpdated() throws Exception{
+    public void testUpdateUser_oneToMany_valueUpdated() throws Exception {
         //given
         userEntityManager.add(new User(30, "blob", null, Arrays.asList(new Dog("a"), new Dog("b")), true));
 
@@ -606,6 +605,61 @@ public class UserEntityManagerTest {
         assertThat(usersFromBase).hasSize(2);
         assertThat(usersFromBase.get(0).getName()).isEqualTo("florent");
         assertThat(usersFromBase.get(1).getName()).isEqualTo("kevin");
+    }
+
+    @Test
+    public void testSelectUsers_withoutAgeColumns() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", null, null, true),
+                new User(21, "kevin", null, null, true),
+                new User(10, "alex", null, null, false)
+        );
+        userEntityManager.add(users);
+
+        //when
+        List<User> usersFromBase = userEntityManager
+                .select()
+                .fields(UserColumns.name, UserColumns.cat, UserColumns.dogs, UserColumns.hacker)
+                .asList();
+
+        //then
+        assertThat(usersFromBase).isNotNull();
+        assertThat(usersFromBase).hasSize(3);
+        assertThat(usersFromBase.get(0).getName()).isEqualTo("florent");
+        assertThat(usersFromBase.get(0).getAge()).isEqualTo(0);
+        assertThat(usersFromBase.get(1).getName()).isEqualTo("kevin");
+        assertThat(usersFromBase.get(1).getAge()).isEqualTo(0);
+        assertThat(usersFromBase.get(2).getName()).isEqualTo("alex");
+        assertThat(usersFromBase.get(2).getAge()).isEqualTo(0);
+    }
+
+    @Test
+    public void testSelectUsers_withoutNameCollumns() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", new Cat("nnn"), Arrays.asList(new Dog("a"), new Dog("b")), true),
+                new User(21, "kevin", null, null, true),
+                new User(10, "alex", null, null, false)
+        );
+        userEntityManager.add(users);
+
+        //when
+        List<User> usersFromBase = userEntityManager
+                .select()
+                .fieldsWithout(UserColumns.name)
+                .asList();
+
+        //then
+        assertThat(usersFromBase).isNotNull();
+        assertThat(usersFromBase).hasSize(3);
+        assertThat(usersFromBase.get(0).getName()).isNull();
+        assertThat(usersFromBase.get(0).getAge()).isNotNull();
+        assertThat(usersFromBase.get(0).getCat()).isNotNull();
+        assertThat(usersFromBase.get(0).getDogs()).isNotNull();
+
+        assertThat(usersFromBase.get(1).getName()).isNull();
+        assertThat(usersFromBase.get(2).getName()).isNull();
     }
 
 }
