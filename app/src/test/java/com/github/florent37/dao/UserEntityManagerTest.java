@@ -14,6 +14,9 @@ import org.junit.runner.RunWith;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import fr.xebia.android.freezer.async.Callback;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.spy;
@@ -70,6 +73,92 @@ public class UserEntityManagerTest {
         assertThat(catEntityManager.count()).isEqualTo(3);
         assertThat(dogEntityManager.count()).isEqualTo(4);
 
+    }
+
+    @Test
+    public void shouldAddUsersAsync() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
+                new User(30, "kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty")), true),
+                new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")), false)
+        );
+
+        final AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+
+        //when
+        userEntityManager.addAsync(users, new Callback<List<User>>() {
+            @Override
+            public void onSuccess() {
+                atomicBoolean.getAndSet(true);
+            }
+
+            @Override
+            public void onError(List<User> data) {
+
+            }
+        });
+
+        //then
+        assertThat(userEntityManager.count()).isEqualTo(3);
+        assertThat(catEntityManager.count()).isEqualTo(3);
+        assertThat(dogEntityManager.count()).isEqualTo(4);
+        assertThat(atomicBoolean.get()).isTrue();
+    }
+
+    @Test
+    public void shouldAddUsersAsync_NullCallback() {
+        //given
+        List<User> users = Arrays.asList(
+                new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true),
+                new User(30, "kevin", new Cat("Futé"), Arrays.asList(new Dog("Darty")), true),
+                new User(10, "alex", new Cat("Yellow"), Arrays.asList(new Dog("Darty"), new Dog("Sasha")), false)
+        );
+
+        //when
+        userEntityManager.addAsync(users, null);
+
+        //then
+        assertThat(userEntityManager.count()).isEqualTo(3);
+        assertThat(catEntityManager.count()).isEqualTo(3);
+        assertThat(dogEntityManager.count()).isEqualTo(4);
+    }
+
+    @Test
+    public void shouldAddUserAsync() {
+        //given
+        User user = new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true);
+
+        final AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+
+        //when
+        userEntityManager.addAsync(user, new Callback<User>() {
+            @Override
+            public void onSuccess() {
+                atomicBoolean.getAndSet(true);
+            }
+
+            @Override
+            public void onError(User data) {
+
+            }
+        });
+
+        //then
+        assertThat(userEntityManager.count()).isEqualTo(1);
+        assertThat(atomicBoolean.get()).isTrue();
+    }
+
+    @Test
+    public void shouldAddUserAsync_NullCallback() {
+        //given
+        User user = new User(21, "florent", new Cat("Java"), Arrays.asList(new Dog("Loulou")), true);
+
+        //when
+        userEntityManager.addAsync(user, null);
+
+        //then
+        assertThat(userEntityManager.count()).isEqualTo(1);
     }
 
     @Test

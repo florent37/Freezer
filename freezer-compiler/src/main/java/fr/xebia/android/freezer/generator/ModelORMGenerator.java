@@ -7,6 +7,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -349,6 +350,58 @@ public class ModelORMGenerator {
                         .addParameter(ProcessUtils.listOf(modelClassName), "objects")
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("for($T object : objects) add(object)", modelClassName)
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("addAsync")
+                        .addParameter(modelClassName, "object", Modifier.FINAL)
+                        .addParameter(ParameterizedTypeName.get(Constants.callback, modelClassName), "callback")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("final $T<$T<$T>> weakReference = new WeakReference<$T<$T>>(callback)", ClassName.get(WeakReference.class), Constants.callback, modelClassName, Constants.callback, modelClassName)
+                        .addStatement("final $T current = new Handler($T.myLooper())", ClassName.get("android.os", "Handler"), ClassName.get("android.os", "Looper"))
+                        .addCode("new Handler().post(new $T() {\n", ClassName.get(Runnable.class))
+                        .addCode("@$T public void run() {\n", ClassName.get(Override.class))
+                        .addStatement("add(object)")
+                        .addCode("current.post(new Runnable() {\n")
+                        .addCode("@Override public void run() {\n")
+                        .addStatement("$T callback1 = weakReference.get()", ParameterizedTypeName.get(Constants.callback, modelClassName))
+                        .addStatement("if(callback1 != null) callback1.onSuccess()")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("addAsync")
+                        .addParameter(modelClassName, "object", Modifier.FINAL)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("addAsync(object, null)")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("addAsync")
+                        .addParameter(ProcessUtils.listOf(modelClassName), "objects", Modifier.FINAL)
+                        .addParameter(ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName)), "callback")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("final $T weakReference = new $T(callback)",
+                                ParameterizedTypeName.get(ClassName.get(WeakReference.class), ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName))),
+                                ParameterizedTypeName.get(ClassName.get(WeakReference.class), ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName))))
+                        .addStatement("final $T current = new Handler($T.myLooper())", ClassName.get("android.os", "Handler"), ClassName.get("android.os", "Looper"))
+                        .addCode("new Handler().post(new $T() {\n", ClassName.get(Runnable.class))
+                        .addCode("@$T public void run() {\n", ClassName.get(Override.class))
+                        .addStatement("add(objects)")
+                        .addCode("current.post(new Runnable() {\n")
+                        .addCode("@Override public void run() {\n")
+                        .addStatement("$T callback1 = weakReference.get()", ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName)))
+                        .addStatement("if(callback1 != null) callback1.onSuccess()")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("addAsync")
+                        .addParameter(ProcessUtils.listOf(modelClassName), "objects", Modifier.FINAL)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("addAsync(objects, null)")
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("update")
