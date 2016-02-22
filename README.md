@@ -33,7 +33,7 @@ public class User {
     int age;
     String name;
     Cat cat;
-    List<Cat> cats;
+    List<Cat> pets;
 }
 ```
 
@@ -79,8 +79,7 @@ User user3 = userEntityManager.select()
 
 To find all users 
 - with `name` "Florent"
-- or who own a cat with `named` "Java" 
-- or who own a cat `named` "Sasha" 
+- or who own a pet with `named` "Java" 
     
 you would write:             
 ```java  
@@ -89,7 +88,7 @@ List<User> allUsers = userEntityManager.select()
                              .or()
                                 .cat(CatEntityManager.where().name().equalsTo("Java"))
                              .or()
-                                .cats(CatEntityManager.where().name().equalsTo("Sasha"))
+                                .pets(CatEntityManager.where().name().equalsTo("Sasha"))
                              .asList();
 ```
 
