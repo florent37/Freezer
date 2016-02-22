@@ -466,7 +466,6 @@ public class UserQueryBuilderTest {
         //when
         userEntityManager
                 .select()
-                .fieldsWithout(UserColumns.name)
                 .asObservable()
                 .subscribe(new Action1<List<User>>() {
                     @Override
@@ -494,7 +493,6 @@ public class UserQueryBuilderTest {
         //when
         userEntityManager
                 .select()
-                .fieldsWithout(UserColumns.name)
                 .async(new Callback<List<User>>() {
                     @Override
                     public void onSuccess(List<User> data) {

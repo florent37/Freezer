@@ -17,9 +17,9 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  compile 'fr.xebia.android.freezer:freezer:1.0.5'
-  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.5'
-  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.5'
+  compile 'fr.xebia.android.freezer:freezer:1.0.6'
+  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.6'
+  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.6'
 }
 ```
 
@@ -33,14 +33,7 @@ public class User {
     int age;
     String name;
     Cat cat;
-    List<Dog> dogs;
-}
-```
-
-```java
-@Model
-public class Dog {
-    String name;
+    List<Cat> cats;
 }
 ```
 
@@ -48,7 +41,7 @@ public class Dog {
 @Model
 public class Cat {
     @Id long id;
-    String shortName;
+    String name;
 }
 ```
 
@@ -86,17 +79,17 @@ User user3 = userEntityManager.select()
 
 To find all users 
 - with `name` "Florent"
-- or who own a cat with `shortNamed` "Java" 
-- or who own a dog `named` "Sasha" 
+- or who own a cat with `named` "Java" 
+- or who own a cat `named` "Sasha" 
     
 you would write:             
 ```java  
 List<User> allUsers = userEntityManager.select()
                                 .name().equalsTo("Florent")
                              .or()
-                                .cat(CatEntityManager.where().shortName().equalsTo("Java"))
+                                .cat(CatEntityManager.where().name().equalsTo("Java"))
                              .or()
-                                .dogs(DogEntityManager.where().name().equalsTo("Sasha"))
+                                .cats(CatEntityManager.where().name().equalsTo("Sasha"))
                              .asList();
 ```
 
@@ -133,6 +126,53 @@ float agesAverage  = userEntityManager.select().average(UserColumns.age);
 float ageMin       = userEntityManager.select().min(UserColumns.age);
 float ageMax       = userEntityManager.select().max(UserColumns.age);
 int count          = userEntityManager.select().count();
+```
+
+#Asynchronous
+
+Freezer offers various asynchronous methods:
+
+##Add / Delete / Update
+
+```java
+userEntityManager
+                .addAsync(users)
+                .async(new SimpleCallback<List<User>>() {
+                    @Override
+                    public void onSuccess(List<User> data) {
+
+                    }
+                });
+```
+
+##Querying
+
+```java
+userEntityManager
+                .select()
+                ...
+                .async(new SimpleCallback<List<User>>() {
+                    @Override
+                    public void onSuccess(List<User> data) {
+
+                    }
+                });
+```
+
+##Observables
+
+```java
+userEntityManager
+                .select()
+                ...
+                .asObservable()
+                ... //rx operations
+                .subscribe(new Action1<List<User>>() {
+                    @Override
+                    public void call(List<User> users) {
+                    
+                    }
+                });
 ```
 
 #Entities
@@ -260,7 +300,6 @@ Migration isn't yet capable of:
 
 - Improve migration
 - Add Observable support
-- Provide an Asynchronous API
 
 #Changelog
 
@@ -288,6 +327,12 @@ Introduced Migration Engine.
 ##1.0.5
 
 - Model update
+
+##1.0.6
+
+- Async API
+- Support Observables
+- Added @DatabaseName
 
 #A project initiated by Xebia
 
