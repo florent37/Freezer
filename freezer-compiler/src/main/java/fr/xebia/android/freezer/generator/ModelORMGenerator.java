@@ -20,6 +20,8 @@ import javax.lang.model.element.VariableElement;
 
 import fr.xebia.android.freezer.Constants;
 import fr.xebia.android.freezer.ProcessUtils;
+import rx.Observable;
+import rx.Subscriber;
 
 /**
  * Created by florentchampigny on 08/01/2016.
@@ -133,6 +135,37 @@ public class ModelORMGenerator {
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("return execute()")
                         .build())
+
+                .addMethod(MethodSpec.methodBuilder("asObservable")
+                        .returns(ParameterizedTypeName.get(ClassName.get(Observable.class), listObjectsClassName))
+                        .addModifiers(Modifier.PUBLIC)
+                        .addCode("return $T.create(new Observable.OnSubscribe<$T>(){\n", ClassName.get(Observable.class), listObjectsClassName)
+                        .addCode("@$T\n", ClassName.get(Override.class))
+                        .addCode("public void call($T<? super $T> subscriber) {\n", ClassName.get(Subscriber.class), listObjectsClassName)
+                        .addStatement("subscriber.onNext(asList())")
+                        .addStatement("subscriber.onCompleted()")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("async")
+                        .addParameter(ParameterizedTypeName.get(Constants.callback, listObjectsClassName), "callback")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("final $T<$T<$T>> weakReference = new $T<>(callback)", ClassName.get(WeakReference.class), Constants.callback, listObjectsClassName, ClassName.get(WeakReference.class))
+                        .addStatement("final $T current = new Handler($T.myLooper())", ClassName.get("android.os", "Handler"), ClassName.get("android.os", "Looper"))
+                        .addCode("new Handler().post(new $T() {\n", ClassName.get(Runnable.class))
+                        .addCode("@$T public void run() {\n", ClassName.get(Override.class))
+                        .addStatement("final $T objects = asList()", listObjectsClassName)
+                        .addCode("current.post(new Runnable() {\n")
+                        .addCode("@Override public void run() {\n")
+                        .addStatement("$T callback1 = weakReference.get()", ParameterizedTypeName.get(Constants.callback, listObjectsClassName))
+                        .addStatement("if(callback1 != null) callback1.onSuccess(objects)")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .build())
+
 
                 .addMethod(MethodSpec.methodBuilder("first")
                         .returns(modelClassName)
@@ -356,7 +389,7 @@ public class ModelORMGenerator {
                         .addParameter(modelClassName, "object", Modifier.FINAL)
                         .addParameter(ParameterizedTypeName.get(Constants.callback, modelClassName), "callback")
                         .addModifiers(Modifier.PUBLIC)
-                        .addStatement("final $T<$T<$T>> weakReference = new WeakReference<$T<$T>>(callback)", ClassName.get(WeakReference.class), Constants.callback, modelClassName, Constants.callback, modelClassName)
+                        .addStatement("final $T<$T<$T>> weakReference = new WeakReference<>(callback)", ClassName.get(WeakReference.class), Constants.callback, modelClassName)
                         .addStatement("final $T current = new Handler($T.myLooper())", ClassName.get("android.os", "Handler"), ClassName.get("android.os", "Looper"))
                         .addCode("new Handler().post(new $T() {\n", ClassName.get(Runnable.class))
                         .addCode("@$T public void run() {\n", ClassName.get(Override.class))
@@ -364,7 +397,7 @@ public class ModelORMGenerator {
                         .addCode("current.post(new Runnable() {\n")
                         .addCode("@Override public void run() {\n")
                         .addStatement("$T callback1 = weakReference.get()", ParameterizedTypeName.get(Constants.callback, modelClassName))
-                        .addStatement("if(callback1 != null) callback1.onSuccess()")
+                        .addStatement("if(callback1 != null) callback1.onSuccess(object)")
                         .addCode("}\n")
                         .addCode("});\n")
                         .addCode("}\n")
@@ -381,8 +414,7 @@ public class ModelORMGenerator {
                         .addParameter(ProcessUtils.listOf(modelClassName), "objects", Modifier.FINAL)
                         .addParameter(ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName)), "callback")
                         .addModifiers(Modifier.PUBLIC)
-                        .addStatement("final $T weakReference = new $T(callback)",
-                                ParameterizedTypeName.get(ClassName.get(WeakReference.class), ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName))),
+                        .addStatement("final $T weakReference = new WeakReference<>(callback)",
                                 ParameterizedTypeName.get(ClassName.get(WeakReference.class), ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName))))
                         .addStatement("final $T current = new Handler($T.myLooper())", ClassName.get("android.os", "Handler"), ClassName.get("android.os", "Looper"))
                         .addCode("new Handler().post(new $T() {\n", ClassName.get(Runnable.class))
@@ -391,7 +423,7 @@ public class ModelORMGenerator {
                         .addCode("current.post(new Runnable() {\n")
                         .addCode("@Override public void run() {\n")
                         .addStatement("$T callback1 = weakReference.get()", ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName)))
-                        .addStatement("if(callback1 != null) callback1.onSuccess()")
+                        .addStatement("if(callback1 != null) callback1.onSuccess(objects)")
                         .addCode("}\n")
                         .addCode("});\n")
                         .addCode("}\n")
