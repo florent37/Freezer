@@ -179,4 +179,36 @@ public class CatEntityManagerTest {
         assertThat(catFromBase.getShortName()).isEqualTo("mimi");
     }
 
+    @Test
+    public void testDeleteCat() throws Exception{
+        //given
+        Cat cat1 = new Cat("toto");
+        catEntityManager.add(cat1);
+        assertThat(catEntityManager.count()).isEqualTo(1);
+        assertThat(cat1.getId()).isAtLeast(1l);
+
+        //when
+        catEntityManager.delete(cat1);
+
+        //then
+        assertThat(catEntityManager.count()).isEqualTo(0);
+    }
+
+    @Test
+    public void testDeleteCats() throws Exception{
+        //given
+        Cat cat1 = new Cat("toto");
+        Cat cat2 = new Cat("tata");
+        catEntityManager.add(Arrays.asList(cat1, cat2));
+        assertThat(catEntityManager.count()).isEqualTo(2);
+        assertThat(cat1.getId()).isAtLeast(1l);
+        assertThat(cat2.getId()).isAtLeast(1l);
+
+        //when
+        catEntityManager.delete(Arrays.asList(cat1,cat2));
+
+        //then
+        assertThat(catEntityManager.count()).isEqualTo(0);
+    }
+
 }

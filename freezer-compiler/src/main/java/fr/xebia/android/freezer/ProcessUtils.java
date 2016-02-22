@@ -295,8 +295,18 @@ public class ProcessUtils {
         return ClassName.bestGuess(getFieldClass(element).toString() + Constants.ENUM_COLUMN_SUFFIX);
     }
 
-    public static String getModelId(String variable) {
-        return String.format("((%s.%s)%s).%s()", Constants.DAO_PACKAGE, Constants.MODEL_ENTITY_PROXY_INTERFACE, variable, Constants.MODEL_ENTITY_PROXY_GET_ID_METHOD);
+    public static String getModelId(Element element, String elementVarialbe, String idVariableName) {
+        StringBuilder stringBuilder = new StringBuilder();
+        Element idField = getIdField(element);
+        if (idField != null) {
+            stringBuilder.append("java.lang.Long ").append(idVariableName).append(" = ").append(elementVarialbe).append(".").append(getObjectName(idField));
+        } else {
+            stringBuilder.append("java.lang.Long ").append(idVariableName).append(" = ");
+            stringBuilder.append(elementVarialbe).append(" instanceof ").append(Constants.entityProxyClassString).append(" ? ");
+            stringBuilder.append(String.format("((%s.%s)%s).%s()", Constants.DAO_PACKAGE, Constants.MODEL_ENTITY_PROXY_INTERFACE, elementVarialbe, Constants.MODEL_ENTITY_PROXY_GET_ID_METHOD));
+            stringBuilder.append(": null");
+        }
+        return stringBuilder.toString();
     }
 
     public static String setModelId(String variable) {

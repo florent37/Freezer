@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import fr.xebia.android.freezer.async.Callback;
+import fr.xebia.android.freezer.async.SimpleCallback;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.spy;
@@ -135,7 +136,7 @@ public class UserEntityManagerTest {
         userEntityManager.addAsync(user, new Callback<User>() {
             @Override
             public void onSuccess(User data) {
-                if(data != null)
+                if (data != null)
                     atomicBoolean.getAndSet(true);
             }
 
@@ -345,4 +346,25 @@ public class UserEntityManagerTest {
         assertThat(userFromBase2.getDogs().get(1).getName()).isEqualTo("b");
     }
 
+    @Test
+    public void testUpdateUser_onlyFields_async() throws Exception {
+        //given
+        userEntityManager.add(new User(30, "blob", null, null, true));
+
+        //when
+        User userFromBase = userEntityManager.select().name().equalsTo("blob").first();
+        userFromBase.setAge(10);
+
+        final AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+
+        userEntityManager.updateAsync(userFromBase, new SimpleCallback<User>() {
+            @Override
+            public void onSuccess(User data) {
+                atomicBoolean.set(true);
+            }
+        });
+
+        //then
+        assertThat(atomicBoolean.get()).isTrue();
+    }
 }

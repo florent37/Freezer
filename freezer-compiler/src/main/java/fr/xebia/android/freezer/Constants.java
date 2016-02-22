@@ -77,7 +77,8 @@ public class Constants {
     public static final String MODEL_ENTITY_PROXY_GET_ID_METHOD = "getDatabaseModelId";
     public static final String MODEL_ENTITY_PROXY_SET_ID_METHOD = "setDatabaseModelId";
 
-    public static final ClassName entityProxyClass = ClassName.bestGuess(Constants.DAO_PACKAGE + "." + MODEL_ENTITY_PROXY_INTERFACE);
+    public static final String entityProxyClassString = Constants.DAO_PACKAGE + "." + MODEL_ENTITY_PROXY_INTERFACE;
+    public static final ClassName entityProxyClass = ClassName.bestGuess(entityProxyClassString);
 
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 }
