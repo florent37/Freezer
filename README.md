@@ -160,6 +160,8 @@ userEntityManager
 
 ##Observables
 
+[With RxJava](https://github.com/ReactiveX/RxJava)
+
 ```java
 userEntityManager
                 .select()
