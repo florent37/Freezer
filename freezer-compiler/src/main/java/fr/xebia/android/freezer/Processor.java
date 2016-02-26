@@ -22,6 +22,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
+import fr.xebia.android.freezer.annotations.DatabaseName;
 import fr.xebia.android.freezer.annotations.Migration;
 import fr.xebia.android.freezer.annotations.Model;
 import fr.xebia.android.freezer.generator.CursorHelperGenerator;
@@ -61,6 +62,7 @@ public class Processor extends AbstractProcessor {
         writeStaticJavaFiles();
 
         getMigrators(roundEnv);
+        getDatabaseName(roundEnv);
 
         for (Element element : roundEnv.getElementsAnnotatedWith(Model.class)) {
             models.add(element);
@@ -83,6 +85,16 @@ public class Processor extends AbstractProcessor {
             migrators.put(v, element);
         }
         version = max;
+    }
+
+    private void getDatabaseName(RoundEnvironment roundEnv) {
+        for (Element element : roundEnv.getElementsAnnotatedWith(DatabaseName.class)) {
+            String name = element.getAnnotation(DatabaseName.class).value();
+            if(name != null){
+                dbFile = name;
+                return;
+            }
+        }
     }
 
     private void generateEntityProxies(Element element) {

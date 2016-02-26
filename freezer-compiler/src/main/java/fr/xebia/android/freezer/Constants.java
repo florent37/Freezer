@@ -15,6 +15,7 @@ public class Constants {
     public static final String DAO_CLASS_NAME = "Freezer";
     public static final String DATABASE_HELPER_CLASS_NAME = "DatabaseHelper";
     public static final String MIGRATOR = "Migrator";
+    public static final String CALLBACK = "Callback";
 
     public static final String DAO_SUFFIX = "EntityManager";
     public static final String CURSOR_HELPER_SUFFIX = "CursorHelper";
@@ -25,6 +26,7 @@ public class Constants {
     public static final TypeName dbHelperClassName = ClassName.get(Constants.DAO_PACKAGE, DATABASE_HELPER_CLASS_NAME);
     public static final TypeName queryBuilderClassName = ClassName.get(Constants.DAO_PACKAGE, QUERY_BUILDER_SUFFIX);
     public static final TypeName migrator = ClassName.get(Constants.DAO_PACKAGE+".migration", MIGRATOR);
+    public static final ClassName callback = ClassName.get(Constants.DAO_PACKAGE+".async", CALLBACK);
 
     public static final TypeName applicationClassName = ClassName.get("android.app", "Application");
     public static final TypeName databaseClassName = ClassName.get("android.database.sqlite", "SQLiteDatabase");
@@ -34,8 +36,10 @@ public class Constants {
     public static final TypeName contentValuesClassName = ClassName.get("android.content", "ContentValues");
     public static final TypeName dateClassName = ClassName.get(Date.class);
     public static final TypeName simpleDateFormatClassName = ClassName.get(SimpleDateFormat.class);
+    public static final TypeName stringBuilderClassName = ClassName.get(StringBuilder.class);
 
     public static final String ENUM_COLUMN_ELEMENT_NAME = "column_name";
+    public static final String ENUM_COLUMN_IS_PRIMITIVE = "column_is_primitive";
 
     public static final String FIELD_ID = "_id";
     public static final String FIELD_NAME = "_field_name";
@@ -73,7 +77,8 @@ public class Constants {
     public static final String MODEL_ENTITY_PROXY_GET_ID_METHOD = "getDatabaseModelId";
     public static final String MODEL_ENTITY_PROXY_SET_ID_METHOD = "setDatabaseModelId";
 
-    public static final ClassName entityProxyClass = ClassName.bestGuess(Constants.DAO_PACKAGE + "." + MODEL_ENTITY_PROXY_INTERFACE);
+    public static final String entityProxyClassString = Constants.DAO_PACKAGE + "." + MODEL_ENTITY_PROXY_INTERFACE;
+    public static final ClassName entityProxyClass = ClassName.bestGuess(entityProxyClassString);
 
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 }

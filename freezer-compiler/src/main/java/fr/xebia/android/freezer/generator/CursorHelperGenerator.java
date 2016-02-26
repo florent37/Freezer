@@ -50,13 +50,16 @@ public class CursorHelperGenerator {
                 .addParameter(Constants.databaseClassName, "db")
                 .addStatement("$T object = new $T()", modelType, ProcessUtils.getModelProxy(element))
 
-                .addStatement("$L(cursor.getLong(cursor.getColumnIndex($S)))", ProcessUtils.setModelId("object"), Constants.FIELD_ID);
+                .addStatement("long objectId = cursor.getLong(cursor.getColumnIndex($S))", Constants.FIELD_ID)
+                .addStatement("$L(objectId)", ProcessUtils.setModelId("object"));
 
         //for
         for (int i = 0; i < fields.size(); ++i) {
             VariableElement variableElement = fields.get(i);
             if (ProcessUtils.isPrimitive(variableElement)) {
-                String cursor = "cursor.get$L(cursor.getColumnIndex($S))";
+                fromCursorB.addStatement("int index$L = cursor.getColumnIndex($S)", i, variableElement.getSimpleName());
+                fromCursorB.beginControlFlow("if(index$L != -1)", i);
+                String cursor = "cursor.get$L(index$L)";
 
                 if (ProcessUtils.isDate(variableElement)) {
                     fromCursorB.addCode("try{ \n")
@@ -67,8 +70,9 @@ public class CursorHelperGenerator {
                 } else if (!ProcessUtils.isIdField(variableElement)) {
                     cursor = String.format(ProcessUtils.getFieldCast(variableElement), cursor);
 
-                    fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement), variableElement.getSimpleName());
+                    fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement), i);
                 }
+                fromCursorB.endControlFlow();
             }
         }
 
@@ -78,7 +82,7 @@ public class CursorHelperGenerator {
             fromCursorB.addCode("\n");
             String JOIN_NAME = ProcessUtils.getTableName(objectName) + "_" + ProcessUtils.getTableName(variableElement);
 
-            fromCursorB.addStatement("$T cursor$L = db.rawQuery($S,new String[]{String.valueOf($L), $S})", Constants.cursorClassName, i, "SELECT * FROM " + ProcessUtils.getTableName(variableElement) + ", " + JOIN_NAME + " WHERE " + JOIN_NAME + "." + ProcessUtils.getKeyName(objectName) + " = ? AND " + ProcessUtils.getTableName(variableElement) + "." + Constants.FIELD_ID + " = " + JOIN_NAME + "." + ProcessUtils.getKeyName(variableElement) + " AND " + JOIN_NAME + "." + Constants.FIELD_NAME + "= ?", ProcessUtils.getModelId("object"), ProcessUtils.getObjectName(variableElement));
+            fromCursorB.addStatement("$T cursor$L = db.rawQuery($S,new String[]{String.valueOf(objectId), $S})", Constants.cursorClassName, i, "SELECT * FROM " + ProcessUtils.getTableName(variableElement) + ", " + JOIN_NAME + " WHERE " + JOIN_NAME + "." + ProcessUtils.getKeyName(objectName) + " = ? AND " + ProcessUtils.getTableName(variableElement) + "." + Constants.FIELD_ID + " = " + JOIN_NAME + "." + ProcessUtils.getKeyName(variableElement) + " AND " + JOIN_NAME + "." + Constants.FIELD_NAME + "= ?", ProcessUtils.getObjectName(variableElement));
 
             fromCursorB.addStatement("$T objects$L = $T.get(cursor$L,db)", ProcessUtils.listOf(variableElement), i, ProcessUtils.getFieldCursorHelperClass(variableElement), i);
 
@@ -92,7 +96,7 @@ public class CursorHelperGenerator {
 
         for (int i = 0; i < collections.size(); ++i) {
             VariableElement variableElement = collections.get(i);
-            fromCursorB.addStatement("object.$L = $T.$L(db,$L,$S)", ProcessUtils.getObjectName(variableElement), Constants.primitiveCursorHelper, ProcessUtils.getPrimitiveCursorHelperFunction(variableElement), ProcessUtils.getModelId("object"), ProcessUtils.getObjectName(variableElement));
+            fromCursorB.addStatement("object.$L = $T.$L(db,objectId,$S)", ProcessUtils.getObjectName(variableElement), Constants.primitiveCursorHelper, ProcessUtils.getPrimitiveCursorHelperFunction(variableElement), ProcessUtils.getObjectName(variableElement));
         }
 
         fromCursorB.addCode("\n").addStatement("return object");
@@ -177,13 +181,7 @@ public class CursorHelperGenerator {
                 .addParameter(Constants.databaseClassName, "database")
                 .addParameter(modelType, "object");
 
-        Element idField = ProcessUtils.getIdField(element);
-        if (idField != null) {
-            updateB.addStatement("Long objectId = object.$L", ProcessUtils.getObjectName(idField));
-        } else {
-            updateB.addStatement("Long objectId = null");
-            updateB.addStatement("if(object instanceof $T) objectId = $L", Constants.entityProxyClass, ProcessUtils.getModelId("object"));
-        }
+        updateB.addStatement(ProcessUtils.getModelId(element, "object", "objectId"));
 
         updateB.beginControlFlow("if(objectId != null)");
         updateB.addStatement("database.update($S, getValues(object,null), $S, new String[]{String.valueOf(objectId)})", ProcessUtils.getTableName(objectName), Constants.FIELD_ID + " = ?");
@@ -213,13 +211,7 @@ public class CursorHelperGenerator {
 
                     .beginControlFlow("else");
             {
-                Element idFieldChild = ProcessUtils.getIdField(variableElement);
-                if (idFieldChild != null) {
-                    updateForB.addStatement("Long = objectId = child.$L", ProcessUtils.getObjectName(idFieldChild));
-                } else {
-                    updateForB.addStatement("Long objectId = null");
-                    updateForB.addStatement("if(child instanceof $T) objectId = $L", Constants.entityProxyClass, ProcessUtils.getModelId("child"));
-                }
+                updateForB.addStatement(ProcessUtils.getModelId(variableElement, "child", "objectId"));
             }
 
             updateForB
@@ -247,13 +239,7 @@ public class CursorHelperGenerator {
                     .beginControlFlow("for($T child : objects)", ProcessUtils.getFieldClass(variableElement));
 
             {
-                Element idFieldChild = ProcessUtils.getIdField(variableElement);
-                if (idFieldChild != null) {
-                    updateAllB.addStatement("Long = objectId = child.$L", ProcessUtils.getObjectName(idFieldChild));
-                } else {
-                    updateAllB.addStatement("Long objectId = null");
-                    updateAllB.addStatement("if(child instanceof $T) objectId = $L", Constants.entityProxyClass, ProcessUtils.getModelId("child"));
-                }
+                updateAllB.addStatement(ProcessUtils.getModelId(variableElement, "child", "objectId"));
 
                 updateAllB
                         .beginControlFlow("if(objectId != null)")

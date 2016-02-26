@@ -7,7 +7,9 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,11 +20,15 @@ import javax.lang.model.element.VariableElement;
 
 import fr.xebia.android.freezer.Constants;
 import fr.xebia.android.freezer.ProcessUtils;
+import rx.Observable;
+import rx.Subscriber;
 
 /**
  * Created by florentchampigny on 08/01/2016.
  */
 public class ModelORMGenerator {
+
+    private final Element element;
 
     String modelName;
     String modelPackage;
@@ -45,6 +51,7 @@ public class ModelORMGenerator {
     List<VariableElement> collections;
 
     public ModelORMGenerator(Element element) {
+        this.element = element;
         this.modelName = ProcessUtils.getObjectName(element);
         this.modelPackage = ProcessUtils.getObjectPackage(element);
 
@@ -79,6 +86,8 @@ public class ModelORMGenerator {
                 .addModifiers(Modifier.PUBLIC)
 
                 .superclass(Constants.queryBuilderClassName)
+
+                .addField(ProcessUtils.listOf(enumColums), "fields")
 
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
@@ -128,6 +137,36 @@ public class ModelORMGenerator {
                         .returns(listObjectsClassName)
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("return execute()")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("asObservable")
+                        .returns(ParameterizedTypeName.get(ClassName.get(Observable.class), listObjectsClassName))
+                        .addModifiers(Modifier.PUBLIC)
+                        .addCode("return $T.create(new Observable.OnSubscribe<$T>(){\n", ClassName.get(Observable.class), listObjectsClassName)
+                        .addCode("@$T\n", ClassName.get(Override.class))
+                        .addCode("public void call($T<? super $T> subscriber) {\n", ClassName.get(Subscriber.class), listObjectsClassName)
+                        .addStatement("subscriber.onNext(asList())")
+                        .addStatement("subscriber.onCompleted()")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("async")
+                        .addParameter(ParameterizedTypeName.get(Constants.callback, listObjectsClassName), "callback")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("final $T<$T<$T>> weakReference = new $T<>(callback)", ClassName.get(WeakReference.class), Constants.callback, listObjectsClassName, ClassName.get(WeakReference.class))
+                        .addStatement("final $T current = new Handler($T.myLooper())", ClassName.get("android.os", "Handler"), ClassName.get("android.os", "Looper"))
+                        .addCode("new Handler().post(new $T() {\n", ClassName.get(Runnable.class))
+                        .addCode("@$T public void run() {\n", ClassName.get(Override.class))
+                        .addStatement("final $T objects = asList()", listObjectsClassName)
+                        .addCode("current.post(new Runnable() {\n")
+                        .addCode("@Override public void run() {\n")
+                        .addStatement("$T callback1 = weakReference.get()", ParameterizedTypeName.get(Constants.callback, listObjectsClassName))
+                        .addStatement("if(callback1 != null) callback1.onSuccess(objects)")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .addCode("}\n")
+                        .addCode("});\n")
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("first")
@@ -228,11 +267,57 @@ public class ModelORMGenerator {
 
                         .build())
 
+                .addMethod(MethodSpec.methodBuilder("fields")
+                        .returns(queryBuilderClassName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(ArrayTypeName.of(enumColums), "fields")
+                        .varargs()
+                        .addStatement("this.fields = new $T<>()", TypeName.get(ArrayList.class))
+                        .addStatement("this.fields.addAll($T.asList(fields))", TypeName.get(Arrays.class))
+                        .addStatement("return this")
+
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("fieldsWithout")
+                        .returns(queryBuilderClassName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(ArrayTypeName.of(enumColums), "fields")
+                        .varargs()
+                        .addStatement("this.fields = new $T<>($T.asList($L.values()))", TypeName.get(ArrayList.class), TypeName.get(Arrays.class), enumColums)
+                        .addStatement("this.fields.removeAll($T.asList(fields))", TypeName.get(Arrays.class))
+                        .addStatement("return this")
+
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("field")
+                        .returns(queryBuilderClassName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(enumColums, "field")
+                        .addStatement("return this")
+
+                        .build())
+
                 .addMethod(MethodSpec.methodBuilder("execute")
                         .returns(listObjectsClassName)
                         .addModifiers(Modifier.PRIVATE)
                         .addStatement("$T db = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
-                        .addStatement("$T query = $S + constructQuery()", ClassName.get(String.class), String.format("select distinct %s.* from %s ", TABLE_NAME, TABLE_NAME))
+                        .addStatement("$T stringBuilder =  new $T()", Constants.stringBuilderClassName, Constants.stringBuilderClassName)
+                        .addStatement("stringBuilder.append($S)", "select distinct ")
+                        .addStatement("if(fields == null) stringBuilder.append(\"$L.* \")", TABLE_NAME)
+                        .beginControlFlow("else")
+                        .addStatement("stringBuilder.append($S)", TABLE_NAME + "." + Constants.FIELD_ID)
+                        .addStatement("final int fieldsSize = fields.size()")
+                        .beginControlFlow("for(int i=0;i<fieldsSize;++i)")
+                        .addStatement("$T c = fields.get(i)", enumColums)
+                        .beginControlFlow("if(c.isPrimitive())")
+                        .addStatement("stringBuilder.append($S)", ", ")
+                        .addStatement("stringBuilder.append($S+fields.get(i))", TABLE_NAME + ".")
+                        .endControlFlow()
+                        .endControlFlow()
+                        .endControlFlow()
+                        .addStatement("stringBuilder.append($S)", String.format(" from %s ", TABLE_NAME))
+                        .addStatement("stringBuilder.append(constructQuery())")
+                        .addStatement("$T query = stringBuilder.toString()", ClassName.get(String.class))
                         .addStatement("String[] args = constructArgs()")
                         .addStatement("if(logger != null) logger.onQuery(query,args)")
                         .addStatement("$T cursor = db.rawQuery(query, args)", Constants.cursorClassName)
@@ -302,6 +387,57 @@ public class ModelORMGenerator {
                         .addStatement("for($T object : objects) add(object)", modelClassName)
                         .build())
 
+                .addMethod(MethodSpec.methodBuilder("addAsync")
+                        .addParameter(modelClassName, "object", Modifier.FINAL)
+                        .addParameter(ParameterizedTypeName.get(Constants.callback, modelClassName), "callback")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("final $T<$T<$T>> weakReference = new WeakReference<>(callback)", ClassName.get(WeakReference.class), Constants.callback, modelClassName)
+                        .addStatement("final $T current = new Handler($T.myLooper())", ClassName.get("android.os", "Handler"), ClassName.get("android.os", "Looper"))
+                        .addCode("new Handler().post(new $T() {\n", ClassName.get(Runnable.class))
+                        .addCode("@$T public void run() {\n", ClassName.get(Override.class))
+                        .addStatement("add(object)")
+                        .addCode("current.post(new Runnable() {\n")
+                        .addCode("@Override public void run() {\n")
+                        .addStatement("$T callback1 = weakReference.get()", ParameterizedTypeName.get(Constants.callback, modelClassName))
+                        .addStatement("if(callback1 != null) callback1.onSuccess(object)")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("addAsync")
+                        .addParameter(modelClassName, "object", Modifier.FINAL)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("addAsync(object, null)")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("addAsync")
+                        .addParameter(ProcessUtils.listOf(modelClassName), "objects", Modifier.FINAL)
+                        .addParameter(ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName)), "callback")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("final $T weakReference = new WeakReference<>(callback)",
+                                ParameterizedTypeName.get(ClassName.get(WeakReference.class), ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName))))
+                        .addStatement("final $T current = new Handler($T.myLooper())", ClassName.get("android.os", "Handler"), ClassName.get("android.os", "Looper"))
+                        .addCode("new Handler().post(new $T() {\n", ClassName.get(Runnable.class))
+                        .addCode("@$T public void run() {\n", ClassName.get(Override.class))
+                        .addStatement("add(objects)")
+                        .addCode("current.post(new Runnable() {\n")
+                        .addCode("@Override public void run() {\n")
+                        .addStatement("$T callback1 = weakReference.get()", ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName)))
+                        .addStatement("if(callback1 != null) callback1.onSuccess(objects)")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("addAsync")
+                        .addParameter(ProcessUtils.listOf(modelClassName), "objects", Modifier.FINAL)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("addAsync(objects, null)")
+                        .build())
+
                 .addMethod(MethodSpec.methodBuilder("update")
                         .addParameter(modelClassName, "object")
                         .returns(TypeName.LONG)
@@ -318,11 +454,83 @@ public class ModelORMGenerator {
                         .addStatement("for($T object : objects) update(object)", modelClassName)
                         .build())
 
+                .addMethod(MethodSpec.methodBuilder("updateAsync")
+                        .addParameter(modelClassName, "object", Modifier.FINAL)
+                        .addParameter(ParameterizedTypeName.get(Constants.callback, modelClassName), "callback")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("final $T<$T<$T>> weakReference = new WeakReference<>(callback)", ClassName.get(WeakReference.class), Constants.callback, modelClassName)
+                        .addStatement("final $T current = new Handler($T.myLooper())", ClassName.get("android.os", "Handler"), ClassName.get("android.os", "Looper"))
+                        .addCode("new Handler().post(new $T() {\n", ClassName.get(Runnable.class))
+                        .addCode("@$T public void run() {\n", ClassName.get(Override.class))
+                        .addStatement("update(object)")
+                        .addCode("current.post(new Runnable() {\n")
+                        .addCode("@Override public void run() {\n")
+                        .addStatement("$T callback1 = weakReference.get()", ParameterizedTypeName.get(Constants.callback, modelClassName))
+                        .addStatement("if(callback1 != null) callback1.onSuccess(object)")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("updateAsync")
+                        .addParameter(modelClassName, "object", Modifier.FINAL)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("updateAsync(object, null)")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("updateAsync")
+                        .addParameter(ProcessUtils.listOf(modelClassName), "objects", Modifier.FINAL)
+                        .addParameter(ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName)), "callback")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("final $T weakReference = new WeakReference<>(callback)",
+                                ParameterizedTypeName.get(ClassName.get(WeakReference.class), ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName))))
+                        .addStatement("final $T current = new Handler($T.myLooper())", ClassName.get("android.os", "Handler"), ClassName.get("android.os", "Looper"))
+                        .addCode("new Handler().post(new $T() {\n", ClassName.get(Runnable.class))
+                        .addCode("@$T public void run() {\n", ClassName.get(Override.class))
+                        .addStatement("update(objects)")
+                        .addCode("current.post(new Runnable() {\n")
+                        .addCode("@Override public void run() {\n")
+                        .addStatement("$T callback1 = weakReference.get()", ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName)))
+                        .addStatement("if(callback1 != null) callback1.onSuccess(objects)")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("updateAsync")
+                        .addParameter(ProcessUtils.listOf(modelClassName), "objects", Modifier.FINAL)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("updateAsync(objects, null)")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("delete")
+                        .addParameter(Constants.databaseClassName, "db")
+                        .addParameter(modelClassName, "object")
+                        .addModifiers(Modifier.PRIVATE)
+                        .returns(TypeName.VOID)
+                        .addStatement(ProcessUtils.getModelId(element, "object", "id"))
+                        .addStatement("db.delete($S, $S, new String[]{String.valueOf(id)})", TABLE_NAME, "_id = ?")
+                        .build())
+
                 .addMethod(MethodSpec.methodBuilder("delete")
                         .addParameter(modelClassName, "object")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(TypeName.VOID)
-                        .addStatement("$T.getInstance().open().getDatabase().delete($S, $S, new String[]{String.valueOf($L)})", Constants.daoClassName, TABLE_NAME, "_id = ?", ProcessUtils.getModelId("object"))
+                        .addStatement("$T db = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
+                        .addStatement("delete(db,object)")
+                        .addStatement("$T.getInstance().close()", Constants.daoClassName)
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("delete")
+                        .addParameter(listObjectsClassName, "objects")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(TypeName.VOID)
+                        .addStatement("$T db = $T.getInstance().open().getDatabase()", Constants.databaseClassName, Constants.daoClassName)
+                        .beginControlFlow("for($T object : objects)", modelClassName)
+                        .addStatement("delete(db,object)")
+                        .endControlFlow()
                         .addStatement("$T.getInstance().close()", Constants.daoClassName)
                         .build())
 
@@ -331,6 +539,76 @@ public class ModelORMGenerator {
                         .returns(TypeName.VOID)
                         .addStatement("$T.getInstance().open().getDatabase().execSQL($S)", Constants.daoClassName, "delete from " + TABLE_NAME)
                         .addStatement("$T.getInstance().close()", Constants.daoClassName)
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("deleteAllAsync")
+                        .addParameter(modelClassName, "object", Modifier.FINAL)
+                        .addParameter(ParameterizedTypeName.get(Constants.callback, modelClassName), "callback")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("final $T<$T<$T>> weakReference = new WeakReference<>(callback)", ClassName.get(WeakReference.class), Constants.callback, modelClassName)
+                        .addStatement("final $T current = new Handler($T.myLooper())", ClassName.get("android.os", "Handler"), ClassName.get("android.os", "Looper"))
+                        .addCode("new Handler().post(new $T() {\n", ClassName.get(Runnable.class))
+                        .addCode("@$T public void run() {\n", ClassName.get(Override.class))
+                        .addStatement("deleteAll()")
+                        .addCode("current.post(new Runnable() {\n")
+                        .addCode("@Override public void run() {\n")
+                        .addStatement("$T callback1 = weakReference.get()", ParameterizedTypeName.get(Constants.callback, modelClassName))
+                        .addStatement("if(callback1 != null) callback1.onSuccess(null)")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("deleteAsync")
+                        .addParameter(modelClassName, "object", Modifier.FINAL)
+                        .addParameter(ParameterizedTypeName.get(Constants.callback, modelClassName), "callback")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("final $T<$T<$T>> weakReference = new WeakReference<>(callback)", ClassName.get(WeakReference.class), Constants.callback, modelClassName)
+                        .addStatement("final $T current = new Handler($T.myLooper())", ClassName.get("android.os", "Handler"), ClassName.get("android.os", "Looper"))
+                        .addCode("new Handler().post(new $T() {\n", ClassName.get(Runnable.class))
+                        .addCode("@$T public void run() {\n", ClassName.get(Override.class))
+                        .addStatement("delete(object)")
+                        .addCode("current.post(new Runnable() {\n")
+                        .addCode("@Override public void run() {\n")
+                        .addStatement("$T callback1 = weakReference.get()", ParameterizedTypeName.get(Constants.callback, modelClassName))
+                        .addStatement("if(callback1 != null) callback1.onSuccess(object)")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("deleteAsync")
+                        .addParameter(modelClassName, "object", Modifier.FINAL)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("deleteAsync(object, null)")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("deleteAsync")
+                        .addParameter(ProcessUtils.listOf(modelClassName), "objects", Modifier.FINAL)
+                        .addParameter(ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName)), "callback")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("final $T weakReference = new WeakReference<>(callback)",
+                                ParameterizedTypeName.get(ClassName.get(WeakReference.class), ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName))))
+                        .addStatement("final $T current = new Handler($T.myLooper())", ClassName.get("android.os", "Handler"), ClassName.get("android.os", "Looper"))
+                        .addCode("new Handler().post(new $T() {\n", ClassName.get(Runnable.class))
+                        .addCode("@$T public void run() {\n", ClassName.get(Override.class))
+                        .addStatement("delete(objects)")
+                        .addCode("current.post(new Runnable() {\n")
+                        .addCode("@Override public void run() {\n")
+                        .addStatement("$T callback1 = weakReference.get()", ParameterizedTypeName.get(Constants.callback, ProcessUtils.listOf(modelClassName)))
+                        .addStatement("if(callback1 != null) callback1.onSuccess(objects)")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .addCode("}\n")
+                        .addCode("});\n")
+                        .build())
+
+                .addMethod(MethodSpec.methodBuilder("deleteAsync")
+                        .addParameter(ProcessUtils.listOf(modelClassName), "objects", Modifier.FINAL)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("deleteAsync(objects, null)")
                         .build())
 
                 .addMethod(MethodSpec.methodBuilder("count")

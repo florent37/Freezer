@@ -10,17 +10,19 @@ android {
         versionCode 1
         versionName "1.0"
     }
-    
+
     android {
         lintOptions {
             abortOnError false
         }
-  }
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
+
+    compile 'io.reactivex:rxjava:1.1.1'
 }
 
 ext {

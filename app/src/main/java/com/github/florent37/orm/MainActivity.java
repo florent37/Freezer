@@ -8,11 +8,13 @@ import com.github.florent37.orm.model.Cat;
 import com.github.florent37.orm.model.CatEntityManager;
 import com.github.florent37.orm.model.Dog;
 import com.github.florent37.orm.model.User;
+import com.github.florent37.orm.model.UserColumns;
 import com.github.florent37.orm.model.UserEntityManager;
 
 import fr.xebia.android.freezer.QueryLogger;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,6 +54,5 @@ public class MainActivity extends AppCompatActivity {
 
                 .asList()
                 .toString());
-
     }
 }

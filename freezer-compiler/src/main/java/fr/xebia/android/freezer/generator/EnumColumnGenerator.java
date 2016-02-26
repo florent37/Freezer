@@ -30,21 +30,30 @@ public class EnumColumnGenerator {
         TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(ProcessUtils.getObjectName(element) + Constants.ENUM_COLUMN_SUFFIX)
                 .addModifiers(Modifier.PUBLIC)
                 .addField(String.class, Constants.ENUM_COLUMN_ELEMENT_NAME, Modifier.PRIVATE, Modifier.FINAL)
+                .addField(TypeName.BOOLEAN, Constants.ENUM_COLUMN_IS_PRIMITIVE, Modifier.PRIVATE, Modifier.FINAL)
                 .addMethod(MethodSpec.methodBuilder("getName")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(TypeName.get(String.class))
                         .addStatement("return this.$L", Constants.ENUM_COLUMN_ELEMENT_NAME)
                         .build())
+                .addMethod(MethodSpec.methodBuilder("isPrimitive")
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(TypeName.BOOLEAN)
+                        .addStatement("return this.$L", Constants.ENUM_COLUMN_IS_PRIMITIVE)
+                        .build())
                 .addMethod(MethodSpec.constructorBuilder()
                         .addParameter(String.class, "name")
+                        .addParameter(TypeName.BOOLEAN, "primitive")
                         .addStatement("this.$L = name", Constants.ENUM_COLUMN_ELEMENT_NAME)
+                        .addStatement("this.$L = primitive", Constants.ENUM_COLUMN_IS_PRIMITIVE)
                         .build());
 
         for (VariableElement variableElement : fields) {
             String fieldSqlName = ProcessUtils.getObjectName(variableElement);
             if (ProcessUtils.isIdField(variableElement))
                 fieldSqlName = Constants.FIELD_ID;
-            enumBuilder.addEnumConstant(ProcessUtils.getObjectName(variableElement), TypeSpec.anonymousClassBuilder("$S", fieldSqlName)
+            boolean isPrimivive = ProcessUtils.isPrimitive(variableElement);
+            enumBuilder.addEnumConstant(ProcessUtils.getObjectName(variableElement), TypeSpec.anonymousClassBuilder("$S, $L", fieldSqlName, isPrimivive)
                     .build());
         }
 
