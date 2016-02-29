@@ -17,9 +17,9 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  compile 'fr.xebia.android.freezer:freezer:1.0.6'
-  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.6'
-  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.6'
+  compile 'fr.xebia.android.freezer:freezer:2.0.0'
+  provided 'fr.xebia.android.freezer:freezer-annotations:2.0.0'
+  apt 'fr.xebia.android.freezer:freezer-compiler:2.0.0'
 }
 ```
 
@@ -294,11 +294,6 @@ Migration isn't yet capable of:
 - adding/modifying One To One
 - adding/modifying One To Many
 - handling collections/arrays
- 
-#TODO
-
-- Improve migration
-- Add Observable support
 
 #Changelog
 
@@ -327,7 +322,7 @@ Introduced Migration Engine.
 
 - Model update
 
-##1.0.6
+##2.0.0
 
 - Async API
 - Support Observables
