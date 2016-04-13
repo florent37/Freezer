@@ -23,6 +23,21 @@ dependencies {
 }
 ```
 
+#It's always better with a context
+
+Don't forget to initialise Freezer in your application:
+
+```java
+public class MyApplication extends Application {
+
+    @Override public void onCreate() {
+        super.onCreate();
+        Freezer.onCreate(this);
+    }
+
+}
+```
+
 #Usage
 
 Use Annotations to mark classes to be persisted:
@@ -125,6 +140,16 @@ float agesAverage  = userEntityManager.select().average(UserColumns.age);
 float ageMin       = userEntityManager.select().min(UserColumns.age);
 float ageMax       = userEntityManager.select().max(UserColumns.age);
 int count          = userEntityManager.select().count();
+```
+
+## Limit
+
+The `QueryBuilder` offers a limitation method, for example, getting 10 users, starting from the 5th:
+
+```java
+ist<User> someUsers = userEntityManager.select()
+                                .limit(5, 10) //start, count
+                                .asList();
 ```
 
 #Asynchronous
@@ -242,21 +267,6 @@ You can log all SQL queries from entities managers:
 
 ```java
 userEntityManager.logQueries((query, datas) -> Log.d(TAG, query) }
-```
-
-#It's always better with a context
-
-Don't forget to initialise Freezer in your application:
-
-```java
-public class MyApplication extends Application {
-
-    @Override public void onCreate() {
-        super.onCreate();
-        Freezer.onCreate(this);
-    }
-
-}
 ```
 
 #Migration

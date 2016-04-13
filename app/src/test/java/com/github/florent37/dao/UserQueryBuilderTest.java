@@ -509,4 +509,35 @@ public class UserQueryBuilderTest {
         assertThat(numberOfUsers.get()).isEqualTo(3);
     }
 
+    @Test
+    public void testSelectUsers_limit() {
+        //given
+        List<User> users = Arrays.asList(
+            new User(21, "a", null, null, true),
+            new User(21, "b", null, null, true),
+            new User(21, "c", null, null, true),
+            new User(21, "d", null, null, true),
+            new User(21, "e", null, null, true),//4
+            new User(21, "f", null, null, true),
+            new User(21, "g", null, null, true),
+            new User(21, "h", null, null, true),
+            new User(21, "i", null, null, true),
+            new User(21, "j", null, null, true),
+            new User(21, "k", null, null, true),
+            new User(21, "l", null, null, true),
+            new User(21, "m", null, null, true)
+        );
+        userEntityManager.add(users);
+
+        //when
+        List<User> usersFromBase = userEntityManager
+            .select()
+            .limit(4,5)
+            .asList();
+
+        //then
+        assertThat(usersFromBase.size()).isEqualTo(5);
+        assertThat(usersFromBase.get(0).getName()).isEqualTo("e");
+    }
+
 }
