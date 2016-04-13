@@ -17,9 +17,9 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  compile 'fr.xebia.android.freezer:freezer:2.0.0'
-  provided 'fr.xebia.android.freezer:freezer-annotations:2.0.0'
-  apt 'fr.xebia.android.freezer:freezer-compiler:2.0.0'
+  compile 'fr.xebia.android.freezer:freezer:2.0.1'
+  provided 'fr.xebia.android.freezer:freezer-annotations:2.0.1'
+  apt 'fr.xebia.android.freezer:freezer-compiler:2.0.1'
 }
 ```
 
@@ -337,6 +337,10 @@ Introduced Migration Engine.
 - Async API
 - Support Observables
 - Added @DatabaseName
+
+##2.0.1
+
+- Limit
 
 #A project initiated by Xebia
 
