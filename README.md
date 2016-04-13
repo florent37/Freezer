@@ -17,9 +17,24 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  compile 'fr.xebia.android.freezer:freezer:1.0.6'
-  provided 'fr.xebia.android.freezer:freezer-annotations:1.0.6'
-  apt 'fr.xebia.android.freezer:freezer-compiler:1.0.6'
+  compile 'fr.xebia.android.freezer:freezer:2.0.1'
+  provided 'fr.xebia.android.freezer:freezer-annotations:2.0.1'
+  apt 'fr.xebia.android.freezer:freezer-compiler:2.0.1'
+}
+```
+
+#It's always better with a context
+
+Don't forget to initialise Freezer in your application:
+
+```java
+public class MyApplication extends Application {
+
+    @Override public void onCreate() {
+        super.onCreate();
+        Freezer.onCreate(this);
+    }
+
 }
 ```
 
@@ -125,6 +140,16 @@ float agesAverage  = userEntityManager.select().average(UserColumns.age);
 float ageMin       = userEntityManager.select().min(UserColumns.age);
 float ageMax       = userEntityManager.select().max(UserColumns.age);
 int count          = userEntityManager.select().count();
+```
+
+## Limit
+
+The `QueryBuilder` offers a limitation method, for example, getting 10 users, starting from the 5th:
+
+```java
+ist<User> someUsers = userEntityManager.select()
+                                .limit(5, 10) //start, count
+                                .asList();
 ```
 
 #Asynchronous
@@ -246,21 +271,6 @@ You can log all SQL queries from entities managers:
 userEntityManager.logQueries((query, datas) -> Log.d(TAG, query) }
 ```
 
-#It's always better with a context
-
-Don't forget to initialise Freezer in your application:
-
-```java
-public class MyApplication extends Application {
-
-    @Override public void onCreate() {
-        super.onCreate();
-        Freezer.onCreate(this);
-    }
-
-}
-```
-
 #Migration
 
 To handle schema migration, just add `@Migration(newVersion)` in a static method,
@@ -296,11 +306,6 @@ Migration isn't yet capable of:
 - adding/modifying One To One
 - adding/modifying One To Many
 - handling collections/arrays
- 
-#TODO
-
-- Improve migration
-- Add Observable support
 
 #Changelog
 
@@ -329,11 +334,15 @@ Introduced Migration Engine.
 
 - Model update
 
-##1.0.6
+##2.0.0
 
 - Async API
 - Support Observables
 - Added @DatabaseName
+
+##2.0.1
+
+- Limit
 
 #A project initiated by Xebia
 
