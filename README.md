@@ -147,7 +147,7 @@ int count          = userEntityManager.select().count();
 The `QueryBuilder` offers a limitation method, for example, getting 10 users, starting from the 5th:
 
 ```java
-ist<User> someUsers = userEntityManager.select()
+List<User> someUsers = userEntityManager.select()
                                 .limit(5, 10) //start, count
                                 .asList();
 ```
