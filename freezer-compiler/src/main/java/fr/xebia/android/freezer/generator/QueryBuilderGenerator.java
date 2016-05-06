@@ -1,5 +1,6 @@
 package fr.xebia.android.freezer.generator;
 
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -207,6 +208,22 @@ public class QueryBuilderGenerator {
                 .addStatement("return queryBuilder")
                 .build())
 
+            .addMethod(MethodSpec.methodBuilder("in")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(TypeVariableName.get("Q1"))
+                .varargs()
+                .addParameter(ArrayTypeName.of(TypeVariableName.get("M1")), "values")
+                .addStatement("$T sb = new $T()", Constants.stringBuilderClassName, Constants.stringBuilderClassName)
+                .addStatement("sb.append($S)", " in (")
+                .beginControlFlow("for(int i=0;i<values.length;++i)")
+                .addStatement("sb.append(values[i])")
+                .addStatement("if(i != values.length-1) sb.append($S)", ",")
+                .endControlFlow()
+                .addStatement("sb.append($S)", ")")
+                .addStatement("queryBuilder.appendQuery(column+sb.toString(), null)")
+                .addStatement("return queryBuilder")
+                .build())
+
             .addMethod(MethodSpec.methodBuilder("greatherThan")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(TypeVariableName.get("Q1"))
@@ -291,6 +308,22 @@ public class QueryBuilderGenerator {
                 .returns(TypeVariableName.get("Q2"))
                 .addParameter(TypeName.get(String.class), "value")
                 .addStatement("queryBuilder.appendQuery(column+\" LIKE '\"+value+\"'\",null)")
+                .addStatement("return queryBuilder")
+                .build())
+
+            .addMethod(MethodSpec.methodBuilder("in")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(TypeVariableName.get("Q2"))
+                .varargs()
+                .addParameter(ArrayTypeName.of(TypeName.get(String.class)), "values")
+                .addStatement("$T sb = new $T()", Constants.stringBuilderClassName, Constants.stringBuilderClassName)
+                .addStatement("sb.append($S)", " in (")
+                .beginControlFlow("for(int i=0;i<values.length;++i)")
+                .addStatement("sb.append($S).append(values[i]).append($S)", "'", "'")
+                .addStatement("if(i != values.length-1) sb.append($S)", ",")
+                .endControlFlow()
+                .addStatement("sb.append($S)", ")")
+                .addStatement("queryBuilder.appendQuery(column+sb.toString(), null)")
                 .addStatement("return queryBuilder")
                 .build())
 

@@ -17,9 +17,9 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  compile 'fr.xebia.android.freezer:freezer:2.0.1'
-  provided 'fr.xebia.android.freezer:freezer-annotations:2.0.1'
-  apt 'fr.xebia.android.freezer:freezer-compiler:2.0.1'
+  compile 'fr.xebia.android.freezer:freezer:2.0.2'
+  provided 'fr.xebia.android.freezer:freezer-annotations:2.0.2'
+  apt 'fr.xebia.android.freezer:freezer-compiler:2.0.2'
 }
 ```
 
@@ -114,11 +114,13 @@ List<User> allUsers = userEntityManager.select()
      .name().equalsTo("florent")
      .name().notEqualsTo("kevin")
      .name().contains("flo")
+     .name().in("flo","alex","logan")
 //numbers
      .age().equalsTo(10)
      .age().notEqualsTo(30)
      .age().greatherThan(5)
      .age().between(10,20)
+     .age().in(10,13,16)
 //booleans
      .hacker().equalsTo(true)
      .hacker().isTrue()

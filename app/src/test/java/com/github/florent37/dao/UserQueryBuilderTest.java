@@ -154,6 +154,48 @@ public class UserQueryBuilderTest {
     }
 
     @Test
+    public void testSelectUsersFromAge_in() {
+        //given
+        List<User> users = Arrays.asList(
+            new User(1, "a"),
+            new User(3, "b"),
+            new User(5, "c"),
+            new User(1, "d"),
+            new User(10, "e"),
+            new User(11, "f")
+        );
+
+        //when
+        userEntityManager.add(users);
+        List<User> usersFromBase = userEntityManager.select().age().in(1, 10).asList();
+
+        //then
+        assertThat(usersFromBase).isNotNull();
+        assertThat(usersFromBase).hasSize(3);
+    }
+
+    @Test
+    public void testSelectUsersFromName_in() {
+        //given
+        List<User> users = Arrays.asList(
+            new User(1, "a"),
+            new User(3, "b"),
+            new User(5, "a"),
+            new User(1, "e"),
+            new User(10, "e"),
+            new User(11, "f")
+        );
+
+        //when
+        userEntityManager.add(users);
+        List<User> usersFromBase = userEntityManager.select().name().in("a", "e").asList();
+
+        //then
+        assertThat(usersFromBase).isNotNull();
+        assertThat(usersFromBase).hasSize(4);
+    }
+
+    @Test
     public void testSelectUserFromBoolean_equalsTrue() {
         //given
         List<User> users = Arrays.asList(
