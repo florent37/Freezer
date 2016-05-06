@@ -346,6 +346,10 @@ Introduced Migration Engine.
 
 - Limit
 
+## 2.0.2
+
+- Added query.in(...values...)
+
 #A project initiated by Xebia
 
 This project was first developed by Xebia and has been open-sourced since. We will continue working on it.
