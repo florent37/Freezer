@@ -1,5 +1,6 @@
 # Freezer
 
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Freezer-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3080)
 [![Build Status](https://travis-ci.org/florent37/Freezer.svg?branch=master)](https://travis-ci.org/florent37/Freezer)
 
 [![logo freezer](https://raw.githubusercontent.com/florent37/Freezer/master/freezer-logo.png)](https://github.com/florent37/Freezer)
