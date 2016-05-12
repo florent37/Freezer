@@ -43,6 +43,7 @@ import fr.xebia.android.freezer.generator.QueryLoggerGenerator;
         {
                 "fr.xebia.android.freezer.annotations.Model",
                 "fr.xebia.android.freezer.annotations.Migration",
+            "fr.xebia.android.freezer.annotations.DatabaseName",
                 "fr.xebia.android.freezer.annotations.Ignore"
         })
 @AutoService(javax.annotation.processing.Processor.class)
@@ -74,6 +75,36 @@ public class Processor extends AbstractProcessor {
         resolveDependencies();
         writeJavaFiles();
         return true;
+    }
+
+    protected void writeStaticJavaFiles() {
+        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DAOGenerator().generate()).build());
+        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new QueryLoggerGenerator().generate()).build());
+        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, ModelEntityProxyGenerator.generateModelProxyInterface()).build());
+        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new PrimitiveCursorHelperGenerator().generate()).build());
+        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new QueryBuilderGenerator().generate()).build());
+    }
+
+    protected void writeJavaFiles() {
+        for (CursorHelper cursorHelper : cursorHelpers) {
+            writeFile(JavaFile.builder(cursorHelper.getPackage(), cursorHelper.getTypeSpec()).build());
+        }
+
+        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DatabaseHelperGenerator(dbFile, version, daosList, migrators).generate()).build());
+    }
+
+    protected void writeFile(JavaFile javaFile) {
+        //try {
+        //    javaFile.writeTo(System.out);
+        //} catch (IOException e) {
+        //    //e.printStackTrace();
+        //}
+
+        try {
+            javaFile.writeTo(this.processingEnv.getFiler());
+        } catch (IOException e) {
+            //e.printStackTrace();
+        }
     }
 
     private void getMigrators(RoundEnvironment roundEnv) {
@@ -143,34 +174,5 @@ public class Processor extends AbstractProcessor {
         writeFile(JavaFile.builder(ProcessUtils.getObjectPackage(element), modelORMGenerator.getQueryBuilder()).build());
 
         daosList.add(ProcessUtils.getModelDao(element));
-    }
-
-    protected void writeStaticJavaFiles() {
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DAOGenerator().generate()).build());
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new QueryLoggerGenerator().generate()).build());
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, ModelEntityProxyGenerator.generateModelProxyInterface()).build());
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new PrimitiveCursorHelperGenerator().generate()).build());
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new QueryBuilderGenerator().generate()).build());
-    }
-
-    protected void writeJavaFiles() {
-        for (CursorHelper cursorHelper : cursorHelpers)
-            writeFile(JavaFile.builder(cursorHelper.getPackage(), cursorHelper.getTypeSpec()).build());
-
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DatabaseHelperGenerator(dbFile, version, daosList, migrators).generate()).build());
-    }
-
-    protected void writeFile(JavaFile javaFile) {
-        //try {
-        //    javaFile.writeTo(System.out);
-        //} catch (IOException e) {
-        //    //e.printStackTrace();
-        //}
-
-        try {
-            javaFile.writeTo(this.processingEnv.getFiler());
-        } catch (IOException e) {
-            //e.printStackTrace();
-        }
     }
 }
