@@ -39,12 +39,12 @@ import fr.xebia.android.freezer.generator.QueryLoggerGenerator;
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes(
-        {
-                "fr.xebia.android.freezer.annotations.Model",
-                "fr.xebia.android.freezer.annotations.Migration",
-            "fr.xebia.android.freezer.annotations.DatabaseName",
-                "fr.xebia.android.freezer.annotations.Ignore"
-        })
+    {
+        "fr.xebia.android.freezer.annotations.Model",
+        "fr.xebia.android.freezer.annotations.Migration",
+        "fr.xebia.android.freezer.annotations.DatabaseName",
+        "fr.xebia.android.freezer.annotations.Ignore"
+    })
 @AutoService(javax.annotation.processing.Processor.class)
 public class Processor extends AbstractProcessor {
 
@@ -110,8 +110,9 @@ public class Processor extends AbstractProcessor {
         int max = 1;
         for (Element element : roundEnv.getElementsAnnotatedWith(Migration.class)) {
             int v = element.getAnnotation(Migration.class).value();
-            if (max < v)
+            if (max < v) {
                 max = v;
+            }
             migrators.put(v, element);
         }
         version = max;
@@ -120,7 +121,10 @@ public class Processor extends AbstractProcessor {
     private void getDatabaseName(RoundEnvironment roundEnv) {
         for (Element element : roundEnv.getElementsAnnotatedWith(DatabaseName.class)) {
             String name = element.getAnnotation(DatabaseName.class).value();
-            if(name != null){
+            if (name != null && name.trim().length() > 0) {
+                if (!name.endsWith(".db")) {
+                    name = name + ".db";
+                }
                 dbFile = name;
                 return;
             }

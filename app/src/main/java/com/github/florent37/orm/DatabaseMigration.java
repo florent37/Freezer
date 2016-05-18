@@ -1,11 +1,13 @@
 package com.github.florent37.orm;
 
+import fr.xebia.android.freezer.annotations.DatabaseName;
 import fr.xebia.android.freezer.annotations.Migration;
 import fr.xebia.android.freezer.migration.Migrator;
 
 /**
  * Created by florentchampigny on 28/01/2016.
  */
+@DatabaseName("mmm")
 public class DatabaseMigration {
 
     @Migration(2)
