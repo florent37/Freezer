@@ -26,7 +26,6 @@ import fr.xebia.android.freezer.annotations.DatabaseName;
 import fr.xebia.android.freezer.annotations.Migration;
 import fr.xebia.android.freezer.annotations.Model;
 import fr.xebia.android.freezer.generator.CursorHelperGenerator;
-import fr.xebia.android.freezer.generator.DAOGenerator;
 import fr.xebia.android.freezer.generator.DatabaseHelperGenerator;
 import fr.xebia.android.freezer.generator.EnumColumnGenerator;
 import fr.xebia.android.freezer.generator.ModelEntityProxyGenerator;
@@ -78,7 +77,7 @@ public class Processor extends AbstractProcessor {
     }
 
     protected void writeStaticJavaFiles() {
-        writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DAOGenerator().generate()).build());
+        //writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new DAOGenerator().generate()).build());
         writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new QueryLoggerGenerator().generate()).build());
         writeFile(JavaFile.builder(Constants.DAO_PACKAGE, ModelEntityProxyGenerator.generateModelProxyInterface()).build());
         writeFile(JavaFile.builder(Constants.DAO_PACKAGE, new PrimitiveCursorHelperGenerator().generate()).build());

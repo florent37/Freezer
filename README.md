@@ -18,9 +18,9 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  compile 'fr.xebia.android.freezer:freezer:2.0.2'
-  provided 'fr.xebia.android.freezer:freezer-annotations:2.0.2'
-  apt 'fr.xebia.android.freezer:freezer-compiler:2.0.2'
+  compile 'fr.xebia.android.freezer:freezer:2.0.3'
+  provided 'fr.xebia.android.freezer:freezer-annotations:2.0.3'
+  apt 'fr.xebia.android.freezer:freezer-compiler:2.0.3'
 }
 ```
 
@@ -350,6 +350,10 @@ Introduced Migration Engine.
 ## 2.0.2
 
 - Added query.in(...values...)
+
+## 2.0.3
+
+- Freezer.onCreate is no longer dynamic
 
 #A project initiated by Xebia
 

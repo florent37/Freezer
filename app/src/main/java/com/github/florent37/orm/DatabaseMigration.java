@@ -1,7 +1,6 @@
 package com.github.florent37.orm;
 
 import fr.xebia.android.freezer.annotations.Migration;
-import fr.xebia.android.freezer.migration.ColumnType;
 import fr.xebia.android.freezer.migration.Migrator;
 
 /**
@@ -9,12 +8,12 @@ import fr.xebia.android.freezer.migration.Migrator;
  */
 public class DatabaseMigration {
 
-    //@Migration(2)
-    //public static void migrateTo2(Migrator migrator) {
-    //    migrator.update("User")
-    //            .removeField("age")
-    //            .renameTo("Man");
-    //}
+    @Migration(2)
+    public static void migrateTo2(Migrator migrator) {
+        //migrator.update("User")
+        //        .removeField("age")
+        //        .renameTo("Man");
+    }
 
     //@Migration(3)
     //public static void migrateTo3(Migrator migrator) {

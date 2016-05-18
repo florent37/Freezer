@@ -18,12 +18,12 @@ buildscript {
 ext{
     COMPILE_SDK=23
     TARGET_SDK=23
-    BUILD_TOOL="23.0.2"
+    BUILD_TOOL = "23.0.3"
     minSdkVersion = 14
     sourceCompatibilityVersion = JavaVersion.VERSION_1_7
     targetCompatibilityVersion = JavaVersion.VERSION_1_7
 
-    libraryVersion = "2.0.2"
+    libraryVersion = "2.0.3"
 }
 
 allprojects {
