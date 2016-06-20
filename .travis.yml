@@ -2,11 +2,12 @@ language: android
 
 android:
   components:
-  - tools
+    - platform-tools
     - tools
     - build-tools-23.0.3
     - android-23
     - extra-android-m2repository
+    - extra-google-m2repository
     - sys-img-x86-android-17
   licenses:
     - android-sdk-license-5be876d5
@@ -30,4 +31,4 @@ cache:
   directories:
     - $HOME/.m2
 
-script: ./gradlew clean build
+script: ./gradlew clean build test
