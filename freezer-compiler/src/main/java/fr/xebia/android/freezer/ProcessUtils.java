@@ -6,16 +6,16 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.lang.model.element.Element;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.ElementFilter;
-
 import fr.xebia.android.freezer.annotations.Id;
 import fr.xebia.android.freezer.annotations.Ignore;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.ElementFilter;
 
 /**
  * Created by florentchampigny on 17/01/16.
@@ -25,12 +25,22 @@ public class ProcessUtils {
     public static List<VariableElement> filterIgnore(List<VariableElement> elements) {
         List<VariableElement> filtered = new ArrayList<>();
         for (VariableElement variableElement : elements) {
-            if (variableElement.getAnnotation(Ignore.class) == null &&
-                !Constants.PARCEL_CREATOR.equals(ProcessUtils.getObjectName(variableElement))) {
+            if (variableElement.getAnnotation(Ignore.class) == null && !Constants.PARCEL_CREATOR.equals(
+                ProcessUtils.getObjectName(variableElement))) {
                 filtered.add(variableElement);
             }
         }
-        return filtered;
+        return filterStaticFinal(filtered);
+    }
+
+    public static List<VariableElement> filterStaticFinal(List<VariableElement> elements) {
+        List<VariableElement> filtered = new ArrayList<>();
+        for (VariableElement variableElement : elements) {
+            final Set<Modifier> modifiers = variableElement.getModifiers();
+            if (!modifiers.containsAll(Arrays.asList(Modifier.FINAL, Modifier.STATIC))) {
+                filtered.add(variableElement);
+            }
+        } return filtered;
     }
 
     public static List<VariableElement> getFields(Element element) {
@@ -106,7 +116,10 @@ public class ProcessUtils {
 
     public static String getFieldTableType(Element variableElement) {
         TypeName typeName = getFieldClass(variableElement);
-        if (typeName == TypeName.INT || typeName == TypeName.BOOLEAN || typeName == TypeName.LONG || typeName == TypeName.BYTE) {
+        if (typeName == TypeName.INT
+            || typeName == TypeName.BOOLEAN
+            || typeName == TypeName.LONG
+            || typeName == TypeName.BYTE) {
             return "integer";
         }
         if (typeName == TypeName.FLOAT) {
@@ -194,7 +207,10 @@ public class ProcessUtils {
     }
 
     public static boolean isPrimitive(TypeName typeName) {
-        return typeName.isPrimitive() || unbox(typeName).isPrimitive() || (ClassName.get(String.class).equals(typeName)) || isDate(typeName);
+        return typeName.isPrimitive()
+            || unbox(typeName).isPrimitive()
+            || (ClassName.get(String.class).equals(typeName))
+            || isDate(typeName);
     }
 
     public static boolean isCollectionOfPrimitive(Element element) {
@@ -309,18 +325,29 @@ public class ProcessUtils {
         StringBuilder stringBuilder = new StringBuilder();
         Element idField = getIdField(element);
         if (idField != null) {
-            stringBuilder.append("java.lang.Long ").append(idVariableName).append(" = ").append(elementVarialbe).append(".").append(getObjectName(idField));
+            stringBuilder.append("java.lang.Long ")
+                .append(idVariableName)
+                .append(" = ")
+                .append(elementVarialbe)
+                .append(".")
+                .append(getObjectName(idField));
         } else {
             stringBuilder.append("java.lang.Long ").append(idVariableName).append(" = ");
-            stringBuilder.append(elementVarialbe).append(" instanceof ").append(Constants.entityProxyClassString).append(" ? ");
-            stringBuilder.append(String.format("((%s.%s)%s).%s()", Constants.DAO_PACKAGE, Constants.MODEL_ENTITY_PROXY_INTERFACE, elementVarialbe, Constants.MODEL_ENTITY_PROXY_GET_ID_METHOD));
+            stringBuilder.append(elementVarialbe)
+                .append(" instanceof ")
+                .append(Constants.entityProxyClassString)
+                .append(" ? ");
+            stringBuilder.append(
+                String.format("((%s.%s)%s).%s()", Constants.DAO_PACKAGE, Constants.MODEL_ENTITY_PROXY_INTERFACE,
+                    elementVarialbe, Constants.MODEL_ENTITY_PROXY_GET_ID_METHOD));
             stringBuilder.append(": null");
         }
         return stringBuilder.toString();
     }
 
     public static String setModelId(String variable) {
-        return String.format("((%s.%s)%s).%s", Constants.DAO_PACKAGE, Constants.MODEL_ENTITY_PROXY_INTERFACE, variable, Constants.MODEL_ENTITY_PROXY_SET_ID_METHOD);
+        return String.format("((%s.%s)%s).%s", Constants.DAO_PACKAGE, Constants.MODEL_ENTITY_PROXY_INTERFACE, variable,
+            Constants.MODEL_ENTITY_PROXY_SET_ID_METHOD);
     }
 
     public static TypeName getModelProxy(Element element) {
@@ -462,5 +489,4 @@ public class ProcessUtils {
         }
         return names;
     }
-
 }

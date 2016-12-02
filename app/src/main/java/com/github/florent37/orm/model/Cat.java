@@ -3,15 +3,15 @@ package com.github.florent37.orm.model;
 import fr.xebia.android.freezer.annotations.Id;
 import fr.xebia.android.freezer.annotations.Ignore;
 import fr.xebia.android.freezer.annotations.Model;
-
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by florentchampigny on 21/01/2016.
  */
 @Model
 public class Cat {
+
+    public static final int VISIBLE = 0;
 
     @Id
     long id;
