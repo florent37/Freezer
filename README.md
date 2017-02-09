@@ -2,6 +2,9 @@
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Freezer-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3080)
 
+A simple & fluent Android ORM, how can it be easier ?
+And it's compatible with RX !
+
 ```java
 UserEntityManager userEntityManager = new UserEntityManager();
 
@@ -9,11 +12,9 @@ userEntityManager.add(new User("Florent", 6));
 userEntityManager.add(new User("Florian", 3));
 userEntityManager.add(new User("Bastien", 3));
 
-
 List<User> allUsers = userEntityManager.select()
                              .name().startsWith("Flo")
                              .asList();
-
 
 userEntityManager.select()
        .age().equals(3)
