@@ -18,7 +18,7 @@ buildscript {
 ext{
     COMPILE_SDK=25
     TARGET_SDK=25
-    BUILD_TOOL = "25.0.2"
+    BUILD_TOOL = "25.0.0"
     minSdkVersion = 14
     sourceCompatibilityVersion = JavaVersion.VERSION_1_7
     targetCompatibilityVersion = JavaVersion.VERSION_1_7
