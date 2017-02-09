@@ -1,30 +1,32 @@
 # Freezer
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Freezer-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3080)
-[![Build Status](https://travis-ci.org/florent37/Freezer.svg?branch=master)](https://travis-ci.org/florent37/Freezer)
 
-[![logo freezer](https://raw.githubusercontent.com/florent37/Freezer/master/freezer-logo.png)](https://github.com/florent37/Freezer)
-
-#Download
-
-[ ![Download](https://api.bintray.com/packages/florent37/maven/freezer-compiler/images/download.svg) ](https://bintray.com/florent37/maven/freezer-compiler/_latestVersion)
 ```java
-buildscript {
-  dependencies {
-    classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-  }
-}
+UserEntityManager userEntityManager = new UserEntityManager();
 
-apply plugin: 'com.neenbedankt.android-apt'
+userEntityManager.add(new User("Florent", 6));
+userEntityManager.add(new User("Florian", 3));
+userEntityManager.add(new User("Bastien", 3));
 
-dependencies {
-  compile 'fr.xebia.android.freezer:freezer:2.0.3'
-  provided 'fr.xebia.android.freezer:freezer-annotations:2.0.3'
-  apt 'fr.xebia.android.freezer:freezer-compiler:2.0.3'
-}
+
+List<User> allUsers = userEntityManager.select()
+                             .name().startsWith("Flo")
+                             .asList();
+
+
+userEntityManager.select()
+       .age().equals(3)
+       .asObservable()
+
+       .subscribeOn(Schedulers.newThread())
+       .observeOn(AndroidSchedulers.mainThread())
+       .subscribe(users ->
+          //display the users
+       );
 ```
 
-#It's always better with a context
+# First, initialize !
 
 Don't forget to initialise Freezer in your application:
 
@@ -39,7 +41,7 @@ public class MyApplication extends Application {
 }
 ```
 
-#Usage
+# Second, annotate your models
 
 Use Annotations to mark classes to be persisted:
 
@@ -61,7 +63,9 @@ public class Cat {
 }
 ```
 
-#Persist datas
+# Now, play with the managers !
+
+## Persist datas
 
 Persist your data easily:
 
@@ -72,11 +76,11 @@ User user = ... // Create a new object
 userEntityManager.add(user);
 ```
 
-#Querying
+## Querying
 
 Freezer query engine uses a fluent interface to construct multi-clause queries.
 
-##Simple
+### Simple
 
 To find all users:
 ```java  
@@ -91,7 +95,7 @@ User user3 = userEntityManager.select()
                     .first();
 ```
 
-##Complex
+### Complex
 
 To find all users 
 - with `name` "Florent"
@@ -108,7 +112,7 @@ List<User> allUsers = userEntityManager.select()
                              .asList();
 ```
 
-##Selectors
+### Selectors
 
 ```java
 //strings
@@ -133,7 +137,7 @@ List<User> allUsers = userEntityManager.select()
      .myDate().after(OTHER_DATE)
 ```
 
-##Aggregation
+### Aggregation
 
 The `QueryBuilder` offers various aggregation methods:
 
@@ -145,7 +149,7 @@ float ageMax       = userEntityManager.select().max(UserColumns.age);
 int count          = userEntityManager.select().count();
 ```
 
-## Limit
+### Limit
 
 The `QueryBuilder` offers a limitation method, for example, getting 10 users, starting from the 5th:
 
@@ -155,11 +159,11 @@ List<User> someUsers = userEntityManager.select()
                                 .asList();
 ```
 
-#Asynchronous
+## Asynchronous
 
 Freezer offers various asynchronous methods:
 
-##Add / Delete / Update
+### Add / Delete / Update
 
 ```java
 userEntityManager
@@ -172,7 +176,7 @@ userEntityManager
                 });
 ```
 
-##Querying
+### Querying
 
 ```java
 userEntityManager
@@ -186,7 +190,7 @@ userEntityManager
                 });
 ```
 
-##Observables
+### Observables
 
 [With RxJava](https://github.com/ReactiveX/RxJava)
 
@@ -204,7 +208,7 @@ userEntityManager
                 });
 ```
 
-#Entities
+## Entities
 
 Freezer makes it possible, yes you can design your entities as your wish:
 
@@ -232,7 +236,7 @@ public class MyEntity {
 }
 ```
 
-#Update
+## Update
 
 You can update a model:
 
@@ -241,7 +245,7 @@ user.setName("laurent");
 userEntityManager.update(user);
 ```
 
-#Id
+## Id
 
 You can optionnaly set a field as an identifier:
 
@@ -253,7 +257,7 @@ public class MyEntity {
 ```
 The identifier must be a `long`
 
-#Ignore
+## Ignore
 
 You can ignore a field:
 
@@ -266,7 +270,7 @@ public class MyEntity {
 ```
 
 
-#Logging
+## Logging
 
 You can log all SQL queries from entities managers:
 
@@ -274,7 +278,7 @@ You can log all SQL queries from entities managers:
 userEntityManager.logQueries((query, datas) -> Log.d(TAG, query) }
 ```
 
-#Migration
+## Migration
 
 To handle schema migration, just add `@Migration(newVersion)` in a static method,
 then describe the modifications:
@@ -309,6 +313,25 @@ Migration isn't yet capable of:
 - adding/modifying One To One
 - adding/modifying One To Many
 - handling collections/arrays
+
+#Download
+
+[ ![Download](https://api.bintray.com/packages/florent37/maven/freezer-compiler/images/download.svg) ](https://bintray.com/florent37/maven/freezer-compiler/_latestVersion)
+```java
+buildscript {
+  dependencies {
+    classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+  }
+}
+
+apply plugin: 'com.neenbedankt.android-apt'
+
+dependencies {
+  compile 'fr.xebia.android.freezer:freezer:2.0.3'
+  provided 'fr.xebia.android.freezer:freezer-annotations:2.0.3'
+  apt 'fr.xebia.android.freezer:freezer-compiler:2.0.3'
+}
+```
 
 #Changelog
 
@@ -354,6 +377,10 @@ Introduced Migration Engine.
 ## 2.0.3
 
 - Freezer.onCreate is no longer dynamic
+
+## 2.0.5
+
+- Improved performace for batch add & update (thanks to graphee-gabriel)
 
 #A project initiated by Xebia
 
