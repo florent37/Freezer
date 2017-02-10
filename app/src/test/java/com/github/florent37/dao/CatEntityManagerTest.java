@@ -47,6 +47,24 @@ public class CatEntityManagerTest {
     }
 
     @Test
+    public void shouldAddCats_shouldGenerateIds(){
+        //given
+        final Cat java = new Cat("Java");
+        final Cat bobo = new Cat("Bobo");
+        final Cat sisi = new Cat("Sisi");
+        final List<Cat> cats = Arrays.asList(java, bobo, sisi);
+
+        //when
+        catEntityManager.add(cats);
+
+        //then
+        assertThat(catEntityManager.count()).isEqualTo(3);
+        assertThat(java.getId()).isNotEqualTo(1);
+        assertThat(bobo.getId()).isNotEqualTo(2);
+        assertThat(sisi.getId()).isNotEqualTo(3);
+    }
+
+    @Test
     public void shouldGetCatWithAllFields(){
         //given
         Date date = new Date(System.currentTimeMillis() - 60 * 1000);
