@@ -65,6 +65,29 @@ public class CatEntityManagerTest {
     }
 
     @Test
+    public void shouldUpdateCats_becauseAlreadyExists(){
+        //given
+        {
+            final Cat java = new Cat(1, "Java");
+            final Cat bobo = new Cat(2, "Bobo");
+            final Cat sisi = new Cat(3, "Sisi");
+            final List<Cat> cats = Arrays.asList(java, bobo, sisi);
+            catEntityManager.add(cats);
+        }
+
+        final Cat java = new Cat(1, "Java_e");
+
+        //when
+        catEntityManager.add(java);
+
+        //then
+        assertThat(catEntityManager.count()).isEqualTo(3);
+        final Cat cat = catEntityManager.select().id().equalsTo(1l).first();
+        assertThat(cat.getId()).isEqualTo(1);
+        assertThat(cat.getShortName()).isEqualTo("Java_e");
+    }
+
+    @Test
     public void shouldGetCatWithAllFields(){
         //given
         Date date = new Date(System.currentTimeMillis() - 60 * 1000);

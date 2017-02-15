@@ -30,6 +30,11 @@ public class Cat {
         this.shortName = shortName;
     }
 
+    public Cat(long id, String shortName) {
+        this.id = id;
+        this.shortName = shortName;
+    }
+
     public Cat(String shortName, Date date) {
         this.shortName = shortName;
         this.date = date;

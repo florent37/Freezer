@@ -123,6 +123,9 @@ public class CursorHelperGenerator {
             }
         }
 
+        getValuesB.addStatement(ProcessUtils.getModelId(element, "object", "id"));
+        getValuesB.addStatement("if(id != null && id != 0) values.put($S, id)", "_id");
+
         List<MethodSpec> joinMethods = new ArrayList<>();
         Set<String> addedMethodsNames = new HashSet<>();
         for (VariableElement variableElement : otherClassFields) {
@@ -279,7 +282,7 @@ public class CursorHelperGenerator {
                 .returns(TypeName.LONG)
                 .addParameter(Constants.databaseClassName, "database")
                 .addParameter(modelType, "object")
-                .addStatement("long objectId = database.insert($S, null, getValues(object,null))", ProcessUtils.getTableName(objectName));
+                .addStatement("long objectId = database.insertWithOnConflict($S, null, getValues(object,null), android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE)", ProcessUtils.getTableName(objectName));
 
         Element idField = ProcessUtils.getIdField(element);
         if (idField != null)
