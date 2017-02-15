@@ -29,7 +29,7 @@ def _user = properties.getProperty("bintray.user")
 def _key = properties.getProperty("bintray.apikey");
 def _passphrase = properties.getProperty("bintray.gpg.password")
 
-if(_user == null || _user.isEmpty()){
+if (_user == null || _user.isEmpty()) {
     _user = System.getenv("BINTRAY_USER")
     _key = System.getenv("BINTRAY_API_KEY")
     _passphrase = System.getenv("BINTRAY_PASSPHRASE")
