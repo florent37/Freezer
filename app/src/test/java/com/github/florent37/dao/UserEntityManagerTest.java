@@ -56,6 +56,23 @@ public class UserEntityManagerTest {
 
     }
 
+    //@Test
+    //public void shouldNotAddUser_butUpdateBecauseExists() {
+    //    //given
+    //    User user = new User(21, "florent");
+    //    userEntityManager.add(user);
+//
+    //    user.setName("florent_updated");
+//
+//
+    //    //when
+    //    userEntityManager.addOrUpdateIfExists(user);
+//
+    //    //then
+    //    assertThat(userEntityManager.count()).isEqualTo(1);
+//
+    //}
+
     @Test
     public void shouldAddUsers() {
         //given

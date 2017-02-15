@@ -67,7 +67,7 @@ public class CursorHelperGenerator {
                             .addStatement("if(date$L != null) object.$L = new $T($S).parse(date$L)",
                                     i, variableElement.getSimpleName(), Constants.simpleDateFormatClassName, Constants.DATE_FORMAT, i)
                             .addCode("} catch ($T e) { e.printStackTrace(); }", TypeName.get(Exception.class));
-                } else if (!ProcessUtils.isIdField(variableElement)) {
+                } else {
                     cursor = String.format(ProcessUtils.getFieldCast(variableElement), cursor);
 
                     fromCursorB.addStatement("object.$L = " + cursor, variableElement.getSimpleName(), ProcessUtils.getFieldType(variableElement), i);

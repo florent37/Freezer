@@ -533,6 +533,16 @@ public class ModelORMGenerator {
                 .addStatement("db.delete($S, $S, new String[]{String.valueOf(id)})", TABLE_NAME, "_id = ?")
                 .build())
 
+            .addMethod(MethodSpec.methodBuilder("exists")
+                    .addParameter(Constants.databaseClassName, "db")
+                    .addParameter(modelClassName, "object")
+                    .addModifiers(Modifier.PUBLIC)
+                    .returns(TypeName.BOOLEAN)
+                    .addStatement(ProcessUtils.getModelId(element, "object", "id"))
+                    .addStatement("$T.getInstance().close()", Constants.daoClassName)
+                    .addStatement("return id != null")
+                    .build())
+
             .addMethod(MethodSpec.methodBuilder("delete")
                 .addParameter(modelClassName, "object")
                 .addModifiers(Modifier.PUBLIC)

@@ -59,9 +59,9 @@ public class CatEntityManagerTest {
 
         //then
         assertThat(catEntityManager.count()).isEqualTo(3);
-        assertThat(java.getId()).isNotEqualTo(1);
-        assertThat(bobo.getId()).isNotEqualTo(2);
-        assertThat(sisi.getId()).isNotEqualTo(3);
+        assertThat(java.getId()).isEqualTo(1);
+        assertThat(bobo.getId()).isEqualTo(2);
+        assertThat(sisi.getId()).isEqualTo(3);
     }
 
     @Test
