@@ -1,6 +1,5 @@
 deployment:
-  master:
-    branch: master
+  release:
     tag: /v.*/
     commands:
       - ./gradlew bintrayUpload
