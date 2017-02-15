@@ -328,9 +328,9 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-  compile 'fr.xebia.android.freezer:freezer:2.0.3'
-  provided 'fr.xebia.android.freezer:freezer-annotations:2.0.3'
-  apt 'fr.xebia.android.freezer:freezer-compiler:2.0.3'
+  compile 'fr.xebia.android.freezer:freezer:2.0.6'
+  provided 'fr.xebia.android.freezer:freezer-annotations:2.0.6'
+  apt 'fr.xebia.android.freezer:freezer-compiler:2.0.6'
 }
 ```
 
@@ -382,6 +382,10 @@ Introduced Migration Engine.
 ## 2.0.5
 
 - Improved performace for batch add & update (thanks to graphee-gabriel)
+
+## 2.0.6
+
+- Add or update object if same `@Id on `add, addAll`
 
 #A project initiated by Xebia
 
