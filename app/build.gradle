@@ -32,6 +32,8 @@ dependencies {
     apt project(":freezer-compiler")
     compile project(":freezer")
 
+    compile 'com.facebook.stetho:stetho:1.4.2'
+
     //apt "fr.xebia.android.freezer:freezer-compiler:0.0.1"
     //provided "fr.xebia.android.freezer:freezer-annotations:0.0.1"
 
