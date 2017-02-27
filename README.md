@@ -1,6 +1,7 @@
 # Freezer
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Freezer-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3080)
+[![CircleCI](https://circleci.com/gh/florent37/Freezer.svg?style=svg)](https://circleci.com/gh/florent37/Freezer)
 
 A simple & fluent Android ORM, how can it be easier ?
 And it's compatible with RX !
