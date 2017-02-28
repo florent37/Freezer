@@ -4,6 +4,7 @@ import fr.xebia.android.freezer.annotations.Id;
 import fr.xebia.android.freezer.annotations.Ignore;
 import fr.xebia.android.freezer.annotations.Model;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by florentchampigny on 21/01/2016.

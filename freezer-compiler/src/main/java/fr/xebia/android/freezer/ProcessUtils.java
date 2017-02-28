@@ -392,7 +392,7 @@ public class ProcessUtils {
             } else if (TypeName.INT.equals(typeName)) {
                 return "getIntegers";
             } else if (TypeName.LONG.equals(typeName)) {
-                return "getIntegers";
+                return "getLongs";
             } else if (TypeName.FLOAT.equals(typeName)) {
                 return "getFloats";
             } else if (TypeName.DOUBLE.equals(typeName)) {
