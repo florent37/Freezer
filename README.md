@@ -4,7 +4,7 @@
 [![CircleCI](https://circleci.com/gh/florent37/Freezer.svg?style=svg)](https://circleci.com/gh/florent37/Freezer)
 
 A simple & fluent Android ORM, how can it be easier ?
-And it's compatible with RX !
+And it's compatible with RxJava2 !
 
 ```java
 UserEntityManager userEntityManager = new UserEntityManager();
@@ -387,6 +387,10 @@ Introduced Migration Engine.
 ## 2.0.6
 
 - Add or update object if same `@Id on `add, addAll`
+
+## 2.1.0
+
+- Added RxJava2 support
 
 #A project initiated by Xebia
 

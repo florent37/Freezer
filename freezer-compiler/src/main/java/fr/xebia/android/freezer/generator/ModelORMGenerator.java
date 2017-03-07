@@ -20,8 +20,9 @@ import javax.lang.model.element.VariableElement;
 
 import fr.xebia.android.freezer.Constants;
 import fr.xebia.android.freezer.ProcessUtils;
-import rx.Observable;
-import rx.Subscriber;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 
 /**
  * Created by florentchampigny on 08/01/2016.
@@ -151,11 +152,11 @@ public class ModelORMGenerator {
             .addMethod(MethodSpec.methodBuilder("asObservable")
                 .returns(ParameterizedTypeName.get(ClassName.get(Observable.class), listObjectsClassName))
                 .addModifiers(Modifier.PUBLIC)
-                .addCode("return $T.create(new Observable.OnSubscribe<$T>(){\n", ClassName.get(Observable.class), listObjectsClassName)
+                .addCode("return $T.create(new $T<$T>(){\n", ClassName.get(Observable.class), ClassName.get(ObservableOnSubscribe.class), listObjectsClassName)
                 .addCode("@$T\n", ClassName.get(Override.class))
-                .addCode("public void call($T<? super $T> subscriber) {\n", ClassName.get(Subscriber.class), listObjectsClassName)
+                .addCode("public void subscribe($T<$T> subscriber) {\n", ClassName.get(ObservableEmitter.class), listObjectsClassName)
                 .addStatement("subscriber.onNext(asList())")
-                .addStatement("subscriber.onCompleted()")
+                .addStatement("subscriber.onComplete()")
                 .addCode("}\n")
                 .addCode("});\n")
                 .build())

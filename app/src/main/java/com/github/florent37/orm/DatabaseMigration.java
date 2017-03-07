@@ -1,8 +1,12 @@
 package com.github.florent37.orm;
 
+import java.util.Observable;
+
 import fr.xebia.android.freezer.annotations.DatabaseName;
 import fr.xebia.android.freezer.annotations.Migration;
 import fr.xebia.android.freezer.migration.Migrator;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 
 /**
  * Created by florentchampigny on 28/01/2016.

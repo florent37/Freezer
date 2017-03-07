@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import fr.xebia.android.freezer.async.Callback;
-import rx.functions.Action1;
+import io.reactivex.functions.Consumer;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.spy;
@@ -509,9 +509,9 @@ public class UserQueryBuilderTest {
         userEntityManager
                 .select()
                 .asObservable()
-                .subscribe(new Action1<List<User>>() {
+                .subscribe(new Consumer<List<User>>() {
                     @Override
-                    public void call(List<User> users) {
+                    public void accept(List<User> users) {
                         numberOfUsers.set(users.size());
                     }
                 });

@@ -23,7 +23,7 @@ ext{
     sourceCompatibilityVersion = JavaVersion.VERSION_1_7
     targetCompatibilityVersion = JavaVersion.VERSION_1_7
 
-    libraryVersion = "2.0.7"
+    libraryVersion = "2.1.0"
 }
 
 allprojects {
