@@ -316,7 +316,7 @@ Migration isn't yet capable of:
 - adding/modifying One To Many
 - handling collections/arrays
 
-#Download
+# Download
 
 [ ![Download](https://api.bintray.com/packages/florent37/maven/freezer-compiler/images/download.svg) ](https://bintray.com/florent37/maven/freezer-compiler/_latestVersion)
 ```java
@@ -335,40 +335,40 @@ dependencies {
 }
 ```
 
-#Changelog
+# Changelog
 
-##1.0.1
+## 1.0.1
 
 Introduced Migration Engine.
 
-##1.0.2
+## 1.0.2
 
 - Support long & double
 - Support arrays
 - Improved QueryBuilder
 - Refactored cursors helpers
 
-##1.0.3
+## 1.0.3
 
 - Support dates
 - Added unit tests
 - Fixed one to many
 
-##1.0.4
+## 1.0.4
 
 - Added @Id & @Ignore
 
-##1.0.5
+## 1.0.5
 
 - Model update
 
-##2.0.0
+## 2.0.0
 
 - Async API
 - Support Observables
 - Added @DatabaseName
 
-##2.0.1
+## 2.0.1
 
 - Limit
 
@@ -392,7 +392,7 @@ Introduced Migration Engine.
 
 - Added RxJava2 support
 
-#A project initiated by Xebia
+# A project initiated by Xebia
 
 This project was first developed by Xebia and has been open-sourced since. We will continue working on it.
 We encourage the community to contribute to the project by opening tickets and/or pull requests.
