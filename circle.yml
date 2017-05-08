@@ -2,4 +2,4 @@ deployment:
   release:
     tag: /v.*/
     commands:
-      - ./gradlew assembleDebug install :freezer:bintrayUpload :freezer-annotations:bintrayUpload :freezer-compiler:bintrayUpload
+      - ./gradlew assembleDebug install :rxAndroidOrm:bintrayUpload :rxAndroidOrm-annotations:bintrayUpload :rxAndroidOrm-compiler:bintrayUpload

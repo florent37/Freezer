@@ -1,0 +1,50 @@
+apply plugin: 'java'
+
+targetCompatibility = project.targetCompatibilityVersion
+sourceCompatibility = project.sourceCompatibilityVersion
+
+dependencies {
+    compile 'com.squareup:javapoet:1.4.0'
+    compile 'com.google.auto.service:auto-service:1.0-rc2'
+
+    compile 'io.reactivex.rxjava2:rxjava:2.0.6'
+
+    compile 'com.facebook.stetho:stetho:1.4.2'
+
+    testCompile 'com.google.truth:truth:0.27'
+    testCompile 'com.google.testing.compile:compile-testing:0.8'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.assertj:assertj-core:3.2.0'
+    testCompile 'pl.pragmatists:JUnitParams:1.0.3'
+
+    compile project(':rxandroidorm-annotations')
+}
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'rxandroidorm-compiler'
+    orgName = 'florent37'
+
+    publishedGroupId = 'com.github.florent37'
+    libraryName = 'RxAndroidOrm'
+    artifact = 'rxandroidorm-compiler'
+
+    libraryDescription = 'A simple & fluent Android ORM'
+
+    siteUrl = 'https://github.com/florent37/Freezer'
+    gitUrl = 'https://github.com/florent37/Freezer.git'
+
+    libraryVersion = rootProject.ext.libraryVersion
+
+    developerId = 'florent37'
+    developerName = 'florent37'
+    developerEmail = 'champigny.florent@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+
+apply from: rootProject.file('gradle/install-v1.gradle')
+apply from: rootProject.file('gradle/bintray-java-v1.gradle')

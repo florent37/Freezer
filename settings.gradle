@@ -1,1 +1,1 @@
-include ':app', ':freezer', ':freezer-compiler', ':freezer-annotations'
+include ':app', ':rxandroidorm', ':rxandroidorm-compiler', ':rxandroidorm-annotations'
