@@ -3,6 +3,10 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Freezer-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3080)
 [![CircleCI](https://circleci.com/gh/florent37/Freezer.svg?style=svg)](https://circleci.com/gh/florent37/Freezer)
 
+<a href="https://play.google.com/store/apps/details?id=com.github.florent37.florent.champigny">
+  <img alt="Android app on Google Play" src="https://developer.android.com/images/brand/en_app_rgb_wo_45.png" />
+</a>
+
 A simple & fluent Android ORM, how can it be easier ?
 And it's compatible with RxJava2 !
 
@@ -400,6 +404,10 @@ This project was first developed by Xebia and has been open-sourced since. We wi
 We encourage the community to contribute to the project by opening tickets and/or pull requests.
 
 [![logo xebia](https://raw.githubusercontent.com/florent37/Freezer/master/logo_xebia.jpg)](http://www.xebia.fr/)
+
+<a href="https://play.google.com/store/apps/details?id=com.github.florent37.florent.champigny">
+  <img alt="Android app on Google Play" src="https://developer.android.com/images/brand/en_app_rgb_wo_45.png" />
+</a>
 
 License
 --------
